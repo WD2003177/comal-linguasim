@@ -1,0 +1,12 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<nodes xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://sumo.dlr.de/xsd/nodes_file.xsd">
+  <node id="center_intersection" type="priority" x="0" y="0"/>
+  <node id="top_upper_ring" type="priority" x="30" y="60"/>
+  <node id="bottom_upper_ring_in" type="priority" x="30" y="0"/>
+  <node id="left_upper_ring" type="priority" x="0" y="30"/>
+  <node id="right_upper_ring" type="priority" x="60" y="30"/>
+  <node id="top_lower_ring" type="priority" x="-30" y="0"/>
+  <node id="bottom_lower_ring" type="priority" x="-30" y="-60"/>
+  <node id="left_lower_ring" type="priority" x="-60" y="-30"/>
+  <node id="right_lower_ring_in" type="priority" x="0" y="-30"/>
+</nodes>

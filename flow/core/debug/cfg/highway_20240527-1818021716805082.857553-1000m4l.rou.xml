@@ -1,0 +1,47 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<routes xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://sumo.dlr.de/xsd/routes_file.xsd">
+  <vType accel="1.0" carFollowModel="IDM" decel="1.5" id="human" impatience="0.5" laneChangeModel="LC2013" lcCooperative="1.0" lcKeepRight="1.0" lcSpeedGain="1.0" lcStrategic="1.0" maxSpeed="30" minGap="0.0" sigma="0.5" speedDev="0.1" speedFactor="1.0" tau="1.0"/>
+  <vType accel="1.0" carFollowModel="IDM" decel="1.5" id="human2" impatience="0.5" laneChangeModel="LC2013" lcCooperative="1.0" lcKeepRight="1.0" lcSpeedGain="1.0" lcStrategic="1.0" maxSpeed="30" minGap="0.0" sigma="0.5" speedDev="0.1" speedFactor="1.0" tau="1.0"/>
+  <vehicle color="1,1,1" depart="0" departLane="0" departPos="0" departSpeed="0" id="human2_0" route="routehighway_0" type="human2"/>
+  <vehicle color="1,1,1" depart="0" departLane="1" departPos="0" departSpeed="0" id="human2_3" route="routehighway_0" type="human2"/>
+  <vehicle color="1,1,1" depart="0" departLane="2" departPos="0" departSpeed="0" id="human_8" route="routehighway_0" type="human"/>
+  <vehicle color="1,1,1" depart="0" departLane="3" departPos="0" departSpeed="0" id="human_17" route="routehighway_0" type="human"/>
+  <vehicle color="1,1,1" depart="0" departLane="0" departPos="100.0" departSpeed="0" id="human2_4" route="routehighway_0" type="human2"/>
+  <vehicle color="1,1,1" depart="0" departLane="1" departPos="100.0" departSpeed="0" id="human_5" route="routehighway_0" type="human"/>
+  <vehicle color="1,1,1" depart="0" departLane="2" departPos="100.0" departSpeed="0" id="human_1" route="routehighway_0" type="human"/>
+  <vehicle color="1,1,1" depart="0" departLane="3" departPos="100.0" departSpeed="0" id="human2_6" route="routehighway_0" type="human2"/>
+  <vehicle color="1,1,1" depart="0" departLane="0" departPos="200.0" departSpeed="0" id="human2_8" route="routehighway_0" type="human2"/>
+  <vehicle color="1,1,1" depart="0" departLane="1" departPos="200.0" departSpeed="0" id="human2_1" route="routehighway_0" type="human2"/>
+  <vehicle color="1,1,1" depart="0" departLane="2" departPos="200.0" departSpeed="0" id="human_4" route="routehighway_0" type="human"/>
+  <vehicle color="1,1,1" depart="0" departLane="3" departPos="200.0" departSpeed="0" id="human_9" route="routehighway_0" type="human"/>
+  <vehicle color="1,1,1" depart="0" departLane="0" departPos="300.0" departSpeed="0" id="human_18" route="routehighway_0" type="human"/>
+  <vehicle color="1,1,1" depart="0" departLane="1" departPos="300.0" departSpeed="0" id="human_12" route="routehighway_0" type="human"/>
+  <vehicle color="1,1,1" depart="0" departLane="2" departPos="300.0" departSpeed="0" id="human_11" route="routehighway_0" type="human"/>
+  <vehicle color="1,1,1" depart="0" departLane="3" departPos="300.0" departSpeed="0" id="human_6" route="routehighway_0" type="human"/>
+  <vehicle color="1,1,1" depart="0" departLane="0" departPos="400.0" departSpeed="0" id="human2_13" route="routehighway_0" type="human2"/>
+  <vehicle color="1,1,1" depart="0" departLane="1" departPos="400.0" departSpeed="0" id="human2_10" route="routehighway_0" type="human2"/>
+  <vehicle color="1,1,1" depart="0" departLane="2" departPos="400.0" departSpeed="0" id="human_14" route="routehighway_0" type="human"/>
+  <vehicle color="1,1,1" depart="0" departLane="3" departPos="400.0" departSpeed="0" id="human_19" route="routehighway_0" type="human"/>
+  <vehicle color="1,1,1" depart="0" departLane="0" departPos="500.0" departSpeed="0" id="human_3" route="routehighway_0" type="human"/>
+  <vehicle color="1,1,1" depart="0" departLane="1" departPos="500.0" departSpeed="0" id="human_0" route="routehighway_0" type="human"/>
+  <vehicle color="1,1,1" depart="0" departLane="2" departPos="500.0" departSpeed="0" id="human2_2" route="routehighway_0" type="human2"/>
+  <vehicle color="1,1,1" depart="0" departLane="3" departPos="500.0" departSpeed="0" id="human2_12" route="routehighway_0" type="human2"/>
+  <vehicle color="1,1,1" depart="0" departLane="0" departPos="600.0" departSpeed="0" id="human2_9" route="routehighway_0" type="human2"/>
+  <vehicle color="1,1,1" depart="0" departLane="1" departPos="600.0" departSpeed="0" id="human_16" route="routehighway_0" type="human"/>
+  <vehicle color="1,1,1" depart="0" departLane="2" departPos="600.0" departSpeed="0" id="human2_15" route="routehighway_0" type="human2"/>
+  <vehicle color="1,1,1" depart="0" departLane="3" departPos="600.0" departSpeed="0" id="human2_5" route="routehighway_0" type="human2"/>
+  <vehicle color="1,1,1" depart="0" departLane="0" departPos="700.0" departSpeed="0" id="human2_14" route="routehighway_0" type="human2"/>
+  <vehicle color="1,1,1" depart="0" departLane="1" departPos="700.0" departSpeed="0" id="human2_17" route="routehighway_0" type="human2"/>
+  <vehicle color="1,1,1" depart="0" departLane="2" departPos="700.0" departSpeed="0" id="human2_19" route="routehighway_0" type="human2"/>
+  <vehicle color="1,1,1" depart="0" departLane="3" departPos="700.0" departSpeed="0" id="human_2" route="routehighway_0" type="human"/>
+  <vehicle color="1,1,1" depart="0" departLane="0" departPos="800.0" departSpeed="0" id="human2_7" route="routehighway_0" type="human2"/>
+  <vehicle color="1,1,1" depart="0" departLane="1" departPos="800.0" departSpeed="0" id="human_13" route="routehighway_0" type="human"/>
+  <vehicle color="1,1,1" depart="0" departLane="2" departPos="800.0" departSpeed="0" id="human_15" route="routehighway_0" type="human"/>
+  <vehicle color="1,1,1" depart="0" departLane="3" departPos="800.0" departSpeed="0" id="human2_11" route="routehighway_0" type="human2"/>
+  <vehicle color="1,1,1" depart="0" departLane="0" departPos="900.0" departSpeed="0" id="human2_16" route="routehighway_0" type="human2"/>
+  <vehicle color="1,1,1" depart="0" departLane="1" departPos="900.0" departSpeed="0" id="human2_18" route="routehighway_0" type="human2"/>
+  <vehicle color="1,1,1" depart="0" departLane="2" departPos="900.0" departSpeed="0" id="human_10" route="routehighway_0" type="human"/>
+  <vehicle color="1,1,1" depart="0" departLane="3" departPos="900.0" departSpeed="0" id="human_7" route="routehighway_0" type="human"/>
+  <flow begin="1" departLane="free" departSpeed="20" end="2000000.0" id="flow_0" probability="0.25" route="routehighway_0" type="human"/>
+  <flow begin="1" departLane="free" departSpeed="20" end="2000000.0" id="flow_1" probability="0.25" route="routehighway_0" type="human2"/>
+</routes>

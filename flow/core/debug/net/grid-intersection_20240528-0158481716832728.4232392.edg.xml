@@ -1,0 +1,37 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<edges xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://sumo.dlr.de/xsd/edges_file.xsd">
+  <edge from="center1" id="top0_1" length="300" priority="78" to="center0" type="horizontal"/>
+  <edge from="center0" id="bot0_1" length="300" priority="78" to="center1" type="horizontal"/>
+  <edge from="center2" id="top0_2" length="300" priority="78" to="center1" type="horizontal"/>
+  <edge from="center1" id="bot0_2" length="300" priority="78" to="center2" type="horizontal"/>
+  <edge from="center4" id="top1_1" length="300" priority="78" to="center3" type="horizontal"/>
+  <edge from="center3" id="bot1_1" length="300" priority="78" to="center4" type="horizontal"/>
+  <edge from="center5" id="top1_2" length="300" priority="78" to="center4" type="horizontal"/>
+  <edge from="center4" id="bot1_2" length="300" priority="78" to="center5" type="horizontal"/>
+  <edge from="center0" id="right1_0" length="300" priority="78" to="center3" type="vertical"/>
+  <edge from="center3" id="left1_0" length="300" priority="78" to="center0" type="vertical"/>
+  <edge from="center1" id="right1_1" length="300" priority="78" to="center4" type="vertical"/>
+  <edge from="center4" id="left1_1" length="300" priority="78" to="center1" type="vertical"/>
+  <edge from="center2" id="right1_2" length="300" priority="78" to="center5" type="vertical"/>
+  <edge from="center5" id="left1_2" length="300" priority="78" to="center2" type="vertical"/>
+  <edge from="bot_col_short0" id="right0_0" length="300" priority="78" to="center0" type="vertical"/>
+  <edge from="center0" id="left0_0" length="500" priority="78" to="bot_col_long0" type="vertical"/>
+  <edge from="top_col_short0" id="left2_0" length="300" priority="78" to="center3" type="vertical"/>
+  <edge from="center3" id="right2_0" length="500" priority="78" to="top_col_long0" type="vertical"/>
+  <edge from="bot_col_short1" id="right0_1" length="300" priority="78" to="center1" type="vertical"/>
+  <edge from="center1" id="left0_1" length="500" priority="78" to="bot_col_long1" type="vertical"/>
+  <edge from="top_col_short1" id="left2_1" length="300" priority="78" to="center4" type="vertical"/>
+  <edge from="center4" id="right2_1" length="500" priority="78" to="top_col_long1" type="vertical"/>
+  <edge from="bot_col_short2" id="right0_2" length="300" priority="78" to="center2" type="vertical"/>
+  <edge from="center2" id="left0_2" length="500" priority="78" to="bot_col_long2" type="vertical"/>
+  <edge from="top_col_short2" id="left2_2" length="300" priority="78" to="center5" type="vertical"/>
+  <edge from="center5" id="right2_2" length="500" priority="78" to="top_col_long2" type="vertical"/>
+  <edge from="left_row_short0" id="bot0_0" length="300" priority="78" to="center0" type="horizontal"/>
+  <edge from="center0" id="top0_0" length="500" priority="78" to="left_row_long0" type="horizontal"/>
+  <edge from="right_row_short0" id="top0_3" length="300" priority="78" to="center2" type="horizontal"/>
+  <edge from="center2" id="bot0_3" length="500" priority="78" to="right_row_long0" type="horizontal"/>
+  <edge from="left_row_short1" id="bot1_0" length="300" priority="78" to="center3" type="horizontal"/>
+  <edge from="center3" id="top1_0" length="500" priority="78" to="left_row_long1" type="horizontal"/>
+  <edge from="right_row_short1" id="top1_3" length="300" priority="78" to="center5" type="horizontal"/>
+  <edge from="center5" id="bot1_3" length="500" priority="78" to="right_row_long1" type="horizontal"/>
+</edges>

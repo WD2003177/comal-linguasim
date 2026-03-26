@@ -1,0 +1,13 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<additional xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://sumo.dlr.de/xsd/additional_file.xsd">
+  <route edges="right_lower_ring_out left_upper_ring top_upper_ring right_upper_ring bottom_upper_ring_in bottom_upper_ring_out top_lower_ring left_lower_ring bottom_lower_ring right_lower_ring_in" id="routeright_lower_ring_out"/>
+  <route edges="left_lower_ring bottom_lower_ring right_lower_ring_in right_lower_ring_out left_upper_ring top_upper_ring right_upper_ring bottom_upper_ring_in bottom_upper_ring_out top_lower_ring" id="routeleft_lower_ring"/>
+  <route edges="bottom_upper_ring_out top_lower_ring left_lower_ring bottom_lower_ring right_lower_ring_in right_lower_ring_out left_upper_ring top_upper_ring right_upper_ring bottom_upper_ring_in" id="routebottom_upper_ring_out"/>
+  <route edges="top_upper_ring right_upper_ring bottom_upper_ring_in bottom_upper_ring_out top_lower_ring left_lower_ring bottom_lower_ring right_lower_ring_in right_lower_ring_out left_upper_ring" id="routetop_upper_ring"/>
+  <route edges="top_lower_ring left_lower_ring bottom_lower_ring right_lower_ring_in right_lower_ring_out left_upper_ring top_upper_ring right_upper_ring bottom_upper_ring_in bottom_upper_ring_out" id="routetop_lower_ring"/>
+  <route edges="bottom_upper_ring_in bottom_upper_ring_out top_lower_ring left_lower_ring bottom_lower_ring right_lower_ring_in right_lower_ring_out left_upper_ring top_upper_ring right_upper_ring" id="routebottom_upper_ring_in"/>
+  <route edges="left_upper_ring top_upper_ring right_upper_ring bottom_upper_ring_in bottom_upper_ring_out top_lower_ring left_lower_ring bottom_lower_ring right_lower_ring_in right_lower_ring_out" id="routeleft_upper_ring"/>
+  <route edges="bottom_lower_ring right_lower_ring_in right_lower_ring_out left_upper_ring top_upper_ring right_upper_ring bottom_upper_ring_in bottom_upper_ring_out top_lower_ring left_lower_ring" id="routebottom_lower_ring"/>
+  <route edges="right_lower_ring_in right_lower_ring_out left_upper_ring top_upper_ring right_upper_ring bottom_upper_ring_in bottom_upper_ring_out top_lower_ring left_lower_ring bottom_lower_ring" id="routeright_lower_ring_in"/>
+  <route edges="right_upper_ring bottom_upper_ring_in bottom_upper_ring_out top_lower_ring left_lower_ring bottom_lower_ring right_lower_ring_in right_lower_ring_out left_upper_ring top_upper_ring" id="routeright_upper_ring"/>
+</additional>

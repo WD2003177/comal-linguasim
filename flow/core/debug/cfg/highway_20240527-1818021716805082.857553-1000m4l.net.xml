@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- generated on 2024-05-27 18:18:02 by Eclipse SUMO netconvert Version UNKNOWN
+<configuration xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://sumo.dlr.de/xsd/netconvertConfiguration.xsd">
+
+    <input>
+        <node-files value="/home/yao/flow/flow/core/debug/net/highway_20240527-1818021716805082.857553-1000m4l.nod.xml"/>
+        <edge-files value="/home/yao/flow/flow/core/debug/net/highway_20240527-1818021716805082.857553-1000m4l.edg.xml"/>
+        <type-files value="/home/yao/flow/flow/core/debug/net/highway_20240527-1818021716805082.857553-1000m4l.typ.xml"/>
+    </input>
+
+    <output>
+        <output-file value="/home/yao/flow/flow/core/debug/cfg/highway_20240527-1818021716805082.857553-1000m4l.net.xml"/>
+    </output>
+
+    <junctions>
+        <no-internal-links value="true"/>
+        <no-turnarounds value="true"/>
+    </junctions>
+
+</configuration>
+-->
+
+<net version="1.20" junctionCornerDetail="5" limitTurnSpeed="5.50" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://sumo.dlr.de/xsd/net_file.xsd">
+
+    <location netOffset="0.00,0.00" convBoundary="0.00,0.00,1000.00,0.00" origBoundary="0.00,0.00,1000.00,0.00" projParameter="!"/>
+
+    <type id="highwayType" numLanes="4" speed="30.00"/>
+
+    <edge id="highway_0" from="edge_0" to="edge_1" priority="-1" type="highwayType" length="1000.00">
+        <lane id="highway_0_0" index="0" speed="30.00" length="1000.00" shape="0.00,-11.20 1000.00,-11.20"/>
+        <lane id="highway_0_1" index="1" speed="30.00" length="1000.00" shape="0.00,-8.00 1000.00,-8.00"/>
+        <lane id="highway_0_2" index="2" speed="30.00" length="1000.00" shape="0.00,-4.80 1000.00,-4.80"/>
+        <lane id="highway_0_3" index="3" speed="30.00" length="1000.00" shape="0.00,-1.60 1000.00,-1.60"/>
+    </edge>
+
+    <junction id="edge_0" type="dead_end" x="0.00" y="0.00" incLanes="" intLanes="" shape="0.00,0.00 0.00,-12.80"/>
+    <junction id="edge_1" type="dead_end" x="1000.00" y="0.00" incLanes="highway_0_0 highway_0_1 highway_0_2 highway_0_3" intLanes="" shape="1000.00,-12.80 1000.00,0.00"/>
+
+</net>

@@ -1,0 +1,22 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<routes xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://sumo.dlr.de/xsd/routes_file.xsd">
+  <vType accel="1.0" carFollowModel="IDM" decel="1.5" id="idm" impatience="0.5" laneChangeModel="LC2013" lcCooperative="1.0" lcKeepRight="1.0" lcSpeedGain="1.0" lcStrategic="1.0" maxSpeed="30" minGap="0.0" sigma="0.5" speedDev="0.1" speedFactor="1.0" tau="0.5"/>
+  <vType accel="1.0" carFollowModel="IDM" decel="1.5" id="merge-idm" impatience="0.5" laneChangeModel="LC2013" lcCooperative="1.0" lcKeepRight="1.0" lcSpeedGain="1.0" lcStrategic="1.0" maxSpeed="30" minGap="0.0" sigma="0.5" speedDev="0.1" speedFactor="1.0" tau="0.5"/>
+  <vehicle color="1,1,1" depart="0" departLane="0" departPos="24.5" departSpeed="0" id="idm_0" route="routeleft" type="idm"/>
+  <vehicle color="1,1,1" depart="0" departLane="0" departPos="61.04352941176471" departSpeed="0" id="idm_1" route="routeleft" type="idm"/>
+  <vehicle color="1,1,1" depart="0" departLane="0" departPos="97.58705882352942" departSpeed="0" id="idm_2" route="routeleft" type="idm"/>
+  <vehicle color="1,1,1" depart="0" departLane="0" departPos="134.1305882352941" departSpeed="0" id="idm_3" route="routeleft" type="idm"/>
+  <vehicle color="1,1,1" depart="0" departLane="0" departPos="0" departSpeed="0" id="idm_4" route="routecenter" type="idm"/>
+  <vehicle color="1,1,1" depart="0" departLane="0" departPos="36.543529411764695" departSpeed="0" id="idm_5" route="routecenter" type="idm"/>
+  <vehicle color="1,1,1" depart="0" departLane="0" departPos="73.08705882352942" departSpeed="0" id="idm_6" route="routecenter" type="idm"/>
+  <vehicle color="1,1,1" depart="0" departLane="0" departPos="109.63058823529414" departSpeed="0" id="merge-idm_0" route="routecenter" type="merge-idm"/>
+  <vehicle color="1,1,1" depart="0" departLane="0" departPos="146.17411764705886" departSpeed="0" id="merge-idm_1" route="routecenter" type="merge-idm"/>
+  <vehicle color="1,1,1" depart="0" departLane="0" departPos="25.638014379333924" departSpeed="0" id="merge-idm_2" route="routebottom" type="merge-idm"/>
+  <vehicle color="1,1,1" depart="0" departLane="0" departPos="62.18154379109865" departSpeed="0" id="merge-idm_3" route="routebottom" type="merge-idm"/>
+  <vehicle color="1,1,1" depart="0" departLane="0" departPos="23.42507320286336" departSpeed="0" id="merge-idm_4" route="routeright" type="merge-idm"/>
+  <vehicle color="1,1,1" depart="0" departLane="0" departPos="59.96860261462808" departSpeed="0" id="merge-idm_5" route="routeright" type="merge-idm"/>
+  <vehicle color="1,1,1" depart="0" departLane="0" departPos="96.5121320263928" departSpeed="0" id="merge-idm_6" route="routeright" type="merge-idm"/>
+  <vehicle color="1,1,1" depart="0" departLane="0" departPos="133.05566143815747" departSpeed="0" id="merge-idm_7" route="routeright" type="merge-idm"/>
+  <vehicle color="1,1,1" depart="0" departLane="0" departPos="12.219558170432492" departSpeed="0" id="merge-idm_8" route="routetop" type="merge-idm"/>
+  <vehicle color="1,1,1" depart="0" departLane="0" departPos="0" departSpeed="0" id="merge-idm_9" route="routeleft" type="merge-idm"/>
+</routes>

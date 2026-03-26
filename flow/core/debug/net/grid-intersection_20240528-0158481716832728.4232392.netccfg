@@ -1,0 +1,15 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<configuration xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://sumo.dlr.de/xsd/netconvertConfiguration.xsd">
+  <input>
+    <node-files value="grid-intersection_20240528-0158481716832728.4232392.nod.xml"/>
+    <edge-files value="grid-intersection_20240528-0158481716832728.4232392.edg.xml"/>
+    <type-files value="grid-intersection_20240528-0158481716832728.4232392.typ.xml"/>
+  </input>
+  <output>
+    <output-file value="grid-intersection_20240528-0158481716832728.4232392.net.xml"/>
+  </output>
+  <processing>
+    <no-internal-links value="false"/>
+    <no-turnarounds value="true"/>
+  </processing>
+</configuration>

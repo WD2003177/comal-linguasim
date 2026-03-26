@@ -1,0 +1,29 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<nodes xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://sumo.dlr.de/xsd/nodes_file.xsd">
+  <node id="center0" type="traffic_light" x="0" y="0"/>
+  <node id="center1" type="traffic_light" x="300" y="0"/>
+  <node id="center2" type="traffic_light" x="600" y="0"/>
+  <node id="center3" type="traffic_light" x="0" y="300"/>
+  <node id="center4" type="traffic_light" x="300" y="300"/>
+  <node id="center5" type="traffic_light" x="600" y="300"/>
+  <node id="bot_col_short0" type="priority" x="0" y="-300"/>
+  <node id="bot_col_long0" type="priority" x="0" y="-500"/>
+  <node id="top_col_short0" type="priority" x="0" y="600"/>
+  <node id="top_col_long0" type="priority" x="0" y="800"/>
+  <node id="bot_col_short1" type="priority" x="300" y="-300"/>
+  <node id="bot_col_long1" type="priority" x="300" y="-500"/>
+  <node id="top_col_short1" type="priority" x="300" y="600"/>
+  <node id="top_col_long1" type="priority" x="300" y="800"/>
+  <node id="bot_col_short2" type="priority" x="600" y="-300"/>
+  <node id="bot_col_long2" type="priority" x="600" y="-500"/>
+  <node id="top_col_short2" type="priority" x="600" y="600"/>
+  <node id="top_col_long2" type="priority" x="600" y="800"/>
+  <node id="left_row_short0" type="priority" x="-300" y="0"/>
+  <node id="left_row_long0" type="priority" x="-500" y="0"/>
+  <node id="right_row_short0" type="priority" x="900" y="0"/>
+  <node id="right_row_long0" type="priority" x="1100" y="0"/>
+  <node id="left_row_short1" type="priority" x="-300" y="300"/>
+  <node id="left_row_long1" type="priority" x="-500" y="300"/>
+  <node id="right_row_short1" type="priority" x="900" y="300"/>
+  <node id="right_row_long1" type="priority" x="1100" y="300"/>
+</nodes>

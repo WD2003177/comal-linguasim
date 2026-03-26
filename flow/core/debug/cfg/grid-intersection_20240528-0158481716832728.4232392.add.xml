@@ -1,0 +1,43 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<additional xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://sumo.dlr.de/xsd/additional_file.xsd">
+  <route edges="bot1_0 bot1_1 bot1_2 bot1_3" id="routebot1_0"/>
+  <route edges="right0_1 right1_1 right2_1" id="routeright0_1"/>
+  <route edges="top1_3 top1_2 top1_1 top1_0" id="routetop1_3"/>
+  <route edges="right0_2 right1_2 right2_2" id="routeright0_2"/>
+  <route edges="bot0_0 bot0_1 bot0_2 bot0_3" id="routebot0_0"/>
+  <route edges="top0_3 top0_2 top0_1 top0_0" id="routetop0_3"/>
+  <route edges="left2_1 left1_1 left0_1" id="routeleft2_1"/>
+  <route edges="right0_0 right1_0 right2_0" id="routeright0_0"/>
+  <route edges="left2_0 left1_0 left0_0" id="routeleft2_0"/>
+  <route edges="left2_2 left1_2 left0_2" id="routeleft2_2"/>
+  <tlLogic id="center0" programID="1" type="static">
+    <param key="type" value="static"/>
+    <phase duration="31" maxDur="45" minDur="8" state="GGGrrrGGGrrr"/>
+    <phase duration="6" maxDur="6" minDur="3" state="yyyrrryyyrrr"/>
+    <phase duration="31" maxDur="45" minDur="8" state="rrrGGGrrrGGG"/>
+    <phase duration="6" maxDur="6" minDur="3" state="rrryyyrrryyy"/>
+    <param key="programID" value="1"/>
+    <param key="id" value="center0"/>
+  </tlLogic>
+  <tlLogic id="center1" programID="1" type="static">
+    <param key="type" value="static"/>
+    <phase duration="31" maxDur="45" minDur="8" state="GGGrrrGGGrrr"/>
+    <phase duration="6" maxDur="6" minDur="3" state="yyyrrryyyrrr"/>
+    <phase duration="31" maxDur="45" minDur="8" state="rrrGGGrrrGGG"/>
+    <phase duration="6" maxDur="6" minDur="3" state="rrryyyrrryyy"/>
+    <param key="programID" value="1"/>
+    <param key="id" value="center1"/>
+  </tlLogic>
+  <tlLogic id="center2" programID="1" type="actuated">
+    <phase duration="31" maxDur="45" minDur="8" state="GGGrrrGGGrrr"/>
+    <phase duration="6" maxDur="6" minDur="3" state="yyyrrryyyrrr"/>
+    <phase duration="31" maxDur="45" minDur="8" state="rrrGGGrrrGGG"/>
+    <phase duration="6" maxDur="6" minDur="3" state="rrryyyrrryyy"/>
+    <param key="max-gap" value="3.0"/>
+    <param key="programID" value="1"/>
+    <param key="id" value="center2"/>
+    <param key="type" value="actuated"/>
+    <param key="detector-gap" value="0.8"/>
+    <param key="show-detectors" value="True"/>
+  </tlLogic>
+</additional>

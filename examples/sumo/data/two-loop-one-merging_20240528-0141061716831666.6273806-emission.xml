@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- generated on 2024-05-28 01:41:07 by Eclipse SUMO GUI Version UNKNOWN
+<configuration xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://sumo.dlr.de/xsd/sumoConfiguration.xsd">
+
+    <input>
+        <net-file value="/home/yao/flow/flow/core/debug/cfg/two-loop-one-merging_20240528-0141061716831666.6273806.net.xml"/>
+        <route-files value="/home/yao/flow/flow/core/debug/cfg/two-loop-one-merging_20240528-0141061716831666.6273806.rou.xml"/>
+        <additional-files value="/home/yao/flow/flow/core/debug/cfg/two-loop-one-merging_20240528-0141061716831666.6273806.add.xml"/>
+    </input>
+
+    <output>
+        <emission-output value="./data/two-loop-one-merging_20240528-0141061716831666.6273806-emission.xml"/>
+    </output>
+
+    <time>
+        <begin value="0"/>
+        <step-length value="0.1"/>
+    </time>
+
+    <processing>
+        <time-to-teleport value="-1"/>
+    </processing>
+
+    <report>
+        <no-step-log value="true"/>
+    </report>
+
+    <traci_server>
+        <remote-port value="57401"/>
+    </traci_server>
+
+    <gui_only>
+        <gui-settings-file value="/home/yao/flow/flow/core/debug/cfg/two-loop-one-merging_20240528-0141061716831666.6273806.gui.cfg"/>
+    </gui_only>
+
+</configuration>
+-->
+
+<emission-export xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://sumo.dlr.de/xsd/emission_file.xsd">
+</emission-export>
