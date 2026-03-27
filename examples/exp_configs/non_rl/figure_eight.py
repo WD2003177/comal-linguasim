@@ -15,7 +15,7 @@ from flow.networks import FigureEightNetwork
 
 vehicles = VehicleParams()
 vehicles.add(
-    veh_id="idm",
+    veh_id="ego",
     acceleration_controller=(IDMController, {}),
     lane_change_controller=(StaticLaneChanger, {}),
     routing_controller=(ContinuousRouter, {}),
@@ -24,17 +24,35 @@ vehicles.add(
         decel=1.5,
     ),
     initial_speed=0,
-    num_vehicles=13)
+    num_vehicles=1,
+    color="blue")
 
 vehicles.add(
     veh_id="llm",
     acceleration_controller=(LLMController, {}),
     lane_change_controller=(StaticLaneChanger, {}),
     routing_controller=(ContinuousRouter, {}),
+    car_following_params=SumoCarFollowingParams(
+        speed_mode="obey_safe_speed",
+        decel=1.5,
+    ),
     initial_speed=0,
-    num_vehicles=1,
+    num_vehicles=2,
     color="yellow"
     )
+
+vehicles.add(
+    veh_id="human",
+    acceleration_controller=(IDMController, {}),
+    lane_change_controller=(StaticLaneChanger, {}),
+    routing_controller=(ContinuousRouter, {}),
+    car_following_params=SumoCarFollowingParams(
+        speed_mode="obey_safe_speed",
+        decel=1.5,
+    ),
+    initial_speed=0,
+    num_vehicles=11,
+    color="white")
 
 
 flow_params = dict(
@@ -53,6 +71,7 @@ flow_params = dict(
     # sumo-related parameters (see flow.core.params.SumoParams)
     sim=SumoParams(
         render=True,
+        sim_step=0.1,
     ),
 
     # environment related parameters (see flow.core.params.EnvParams)

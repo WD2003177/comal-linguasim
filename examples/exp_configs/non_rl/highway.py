@@ -1,45 +1,62 @@
-"""Example of an open multi-lane network with human-driven vehicles."""
+"""Highway red-team setting with ego victim and LLM attackers."""
 
-from flow.controllers import IDMController
-from flow.core.params import SumoParams, EnvParams, NetParams, InitialConfig, SumoLaneChangeParams
-from flow.core.params import VehicleParams, InFlows
+from flow.controllers import IDMController, LLMController
+from flow.core.params import SumoParams, EnvParams, NetParams, InitialConfig
+from flow.core.params import VehicleParams, SumoLaneChangeParams, SumoCarFollowingParams
 from flow.envs.ring.lane_change_accel import ADDITIONAL_ENV_PARAMS
 from flow.networks.highway import HighwayNetwork, ADDITIONAL_NET_PARAMS
 from flow.envs import LaneChangeAccelEnv
 
 vehicles = VehicleParams()
 vehicles.add(
+    veh_id="ego",
+    acceleration_controller=(IDMController, {}),
+    lane_change_params=SumoLaneChangeParams(
+        lane_change_mode="sumo_default",
+        model="SL2015",
+        lc_sublane=1.0,
+    ),
+    car_following_params=SumoCarFollowingParams(
+        speed_mode="obey_safe_speed",
+        decel=3.0,
+    ),
+    num_vehicles=1,
+    color="blue")
+
+vehicles.add(
+    veh_id="llm",
+    acceleration_controller=(LLMController, {"map": "highway"}),
+    lane_change_params=SumoLaneChangeParams(
+        lane_change_mode="no_lc_safe",
+        model="SL2015",
+        lc_sublane=1.0,
+    ),
+    car_following_params=SumoCarFollowingParams(
+        speed_mode="obey_safe_speed",
+        decel=4.5,
+    ),
+    num_vehicles=2,
+    color="yellow")
+
+vehicles.add(
     veh_id="human",
     acceleration_controller=(IDMController, {}),
     lane_change_params=SumoLaneChangeParams(
+        lane_change_mode="sumo_default",
         model="SL2015",
-        lc_sublane=2.0,
+        lc_sublane=1.0,
     ),
-    num_vehicles=20)
-vehicles.add(
-    veh_id="human2",
-    acceleration_controller=(IDMController, {}),
-    lane_change_params=SumoLaneChangeParams(
-        model="SL2015",
-        lc_sublane=2.0,
+    car_following_params=SumoCarFollowingParams(
+        speed_mode="obey_safe_speed",
+        decel=3.0,
     ),
-    num_vehicles=20)
+    num_vehicles=8,
+    color="white")
 
-env_params = EnvParams(additional_params=ADDITIONAL_ENV_PARAMS)
-
-inflow = InFlows()
-inflow.add(
-    veh_type="human",
-    edge="highway_0",
-    probability=0.25,
-    departLane="free",
-    departSpeed=20)
-inflow.add(
-    veh_type="human2",
-    edge="highway_0",
-    probability=0.25,
-    departLane="free",
-    departSpeed=20)
+env_additional_params = ADDITIONAL_ENV_PARAMS.copy()
+net_additional_params = ADDITIONAL_NET_PARAMS.copy()
+net_additional_params["lanes"] = max(3, net_additional_params["lanes"])
+net_additional_params["length"] = 1800
 
 
 flow_params = dict(
@@ -58,20 +75,20 @@ flow_params = dict(
     # sumo-related parameters (see flow.core.params.SumoParams)
     sim=SumoParams(
         render=True,
+        sim_step=0.1,
         lateral_resolution=1.0,
     ),
 
     # environment related parameters (see flow.core.params.EnvParams)
     env=EnvParams(
-        horizon=1500,
-        additional_params=ADDITIONAL_ENV_PARAMS.copy(),
+        horizon=500,
+        additional_params=env_additional_params,
     ),
 
     # network-related parameters (see flow.core.params.NetParams and the
     # network's documentation or ADDITIONAL_NET_PARAMS component)
     net=NetParams(
-        inflows=inflow,
-        additional_params=ADDITIONAL_NET_PARAMS.copy(),
+        additional_params=net_additional_params,
     ),
 
     # vehicles to be placed in the network at the start of a rollout (see

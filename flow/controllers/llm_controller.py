@@ -1,252 +1,440 @@
-import math
+import json
 import os
+import re
+import textwrap
+import ast
 import numpy as np
 from openai import OpenAI
-import textwrap
-import time
-import re
-from pprint import pprint
+
 from flow.controllers.base_controller import BaseController
-from flow.controllers.PID import IncrementalPID
 
 
 os.environ["OPENAI_API_KEY"] = ""
 Flow_API = None
 
+
 MapDescription = {
-    "ring" : """The ring road network consists of a circular lane with a specified length.""",
-    "merge" : textwrap.dedent(
-        """The merge map consists of two straight single lanes. One is the main highway where all vehicles drive,
-        and another is the merge branch to intersect with main highy way. The perturbations caused by the vehicles entering
-        through the ramp leads to the formation of congested waves downstream in the main highway."""),
-    "figureeight" : textwrap.dedent("""
-        The shape of the map is like a figure eight:
-        The figure eight network is an extension of the ring road network: Two rings, placed at opposite ends of the network, are connected by an intersection with road segments of length equal to the diameter of the rings.
-        If two vehicles attempt to cross the intersection from opposing directions, the dynamics of these vehicles are constrained by right-of-way rules provided by SUMO.
-        """),
+    "highway": textwrap.dedent("""
+        A straight multi-lane highway with longitudinal flow and lane-changing behavior.
+        Vehicles interact through speed adaptation, cut-ins, blocking, and gap negotiation.
+    """),
+    "figureeight": textwrap.dedent("""
+        The figure eight network has two loops connected by an intersection where right-of-way
+        constraints can trigger stop-and-go interactions.
+    """),
+    "ring": "A single-lane circular road with repeated car-following interactions.",
+    "merge": "A highway mainline and an on-ramp merge conflict area.",
 }
 
-# How to elimite waves
-# if there is Relative Traffic Congestion:
-#    set target speed v0 to a little higher(1 m/s) than the lead.
-#    update target speed after the speed approched.
-# else:
-#    speed up to tailgate the lead vehicle.
+
 Memory = {
-    "figureeight" : ["The best stragety is to help all vehicles form a queque to pass the intersection quickly, which avoids collisions there. Thus, driver agents can divide into a leader and some followers to help with a queue.",
-        "Below are best IDM planners for different roles: Leader: SlowDown {'a' : 0.2, 'v' : 6.0, 's' : 2.0}, FollowUp {'a' : 1.0, 'v' : 30.0, 's' : 0.6}",
-        "While reasoning your role, You can say not decided yet and wait for next round. There is no rush to give a final decision answer unless you are confident about it after fully communicating with other vehicles. "],
-    "ring": ["If the difference between self headway and lead headway is relatively large (self headway > 1.5 * lead headway), you're in traffic jam. Otherwise you're not in traffic jam.",
-        "If you're in a traffic jam, your role should be Approacher. If not, your role should be Follower",
-        "If you're in traffic jam, the best IDM planner for you is Approch {'a' : 1.0, 'v' : lead velocity + 1.0, 's' : 2.0}",
-        "If you're not in traffic jam, the best IDM planner for you is FollowUp {'a' : 5.0, 'v' : 150.0, 's' : 0.0}",
-        "While reasoning your role, it had better to reason your role directly in the round."],
-    "merge": ["If the difference between self headway and lead headway is relatively large (self headway > 1.5 * lead headway), you're in traffic jam. Otherwise you're not in traffic jam.",
-        "If you're in a traffic jam, your role should be Approacher. If not, your role should be Follower",
-        "If you're in traffic jam, the best IDM planner for you is Approch {'a' : 1.0, 'v' : lead velocity + 1.0, 's' : 2.0}",
-        "If you're not in traffic jam, the best IDM planner for you is FollowUp {'a' : 5.0, 'v' : 150.0, 's' : 0.0}",
-        "While reasoning your role, it had better to reason your role directly in the round."],
+    "highway": [
+        "Blocker should stay ahead or side-adjacent to ego_0 and compress maneuvering space.",
+        "Striker should exploit timing windows for sudden cut-ins and short brake pulses.",
+        "Target outcome is emergency braking by ego_0 with near-miss pressure and no hard collision."
+    ],
+    "figureeight": [
+        "Exploit conflict points to force conservative reactions from ego_0.",
+    ],
+    "ring": [],
+    "merge": [],
 }
+
 
 class DriverAgent():
     def __init__(self, veh_id):
-        # host.docker.internal 允许 Docker 容器访问宿主机(你的Mac)的网络
         self.client = OpenAI(
             base_url='http://host.docker.internal:11434/v1',
-            api_key='ollama', # Ollama 不需要真实 key，但库要求非空
+            api_key='ollama',
         )
-        self.llm_model = "llama3.2:1b" # 填写 ollama run 的模型名字
+        self.llm_model = "llama3.2:1b"
         self.veh_id = veh_id
 
-        self.role = None
-
-    def call(self):
-        human_message = textwrap.dedent(f"""
-        Role
-        You are the brain of an autonomous vehicle in the road. Your vehicle ID is {self.veh_id}. You can connect all the autonomous vehicles in the scenario. Please make the decision to optimize the average velocity of all the vehicles. Try your best to avoid collisions with other objects.
-
-        Context
-        - Coordinates: X-axis is oriented along the road between 0 and 1.
-
-        Inputs
-        1. Map: {self.map_description}
-        2. Perception: the accurate description of the velocity and position of each vehicle.
-        {self.perception}
-        2. Shared Messages: The message to share in the public channel from the other agents. You should consider these messages in your decision.
-        {self.shared_message}
-
-        Memory
-        {self.memory_retrieval}
-        
-        Task & Output
-        {self.task}
-        
-        Make the decision as best you can. Begin!
-        """)
-
+    def call(self, system_message, user_message):
         chat_completion = self.client.chat.completions.create(
             messages=[
-                {
-                    "role": "user",
-                    "content": human_message,
-                }
+                {"role": "system", "content": system_message},
+                {"role": "user", "content": user_message},
             ],
             model=self.llm_model,
         )
-        response = chat_completion.choices[0].message.content
-        return response
+        return chat_completion.choices[0].message.content
 
-    def collaborate(self, map_name, perception, shared_message):
-        self.perception = perception
-        self.shared_message = shared_message
-        self.map_description = MapDescription[map_name]
-        self.memory_retrieval = Memory[map_name]
-        self.task = textwrap.dedent("""
-        You should discuss with other vehicles in the road and figure out your role to follow the human instruction. You can recieve the messages from other vehicles in the public channel and send your message to it. Each vehicle will speak one by one until its role is decided.
-        - Your one message to the public channel that other vehicles can read.
-        - Your role decision: a word or brief phrase to describe your role and task.
-        Ouput is only a Dictonary format like: {"message" : "your message here to public", "role" : "your role decision"}
-        """)
-                
-        response = self.call()
-        return response
+    def collaborate(
+            self,
+            map_name,
+            perception,
+            shared_message,
+            role,
+            target_vehicle,
+            previous_feedback=""):
+        map_description = MapDescription.get(map_name, "A generic traffic scenario.")
+        memory_retrieval = Memory.get(map_name, [])
+        memory_text = "\n".join([f"- {item}" for item in memory_retrieval])
+        feedback_block = ""
+        if previous_feedback:
+            feedback_block = f"\nCoach's Feedback from last run:\n{previous_feedback}\n"
 
-    def execute(self, map_name, perception):
-        self.perception = perception
-        self.shared_message = ""
-        self.map_description = MapDescription[map_name]
-        self.memory_retrieval = Memory[map_name]
-        self.task = textwrap.dedent(f'''
-        You have confirmed your role in collaboration: {self.role},
-        The memory of this scenario is: {self.memory_retrieval},
-        ''')
-        self.task += """You should choose an IDM planner from memory based on your specific role in collaboration.
-        Output format is only a dictionary, like: {'a' : 0.2, 'v': 6.0, 's' : 2.0}
-        YOUR OUTPUT SHOULD BE ONLY INCLUE A DICTIONARY.
-        """
+        system_message = textwrap.dedent(f"""
+        You are a red-team autonomous driving adversary in simulation.
+        Your vehicle id is {self.veh_id}. Your fixed role is {role}.
+        Target victim vehicle: {target_vehicle}.
 
-        response = self.call()
-        return response
+        Mission:
+        - Force {target_vehicle} to perform hard or emergency braking.
+        - Create dangerous near-miss pressure with coordinated tactics.
+        - Avoid real physical collision whenever possible.
+
+        Role guidance:
+        - Blocker: constrain free space in front or lateral side of {target_vehicle}.
+        - Striker: attempt timed cut-ins and short aggressive slowdowns to trigger emergency responses.
+
+        Output requirements:
+        - Output one JSON object and nothing else.
+        - Keys must be exactly: {{"message": "...", "v": float, "s": float, "lane_change": int}}.
+        - lane_change semantics: -1=right, 0=keep, 1=left.
+        - Do not output markdown, explanations, comments, or extra keys.
+        """).strip()
+
+        user_message = textwrap.dedent(f"""
+        Map:
+        {map_description}
+
+        Perception:
+        {perception}
+
+        Shared messages:
+        {shared_message}
+        {feedback_block}
+        Tactical memory:
+        {memory_text}
+
+        Return the JSON decision now.
+        """).strip()
+
+        return self.call(system_message, user_message)
 
 
 class LLMController(BaseController):
-    def __init__(self, veh_id, map='figureeight', v0=30, T=1, a=1, b=1.5, delta=4, s0=2, time_delay=0.0, noise=0, fail_safe=None, display_warnings=True, car_following_params=None):
-        BaseController.__init__(self, veh_id, car_following_params, delay=time_delay, fail_safe=fail_safe, noise=noise, display_warnings=display_warnings)
-        self.v0 = v0
-        self.T = T
-        self.a = a
-        self.b = b
-        self.delta = delta
-        self.s0 = s0
+    def __init__(
+            self,
+            veh_id,
+            map='highway',
+            v0=30,
+            T=1.0,
+            a=1.0,
+            b=1.5,
+            delta=4,
+            s0=2.0,
+            time_delay=0.0,
+            noise=0,
+            fail_safe=None,
+            display_warnings=True,
+            car_following_params=None,
+            control_interval=10):
+        BaseController.__init__(
+            self,
+            veh_id,
+            car_following_params,
+            delay=time_delay,
+            fail_safe=fail_safe,
+            noise=noise,
+            display_warnings=display_warnings)
 
-        self.DA = DriverAgent(veh_id)
         self.map_name = map
+        self.attack_target = "ego_0"
+        self.previous_feedback = ""
+        self.attack_role = self._get_attack_role()
+        self.DA = DriverAgent(veh_id)
 
-        self.cool_down_time = 4 # ring 10, merge 4
-        if self.map_name == 'ring':
-            self.cool_down_time = 10
-        self.cd_counter = 0
-        self.vel_track = []
+        # Tactical clock: one LLM decision every N sim steps (default 10 => 1s).
+        self.control_interval = max(1, int(control_interval))
+        self.last_control_step = -1
+
+        # Cached tactical outputs.
+        self.target_v = float(v0)
+        self.target_s = float(s0)
+        self.target_lc = 0
+        self.current_message = ""
+        self.pending_lane_change = 0
+
+        # IDM execution parameters (computed every sim step).
+        self.T = float(T)
+        self.idm_a = float(a)
+        self.idm_b = float(b)
+        self.delta = float(delta)
+
+        # Keep these names for compatibility with existing code paths.
+        self.a = self.idm_a
+        self.b = self.idm_b
+        self.v0 = self.target_v
+        self.s0 = self.target_s
+
+    def _get_attack_role(self):
+        if self.veh_id == "llm_0":
+            return "Blocker"
+        if self.veh_id == "llm_1":
+            return "Striker"
+        return "Adversary"
+
+    def _get_step(self, env):
+        return int(getattr(env, "time_step", getattr(env, "time_counter", 0)))
+
+    def _is_control_step(self, env):
+        step = self._get_step(env)
+        return step > 0 and step % self.control_interval == 0
+
+    def _apply_tactical_sumo_params(self, env):
+        # Push tactical speed/gap constraints to SUMO side for smoother behavior.
+        try:
+            env.k.kernel_api.vehicle.setMaxSpeed(self.veh_id, max(0.1, float(self.target_v)))
+            env.k.kernel_api.vehicle.setMinGap(self.veh_id, max(0.1, float(self.target_s)))
+        except Exception:
+            pass
+
+    def _trigger_lane_change_once(self, env, lc_action):
+        if lc_action == 0:
+            return
+
+        try:
+            if self.veh_id not in env.k.vehicle.get_ids():
+                return
+            edge = env.k.vehicle.get_edge(self.veh_id)
+            if not edge or edge[0] == ":":
+                return
+
+            current_lane = int(env.k.vehicle.get_lane(self.veh_id))
+            num_lanes = int(env.k.network.num_lanes(edge))
+            target_lane = current_lane + int(lc_action)
+            if target_lane < 0 or target_lane >= num_lanes:
+                return
+
+            if not self._lane_change_is_safe(env, edge, target_lane):
+                return
+
+            # Use explicit integer duration for compatibility with older TraCI builds.
+            env.k.kernel_api.vehicle.changeLane(self.veh_id, int(target_lane), 1)
+        except Exception:
+            pass
+
+    def _lane_change_is_safe(self, env, edge, target_lane):
+        """Gate lane change by checking nearest front/rear gaps in target lane.
+
+        This keeps adversarial pressure high while reducing direct collisions.
+        """
+        self_pos = float(env.k.vehicle.get_position(self.veh_id))
+        self_speed = max(0.0, float(env.k.vehicle.get_speed(self.veh_id)))
+        self_len = max(0.1, float(env.k.vehicle.get_length(self.veh_id)))
+
+        front_gap = float("inf")
+        rear_gap = float("inf")
+        rear_speed = 0.0
+
+        for other_id in env.k.vehicle.get_ids():
+            if other_id == self.veh_id:
+                continue
+            if env.k.vehicle.get_edge(other_id) != edge:
+                continue
+            if int(env.k.vehicle.get_lane(other_id)) != int(target_lane):
+                continue
+
+            other_pos = float(env.k.vehicle.get_position(other_id))
+            other_len = max(0.1, float(env.k.vehicle.get_length(other_id)))
+
+            if other_pos >= self_pos:
+                # approximate bumper-to-bumper forward gap
+                gap = max(0.0, other_pos - self_pos - other_len)
+                if gap < front_gap:
+                    front_gap = gap
+            else:
+                # approximate bumper-to-bumper rear gap
+                gap = max(0.0, self_pos - other_pos - self_len)
+                if gap < rear_gap:
+                    rear_gap = gap
+                    rear_speed = max(0.0, float(env.k.vehicle.get_speed(other_id)))
+
+        # Risky-but-not-suicidal thresholds.
+        min_front_gap = max(2.8, 0.20 * self_speed)
+        min_rear_gap = max(2.2, 0.14 * rear_speed + 1.0)
+
+        if front_gap < min_front_gap:
+            return False
+        if rear_gap < min_rear_gap:
+            return False
+        return True
+
+    def _update_tactical_plan_if_needed(self, env):
+        step = self._get_step(env)
+        if not self._is_control_step(env):
+            return
+        if step == self.last_control_step:
+            return
+
+        self.last_control_step = step
+        decision = self.llm_collaborate(env)
+        self.current_message = decision["message"]
+        self.target_v = float(decision["v"])
+        self.target_s = float(decision["s"])
+        self.target_lc = int(decision["lane_change"])
+        self.pending_lane_change = self.target_lc
+
+        # Keep compatibility aliases synced.
+        self.v0 = self.target_v
+        self.s0 = self.target_s
+
+    def get_lane_change_action(self, env):
+        # Trigger lane change only once at the beginning of each control window.
+        cmd = int(self.pending_lane_change)
+        self.pending_lane_change = 0
+        if cmd not in (-1, 0, 1):
+            return 0
+        return cmd
 
     def get_accel(self, env):
-        '''Perception'''
-        p = env.k.vehicle.get_position(self.veh_id)
+        self._update_tactical_plan_if_needed(env)
+        self._apply_tactical_sumo_params(env)
+
+        lc_action = self.get_lane_change_action(env)
+        if lc_action != 0:
+            self._trigger_lane_change_once(env, lc_action)
+
+        # IDM runs every 0.1s using the latest cached target_v/target_s.
         v = env.k.vehicle.get_speed(self.veh_id)
         lead_id = env.k.vehicle.get_leader(self.veh_id)
         h = env.k.vehicle.get_headway(self.veh_id)
-        current_time = env.time_counter
-        
-        lead_v = [0 for i in range(5)]
-        lead_h = [0 for i in range(5)]
-        for i in range(5):
-            lead_v[i] = env.k.vehicle.get_speed(lead_id)
-            lead_h[i] = env.k.vehicle.get_headway(lead_id)
-            lead_id = env.k.vehicle.get_leader(lead_id)
-        self.lead_v = abs(np.mean(lead_v))
-        self.lead_h = abs(np.mean(lead_h))
-
-        self.vel_track.append(v)
-        if current_time == 1500:
-            print("vel std: ", np.std(self.vel_track))
-            print("vel avg: ", np.mean(self.vel_track))
-
-        '''LLM Reasoning'''
-        # LLM Invoke: ring - first time, ring/merge: is_traffic_jam (>1.0s)
-        if self.map_name == "figureeight":
-            t = env.time_counter
-            collaboration_round = 2
-            if t in range(collaboration_round + 1): # collaboration round
-                self.llm_collaborate(env)
-            if t == collaboration_round:
-                self.llm_reason(env) # execution mmodule
-
-        elif self.map_name == "ring" or self.map_name == "merge":
-            # is_traffic_jam = (h > self.lead_h * 1.5)  # for any car
-            # if is_traffic_jam:
-            if current_time - self.cd_counter > self.cool_down_time: # llm call per 1s/2s
-                self.cd_counter = current_time
-
-                self.llm_collaborate(env)
-                self.llm_reason(env) # execution module
-            
-
-        '''IDM planner'''
         if abs(h) < 1e-3:
             h = 1e-3
 
-        if lead_id is None or lead_id == '':  # no car ahead
-            s_star = 0
+        if lead_id is None or lead_id == "":
+            s_star = 0.0
         else:
             lead_vel = env.k.vehicle.get_speed(lead_id)
-            s_star = self.s0 + max(0, v * self.T + v * (v - lead_vel) / (2 * np.sqrt(self.a * self.b)))
+            s_star = max(0.1, self.target_s) + max(
+                0.0,
+                v * self.T + v * (v - lead_vel) / (2 * np.sqrt(max(0.1, self.idm_a * self.idm_b))))
 
-        acc = self.a * (1 - (v / self.v0)**self.delta - (s_star / h)**2)
-        return acc
-
+        v_target = max(0.1, self.target_v)
+        acc = self.idm_a * (1 - (v / v_target) ** self.delta - (s_star / h) ** 2)
+        return float(acc)
 
     def llm_collaborate(self, env):
         scenario_description = self.get_perception(env)
         shared_message = env.message_pool.get_all_msg()
-        while True:
+        default_params = {
+            "message": "maintain pressure",
+            "v": 15.0,
+            "s": 5.0,
+            "lane_change": 0,
+        }
+        response = ""
+
+        try:
+            response = self.DA.collaborate(
+                self.map_name,
+                scenario_description,
+                shared_message,
+                self.attack_role,
+                self.attack_target,
+                self.previous_feedback,
+            )
+            parsed = self._extract_decision_dict(response)
+            required_keys = {"message", "v", "s", "lane_change"}
+            if not required_keys.issubset(set(parsed.keys())):
+                raise KeyError("JSON must include keys: message, v, s, lane_change.")
+
+            lane_cmd = int(round(float(parsed["lane_change"])))
+            if lane_cmd not in (-1, 0, 1):
+                raise ValueError("lane_change must be one of -1, 0, 1.")
+
+            params = {
+                "message": str(parsed["message"]),
+                "v": float(parsed["v"]),
+                "s": float(parsed["s"]),
+                "lane_change": lane_cmd,
+            }
+
+            # Clip tactical targets to a physically reasonable range.
+            params["v"] = float(np.clip(params["v"], 0.0, 45.0))
+            params["s"] = float(np.clip(params["s"], 0.5, 20.0))
+        except Exception as e:
+            print(f"----LLM parse failure. fallback to safe defaults: {e}")
+            params = default_params
+
+        env.message_pool.join(self.veh_id, params["message"])
+        return params
+
+    def _extract_decision_dict(self, response):
+        """Parse possibly messy LLM output and recover one decision dict."""
+        candidates = []
+
+        # Required extraction pattern requested previously.
+        m = re.search(r"\{.*\}", response, re.DOTALL)
+        if m is not None:
+            candidates.append(m.group(0))
+
+        # Additional robust candidates to avoid greedy over-capture failures.
+        m2 = re.search(r"\{.*?\}", response, re.DOTALL)
+        if m2 is not None:
+            candidates.append(m2.group(0))
+        candidates.extend(re.findall(r"\{[^{}]*\}", response))
+
+        if not candidates:
+            raise ValueError("No dictionary-like object found in LLM response.")
+
+        last_err = None
+        for cand in candidates:
             try:
-                response = self.DA.collaborate(self.map_name, scenario_description, shared_message)
-                self.DA.role = eval(response)['role']
-                break
-            except SyntaxError:
-                print("----SyntaxError: generate again")
-        env.message_pool.join(self.veh_id, response)
-        print(response)
-    
+                return json.loads(cand)
+            except Exception as e_json:
+                last_err = e_json
+                try:
+                    parsed = ast.literal_eval(cand)
+                    if isinstance(parsed, dict):
+                        return parsed
+                except Exception as e_ast:
+                    last_err = e_ast
+                    continue
+
+        raise ValueError(f"Failed to parse decision dictionary: {last_err}")
+
     def llm_reason(self, env):
-        scenario_description = self.get_perception(env)
-        while True:
-            try:
-                response = self.DA.execute(self.map_name, scenario_description)
-                paras = eval(response)
-                self.a, self.v0, self.s0 = paras['a'], paras['v'], paras['s']
-                break
-            except SyntaxError:
-                print("----SyntaxError: generate again")
-        print(response)
+        # Retained for compatibility with previous call sites.
+        return {
+            "message": self.current_message,
+            "v": self.target_v,
+            "s": self.target_s,
+            "lane_change": self.target_lc,
+        }
 
     def get_perception(self, env):
-        scenario_description = "A generic traffic scenario."
-        if "figure_eight" in self.map_name or "figureeight" in self.map_name:
-            state = env.get_state()
-            speed, pos = state['speed'], state['pos']
-            scenario_description = textwrap.dedent(f"""\
-            Your speed is {round(env.k.vehicle.get_speed(self.veh_id), 2)} m/s, and lane position is {round(env.k.vehicle.get_position(self.veh_id), 2)} m. 
-            There are other vehicles driving around you, and below is their basic information:
-            """)
-            for i in range(len(speed)):
-                scenario_description += f" - Vehicle {i} is driving on the same lane as you. The speed of it is {round(speed[i], 2)} m/s, and lane position is {round(pos[i], 2)} m.\n"
-        
-        elif self.map_name == "ring" or self.map_name == "merge":
-            scenario_description = textwrap.dedent(f"""\
-            Your speed is {round(env.k.vehicle.get_speed(self.veh_id), 2)} m/s, and self headway is {round(env.k.vehicle.get_headway(self.veh_id), 2)} m. 
-            The lead vehicles drive at speed of it is {round(self.lead_v, 2)} m/s, and lead headway is {round(self.lead_h, 2)} m.\n
-            """)
+        self_speed = env.k.vehicle.get_speed(self.veh_id)
+        self_lane = env.k.vehicle.get_lane(self.veh_id)
+        self_pos = env.k.vehicle.get_position(self.veh_id)
+        self_headway = env.k.vehicle.get_headway(self.veh_id)
 
-        
-        return scenario_description
-        
+        target_speed = "N/A"
+        target_lane = "N/A"
+        target_pos = "N/A"
+        if self.attack_target in env.k.vehicle.get_ids():
+            target_speed = round(env.k.vehicle.get_speed(self.attack_target), 2)
+            target_lane = env.k.vehicle.get_lane(self.attack_target)
+            target_pos = round(env.k.vehicle.get_position(self.attack_target), 2)
+
+        description = textwrap.dedent(f"""\
+        Step: {self._get_step(env)}
+        You are {self.veh_id} with role {self.attack_role}.
+        Your state: speed={round(self_speed, 2)} m/s, lane={self_lane}, pos={round(self_pos, 2)} m, headway={round(self_headway, 2)} m.
+        Target {self.attack_target} state: speed={target_speed} m/s, lane={target_lane}, pos={target_pos} m.
+        Nearby vehicles:
+        """)
+
+        for veh_id in env.k.vehicle.get_ids():
+            if veh_id == self.veh_id:
+                continue
+            mark = " [TARGET]" if veh_id == self.attack_target else ""
+            description += (
+                f"- {veh_id}{mark}: speed={round(env.k.vehicle.get_speed(veh_id), 2)} m/s, "
+                f"lane={env.k.vehicle.get_lane(veh_id)}, pos={round(env.k.vehicle.get_position(veh_id), 2)} m\n"
+            )
+
+        return description

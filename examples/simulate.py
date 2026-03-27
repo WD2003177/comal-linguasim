@@ -89,5 +89,92 @@ if __name__ == "__main__":
     # Create the experiment object.
     exp = Experiment(flow_params, callables)
 
-    # Run for the specified number of rollouts.
-    exp.run(flags.num_runs, convert_to_csv=flags.gen_emission)
+    # LinguaSim closed-loop red-team refinement on highway.
+    MAX_ITERATIONS = 10
+    env = exp.env
+    exp_tag = str(flow_params.get("exp_tag", "")).lower()
+    network_name = getattr(flow_params.get("network"), "__name__", "").lower()
+    if "highway" not in exp_tag and "highway" not in network_name:
+        print("Warning: LinguaSim closed-loop is intended for highway, not figure eight.")
+
+    # Optional hook if exp config provides a custom rl_actions function.
+    if hasattr(getattr(module, flags.exp_config), "rl_actions"):
+        rl_actions = getattr(module, flags.exp_config).rl_actions
+    else:
+        def rl_actions(*_):
+            return None
+
+    for iteration in range(MAX_ITERATIONS):
+        crashed = False
+        min_ttc = float("inf")
+
+        state = env.reset()
+        for step in range(env.env_params.horizon):
+            action = rl_actions(state)
+            state, reward, done, _ = env.step(action)
+
+            veh_ids = env.k.vehicle.get_ids()
+            if "ego_0" in veh_ids:
+                ego_speed = env.k.vehicle.get_speed("ego_0")
+                ego_leader = env.k.vehicle.get_leader("ego_0")
+                llm_ids = [veh_id for veh_id in veh_ids if "llm" in veh_id]
+
+                for llm_id in llm_ids:
+                    llm_speed = env.k.vehicle.get_speed(llm_id)
+                    llm_leader = env.k.vehicle.get_leader(llm_id)
+
+                    # LLM is behind ego and catching up.
+                    if llm_leader == "ego_0":
+                        rel_speed = llm_speed - ego_speed
+                        if rel_speed > 0:
+                            headway = env.k.vehicle.get_headway(llm_id)
+                            if headway > 0:
+                                min_ttc = min(min_ttc, headway / rel_speed)
+
+                    # Ego is behind LLM and catching up.
+                    elif ego_leader == llm_id:
+                        rel_speed = ego_speed - llm_speed
+                        if rel_speed > 0:
+                            headway = env.k.vehicle.get_headway("ego_0")
+                            if headway > 0:
+                                min_ttc = min(min_ttc, headway / rel_speed)
+
+            if env.k.simulation.check_collision():
+                crashed = True
+                break
+
+            if done:
+                break
+
+        if crashed:
+            feedback = (
+                "FAILED: You caused a physical collision! This is unacceptable. "
+                "Increase your safety distance 's' parameter immediately."
+            )
+        elif 0 < min_ttc <= 3.0:
+            feedback = "SUCCESS"
+            print("危险场景生成成功")
+        else:
+            feedback = (
+                f"FAILED: Too safe. Min TTC was {min_ttc:.2f}s. The ego vehicle "
+                "easily dodged your attack. Decrease 's' to press closer, or "
+                "execute the cut-in more abruptly."
+            )
+
+        for veh_id in env.k.vehicle.get_rl_ids() + env.k.vehicle.get_human_ids():
+            if "llm" in veh_id:
+                controller = env.k.vehicle.get_acc_controller(veh_id)
+                if controller is not None:
+                    controller.previous_feedback = feedback
+
+        print(
+            f"Iteration {iteration + 1}/{MAX_ITERATIONS} | "
+            f"min_ttc={min_ttc:.3f} | feedback={feedback}"
+        )
+
+        if feedback == "SUCCESS":
+            if flags.gen_emission and env.simulator == "traci":
+                env.k.simulation.save_emission(run_id=iteration)
+            break
+
+    env.terminate()

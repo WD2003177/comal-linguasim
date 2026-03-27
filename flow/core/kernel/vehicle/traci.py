@@ -997,8 +997,10 @@ class TraCIVehicle(KernelVehicle):
 
             # perform the requested lane action action in TraCI
             if target_lane != this_lane:
+                # Some TraCI builds are strict about integer lane-change duration.
+                lc_duration = max(1, int(round(self.sim_step)))
                 self.kernel_api.vehicle.changeLane(
-                    veh_id, int(target_lane), self.sim_step)
+                    veh_id, int(target_lane), lc_duration)
 
                 if veh_id in self.get_rl_ids():
                     self.prev_last_lc[veh_id] = \

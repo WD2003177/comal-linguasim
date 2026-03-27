@@ -294,11 +294,18 @@ class Env(gym.Env, metaclass=ABCMeta):
             num_vehicles=len(self.initial_ids))
 
         # save the initial state. This is used in the _reset function
+        active_ids = set(self.k.vehicle.get_ids())
         for i, veh_id in enumerate(self.initial_ids):
-            type_id = self.k.vehicle.get_type(veh_id)
+            # A vehicle may have been removed (e.g., teleport after collision)
+            # before reset. In that case, recover static info from snapshot.
+            if veh_id in active_ids:
+                type_id = self.k.vehicle.get_type(veh_id)
+                speed = self.k.vehicle.get_initial_speed(veh_id)
+            else:
+                type_id = self.initial_vehicles.get_type(veh_id)
+                speed = self.initial_vehicles.get_initial_speed(veh_id)
             pos = start_pos[i][1]
             lane = start_lanes[i]
-            speed = self.k.vehicle.get_initial_speed(veh_id)
             edge = start_pos[i][0]
 
             self.initial_state[veh_id] = (type_id, edge, lane, pos, speed)
