@@ -6,6 +6,7 @@ from flow.core.params import VehicleParams, SumoLaneChangeParams, SumoCarFollowi
 from flow.envs.ring.lane_change_accel import ADDITIONAL_ENV_PARAMS
 from flow.networks.highway import HighwayNetwork, ADDITIONAL_NET_PARAMS
 from flow.envs import LaneChangeAccelEnv
+from flow.utils.highway_scene import default_custom_start_params
 
 vehicles = VehicleParams()
 vehicles.add(
@@ -81,7 +82,7 @@ flow_params = dict(
 
     # environment related parameters (see flow.core.params.EnvParams)
     env=EnvParams(
-        horizon=500,
+        horizon=1500,
         additional_params=env_additional_params,
     ),
 
@@ -98,7 +99,8 @@ flow_params = dict(
     # parameters specifying the positioning of vehicles upon initialization/
     # reset (see flow.core.params.InitialConfig)
     initial=InitialConfig(
-        spacing="uniform",
-        shuffle=True,
+        spacing="custom",
+        shuffle=False,
+        additional_params=default_custom_start_params(),
     ),
 )

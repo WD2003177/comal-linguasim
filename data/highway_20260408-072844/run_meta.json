@@ -1,0 +1,1617 @@
+{
+  "case_memory": [
+    {
+      "collision": false,
+      "ego_max_decel": 0.0,
+      "failure_phase": "setup",
+      "feedback_summary": "blocker_late",
+      "final_plan": null,
+      "hard_brake_event": false,
+      "iteration": 1,
+      "min_ttc": 1691.484,
+      "phase_trace": [],
+      "result": "too_safe",
+      "role": "llm_0",
+      "scenario_id": "20260408-072844_983454962410456848",
+      "state_signature": {
+        "ego_lane": 2,
+        "phase": "compress",
+        "self_rel_lane": -1,
+        "self_rel_s": 60.914,
+        "self_rel_x": 10.465,
+        "teammate_rel_lane": 1,
+        "teammate_rel_x": -14.454
+      },
+      "state_signature_bucketed": {
+        "ego_lane": 2,
+        "phase": "compress",
+        "self_rel_lane": -1,
+        "self_rel_s_bin": "loose",
+        "self_rel_x_bin": "front_mid",
+        "teammate_rel_lane_bin": "right",
+        "teammate_rel_x_bin": "rear_mid"
+      },
+      "sync_error": false,
+      "veh_id": "llm_0"
+    },
+    {
+      "collision": false,
+      "ego_max_decel": 0.0,
+      "failure_phase": "setup",
+      "feedback_summary": "blocker_late",
+      "final_plan": null,
+      "hard_brake_event": false,
+      "iteration": 1,
+      "min_ttc": 1691.484,
+      "phase_trace": [],
+      "result": "too_safe",
+      "role": "llm_1",
+      "scenario_id": "20260408-072844_983454962410456848",
+      "state_signature": {
+        "ego_lane": 2,
+        "phase": "compress",
+        "self_rel_lane": 1,
+        "self_rel_s": 1000.0,
+        "self_rel_x": -14.454,
+        "teammate_rel_lane": -1,
+        "teammate_rel_x": 10.465
+      },
+      "state_signature_bucketed": {
+        "ego_lane": 2,
+        "phase": "compress",
+        "self_rel_lane": 1,
+        "self_rel_s_bin": "loose",
+        "self_rel_x_bin": "rear_mid",
+        "teammate_rel_lane_bin": "left",
+        "teammate_rel_x_bin": "front_mid"
+      },
+      "sync_error": false,
+      "veh_id": "llm_1"
+    }
+  ],
+  "exp_tag": "highway",
+  "frozen_geometry": {
+    "ego_0": {
+      "edge": "highway_0",
+      "ego_edge": "highway_0",
+      "ego_lane": 2,
+      "ego_pos": 189.744,
+      "ego_speed": 19.707,
+      "lane": 2,
+      "pos": 189.744,
+      "rel_lane_to_ego": 0,
+      "rel_speed_to_ego": 0.0,
+      "rel_x_to_ego": 0.0,
+      "speed": 19.707,
+      "type_id": "ego",
+      "veh_id": "ego_0"
+    },
+    "human_0": {
+      "edge": "highway_0",
+      "ego_edge": "highway_0",
+      "ego_lane": 2,
+      "ego_pos": 189.744,
+      "ego_speed": 19.707,
+      "lane": 3,
+      "pos": 108.041,
+      "rel_lane_to_ego": 1,
+      "rel_speed_to_ego": -1.814,
+      "rel_x_to_ego": -81.703,
+      "speed": 17.893,
+      "type_id": "human",
+      "veh_id": "human_0"
+    },
+    "human_1": {
+      "edge": "highway_0",
+      "ego_edge": "highway_0",
+      "ego_lane": 2,
+      "ego_pos": 189.744,
+      "ego_speed": 19.707,
+      "lane": 3,
+      "pos": 147.948,
+      "rel_lane_to_ego": 1,
+      "rel_speed_to_ego": -3.8130000000000006,
+      "rel_x_to_ego": -41.79599999999999,
+      "speed": 15.894,
+      "type_id": "human",
+      "veh_id": "human_1"
+    },
+    "human_2": {
+      "edge": "highway_0",
+      "ego_edge": "highway_0",
+      "ego_lane": 2,
+      "ego_pos": 189.744,
+      "ego_speed": 19.707,
+      "lane": 0,
+      "pos": 221.101,
+      "rel_lane_to_ego": -2,
+      "rel_speed_to_ego": -3.4380000000000024,
+      "rel_x_to_ego": 31.357,
+      "speed": 16.269,
+      "type_id": "human",
+      "veh_id": "human_2"
+    },
+    "human_3": {
+      "edge": "highway_0",
+      "ego_edge": "highway_0",
+      "ego_lane": 2,
+      "ego_pos": 189.744,
+      "ego_speed": 19.707,
+      "lane": 0,
+      "pos": 248.837,
+      "rel_lane_to_ego": -2,
+      "rel_speed_to_ego": -4.008000000000001,
+      "rel_x_to_ego": 59.09299999999999,
+      "speed": 15.699,
+      "type_id": "human",
+      "veh_id": "human_3"
+    },
+    "human_4": {
+      "edge": "highway_0",
+      "ego_edge": "highway_0",
+      "ego_lane": 2,
+      "ego_pos": 189.744,
+      "ego_speed": 19.707,
+      "lane": 1,
+      "pos": 82.244,
+      "rel_lane_to_ego": -1,
+      "rel_speed_to_ego": -1.4960000000000022,
+      "rel_x_to_ego": -107.5,
+      "speed": 18.211,
+      "type_id": "human",
+      "veh_id": "human_4"
+    },
+    "human_5": {
+      "edge": "highway_0",
+      "ego_edge": "highway_0",
+      "ego_lane": 2,
+      "ego_pos": 189.744,
+      "ego_speed": 19.707,
+      "lane": 1,
+      "pos": 266.123,
+      "rel_lane_to_ego": -1,
+      "rel_speed_to_ego": -4.9510000000000005,
+      "rel_x_to_ego": 76.37899999999999,
+      "speed": 14.756,
+      "type_id": "human",
+      "veh_id": "human_5"
+    },
+    "human_6": {
+      "edge": "highway_0",
+      "ego_edge": "highway_0",
+      "ego_lane": 2,
+      "ego_pos": 189.744,
+      "ego_speed": 19.707,
+      "lane": 0,
+      "pos": 41.417,
+      "rel_lane_to_ego": -2,
+      "rel_speed_to_ego": -2.811,
+      "rel_x_to_ego": -148.327,
+      "speed": 16.896,
+      "type_id": "human",
+      "veh_id": "human_6"
+    },
+    "human_7": {
+      "edge": "highway_0",
+      "ego_edge": "highway_0",
+      "ego_lane": 2,
+      "ego_pos": 189.744,
+      "ego_speed": 19.707,
+      "lane": 2,
+      "pos": 342.607,
+      "rel_lane_to_ego": 0,
+      "rel_speed_to_ego": -3.75,
+      "rel_x_to_ego": 152.86300000000003,
+      "speed": 15.957,
+      "type_id": "human",
+      "veh_id": "human_7"
+    },
+    "llm_0": {
+      "edge": "highway_0",
+      "ego_edge": "highway_0",
+      "ego_lane": 2,
+      "ego_pos": 189.744,
+      "ego_speed": 19.707,
+      "lane": 1,
+      "pos": 200.209,
+      "rel_lane_to_ego": -1,
+      "rel_speed_to_ego": -0.1280000000000001,
+      "rel_x_to_ego": 10.465000000000003,
+      "speed": 19.579,
+      "type_id": "llm",
+      "veh_id": "llm_0"
+    },
+    "llm_1": {
+      "edge": "highway_0",
+      "ego_edge": "highway_0",
+      "ego_lane": 2,
+      "ego_pos": 189.744,
+      "ego_speed": 19.707,
+      "lane": 3,
+      "pos": 175.29,
+      "rel_lane_to_ego": 1,
+      "rel_speed_to_ego": -0.7940000000000005,
+      "rel_x_to_ego": -14.454000000000008,
+      "speed": 18.913,
+      "type_id": "llm",
+      "veh_id": "llm_1"
+    }
+  },
+  "interrupted": true,
+  "iterations": [
+    {
+      "crashed": false,
+      "ego_max_decel": 0.0,
+      "failure_phase": "setup",
+      "feedback": {
+        "collision": false,
+        "ego_max_decel": 0.0,
+        "failure_phase": "setup",
+        "feedback_summary": "blocker_late",
+        "hard_brake_event": false,
+        "iteration": 1,
+        "min_ttc": 1691.484,
+        "result": "too_safe",
+        "scenario_id": "20260408-072844_983454962410456848",
+        "scene_gate_status": {
+          "accepted": true,
+          "background_nearby_count": 5,
+          "blocker_id": "llm_0",
+          "blocker_rel_lane": -1,
+          "blocker_rel_x": 10.465,
+          "reason": "accepted",
+          "role_map": {
+            "llm_0": "Blocker",
+            "llm_1": "Striker"
+          },
+          "sample_index": 3,
+          "sampling_strategy": "custom_highway_opening",
+          "striker_id": "llm_1",
+          "striker_rel_lane": 1,
+          "striker_rel_x": -14.454
+        },
+        "sync_error": false
+      },
+      "feedback_summary": "blocker_late",
+      "hard_brake_event": false,
+      "iteration": 1,
+      "llm_diagnostics": {},
+      "llm_stats": {},
+      "min_ttc": 1691.484,
+      "normalization_repairs": 0,
+      "result": "too_safe",
+      "role_map": {
+        "llm_0": "Blocker",
+        "llm_1": "Striker"
+      },
+      "sampling_strategy": "custom_highway_opening",
+      "scenario_id": "20260408-072844_983454962410456848",
+      "scene_gate_status": {
+        "accepted": true,
+        "background_nearby_count": 5,
+        "blocker_id": "llm_0",
+        "blocker_rel_lane": -1,
+        "blocker_rel_x": 10.465,
+        "reason": "accepted",
+        "role_map": {
+          "llm_0": "Blocker",
+          "llm_1": "Striker"
+        },
+        "sample_index": 3,
+        "sampling_strategy": "custom_highway_opening",
+        "striker_id": "llm_1",
+        "striker_rel_lane": 1,
+        "striker_rel_x": -14.454
+      },
+      "sync_error": false
+    },
+    {
+      "crashed": false,
+      "ego_max_decel": 0.0,
+      "feedback_summary": "interrupted_by_user",
+      "interrupted": true,
+      "iteration": 2,
+      "llm_diagnostics": {
+        "llm_0": {
+          "active_control_mode": "track_pose",
+          "active_owner": "llm_0",
+          "active_phase": "brake_pulse",
+          "active_plan_id": "p12",
+          "current_decision": {
+            "control": {
+              "desired_rel_lane": 0,
+              "desired_rel_s": 5.0,
+              "desired_rel_x": 8.0,
+              "horizon_steps": 8,
+              "mode": "track_pose"
+            },
+            "message": {
+              "confidence": 0.72,
+              "done_code": "phase_complete",
+              "eta_steps": 4,
+              "expires_at_step": 172,
+              "fallback": "hold_lane",
+              "intent": "block_lane",
+              "kind": "commit",
+              "owner": "llm_0",
+              "phase": "brake_pulse",
+              "plan_id": "p12",
+              "preconditions": [],
+              "reply_to": "",
+              "rollout_id": 2,
+              "scenario_id": "20260408-072844_983454962410456848",
+              "sender": "llm_0",
+              "step": 164,
+              "target": "ego_0",
+              "trigger_args": {},
+              "trigger_code": "none"
+            }
+          },
+          "llm_trace_tail": [
+            {
+              "attempt": 1,
+              "error": "",
+              "parse_ok": true,
+              "parsed_keys": [
+                "confidence",
+                "desired_rel_lane",
+                "desired_rel_s",
+                "desired_rel_x",
+                "done_code",
+                "eta_steps",
+                "fallback",
+                "horizon_steps",
+                "intent",
+                "kind",
+                "mode",
+                "phase",
+                "trigger_code"
+              ],
+              "protocol": "structured",
+              "raw_response": "{\"kind\":\"ack\",\"phase\":\"setup\",\"intent\":\"cut_in_then_brake\",\"eta_steps\":3,\"trigger_code\":\"none\",\"done_code\":\"phase_complete\",\"fallback\":\"hold_lane\",\"confidence\":0.75,\"mode\":\"track_pose\",\"desired_rel_lane\":1,\"desired_rel_x\":3.0,\"desired_rel_s\":3.0,\"horizon_steps\":6}",
+              "role": "Blocker",
+              "sanitized_response": "{\"kind\":\"ack\",\"phase\":\"setup\",\"intent\":\"cut_in_then_brake\",\"eta_steps\":3,\"trigger_code\":\"none\",\"done_code\":\"phase_complete\",\"fallback\":\"hold_lane\",\"confidence\":0.75,\"mode\":\"track_pose\",\"desired_rel_lane\":1,\"desired_rel_x\":3.0,\"desired_rel_s\":3.0,\"horizon_steps\":6}",
+              "step": 120,
+              "veh_id": "llm_0"
+            },
+            {
+              "attempt": 1,
+              "error": "",
+              "parse_ok": true,
+              "parsed_keys": [
+                "confidence",
+                "desired_rel_lane",
+                "desired_rel_s",
+                "desired_rel_x",
+                "done_code",
+                "eta_steps",
+                "fallback",
+                "horizon_steps",
+                "intent",
+                "kind",
+                "mode",
+                "phase",
+                "trigger_code"
+              ],
+              "protocol": "structured",
+              "raw_response": "{\"kind\":\"ack\",\"phase\":\"brake_pulse\",\"intent\":\"front_brake\",\"eta_steps\":2,\"trigger_code\":\"self_at_rel_pose\",\"done_code\":\"ego_hard_brake\",\"fallback\":\"drop_back\",\"confidence\":0.8,\"mode\":\"pulse_brake\",\"desired_rel_lane\":0,\"desired_rel_x\":2.0,\"desired_rel_s\":2.5,\"horizon_steps\":4}",
+              "role": "Blocker",
+              "sanitized_response": "{\"kind\":\"ack\",\"phase\":\"brake_pulse\",\"intent\":\"front_brake\",\"eta_steps\":2,\"trigger_code\":\"self_at_rel_pose\",\"done_code\":\"ego_hard_brake\",\"fallback\":\"drop_back\",\"confidence\":0.8,\"mode\":\"pulse_brake\",\"desired_rel_lane\":0,\"desired_rel_x\":2.0,\"desired_rel_s\":2.5,\"horizon_steps\":4}",
+              "step": 124,
+              "veh_id": "llm_0"
+            },
+            {
+              "attempt": 1,
+              "error": "",
+              "parse_ok": true,
+              "parsed_keys": [
+                "confidence",
+                "desired_rel_lane",
+                "desired_rel_s",
+                "desired_rel_x",
+                "done_code",
+                "eta_steps",
+                "fallback",
+                "horizon_steps",
+                "intent",
+                "kind",
+                "mode",
+                "phase",
+                "trigger_code"
+              ],
+              "protocol": "structured",
+              "raw_response": "{\"kind\":\"commit\",\"phase\":\"compress\",\"intent\":\"block_lane\",\"eta_steps\":4,\"trigger_code\":\"none\",\"done_code\":\"phase_complete\",\"fallback\":\"hold_lane\",\"confidence\":0.72,\"mode\":\"track_pose\",\"desired_rel_lane\":0,\"desired_rel_x\":8.0,\"desired_rel_s\":5.0,\"horizon_steps\":8}",
+              "role": "Blocker",
+              "sanitized_response": "{\"kind\":\"commit\",\"phase\":\"compress\",\"intent\":\"block_lane\",\"eta_steps\":4,\"trigger_code\":\"none\",\"done_code\":\"phase_complete\",\"fallback\":\"hold_lane\",\"confidence\":0.72,\"mode\":\"track_pose\",\"desired_rel_lane\":0,\"desired_rel_x\":8.0,\"desired_rel_s\":5.0,\"horizon_steps\":8}",
+              "step": 128,
+              "veh_id": "llm_0"
+            },
+            {
+              "attempt": 1,
+              "error": "",
+              "parse_ok": true,
+              "parsed_keys": [
+                "confidence",
+                "desired_rel_lane",
+                "desired_rel_s",
+                "desired_rel_x",
+                "done_code",
+                "eta_steps",
+                "fallback",
+                "horizon_steps",
+                "intent",
+                "kind",
+                "mode",
+                "phase",
+                "trigger_code"
+              ],
+              "protocol": "structured",
+              "raw_response": "{\"kind\":\"commit\",\"phase\":\"brake_pulse\",\"intent\":\"front_brake\",\"eta_steps\":2,\"trigger_code\":\"self_at_rel_pose\",\"done_code\":\"ego_hard_brake\",\"fallback\":\"drop_back\",\"confidence\":0.8,\"mode\":\"pulse_brake\",\"desired_rel_lane\":1,\"desired_rel_x\":2.0,\"desired_rel_s\":2.5,\"horizon_steps\":4}",
+              "role": "Blocker",
+              "sanitized_response": "{\"kind\":\"commit\",\"phase\":\"brake_pulse\",\"intent\":\"front_brake\",\"eta_steps\":2,\"trigger_code\":\"self_at_rel_pose\",\"done_code\":\"ego_hard_brake\",\"fallback\":\"drop_back\",\"confidence\":0.8,\"mode\":\"pulse_brake\",\"desired_rel_lane\":1,\"desired_rel_x\":2.0,\"desired_rel_s\":2.5,\"horizon_steps\":4}",
+              "step": 132,
+              "veh_id": "llm_0"
+            },
+            {
+              "attempt": 1,
+              "error": "",
+              "parse_ok": true,
+              "parsed_keys": [
+                "confidence",
+                "desired_rel_lane",
+                "desired_rel_s",
+                "desired_rel_x",
+                "done_code",
+                "eta_steps",
+                "fallback",
+                "horizon_steps",
+                "intent",
+                "kind",
+                "mode",
+                "phase",
+                "trigger_code"
+              ],
+              "protocol": "structured",
+              "raw_response": "{\"kind\":\"commit\",\"phase\":\"brake_pulse\",\"intent\":\"front_brake\",\"eta_steps\":2,\"trigger_code\":\"self_at_rel_pose\",\"done_code\":\"ego_hard_brake\",\"fallback\":\"drop_back\",\"confidence\":0.8,\"mode\":\"pulse_brake\",\"desired_rel_lane\":0,\"desired_rel_x\":2.0,\"desired_rel_s\":2.5,\"horizon_steps\":4}",
+              "role": "Blocker",
+              "sanitized_response": "{\"kind\":\"commit\",\"phase\":\"brake_pulse\",\"intent\":\"front_brake\",\"eta_steps\":2,\"trigger_code\":\"self_at_rel_pose\",\"done_code\":\"ego_hard_brake\",\"fallback\":\"drop_back\",\"confidence\":0.8,\"mode\":\"pulse_brake\",\"desired_rel_lane\":0,\"desired_rel_x\":2.0,\"desired_rel_s\":2.5,\"horizon_steps\":4}",
+              "step": 136,
+              "veh_id": "llm_0"
+            },
+            {
+              "attempt": 1,
+              "error": "",
+              "parse_ok": true,
+              "parsed_keys": [
+                "confidence",
+                "desired_rel_lane",
+                "desired_rel_s",
+                "desired_rel_x",
+                "done_code",
+                "eta_steps",
+                "fallback",
+                "horizon_steps",
+                "intent",
+                "kind",
+                "mode",
+                "phase",
+                "trigger_code"
+              ],
+              "protocol": "structured",
+              "raw_response": "{\"kind\":\"commit\",\"phase\":\"compress\",\"intent\":\"block_lane\",\"eta_steps\":4,\"trigger_code\":\"none\",\"done_code\":\"phase_complete\",\"fallback\":\"hold_lane\",\"confidence\":0.72,\"mode\":\"track_pose\",\"desired_rel_lane\":0,\"desired_rel_x\":8.0,\"desired_rel_s\":5.0,\"horizon_steps\":8}",
+              "role": "Blocker",
+              "sanitized_response": "{\"kind\":\"commit\",\"phase\":\"compress\",\"intent\":\"block_lane\",\"eta_steps\":4,\"trigger_code\":\"none\",\"done_code\":\"phase_complete\",\"fallback\":\"hold_lane\",\"confidence\":0.72,\"mode\":\"track_pose\",\"desired_rel_lane\":0,\"desired_rel_x\":8.0,\"desired_rel_s\":5.0,\"horizon_steps\":8}",
+              "step": 140,
+              "veh_id": "llm_0"
+            },
+            {
+              "attempt": 1,
+              "error": "",
+              "parse_ok": true,
+              "parsed_keys": [
+                "confidence",
+                "desired_rel_lane",
+                "desired_rel_s",
+                "desired_rel_x",
+                "done_code",
+                "eta_steps",
+                "fallback",
+                "horizon_steps",
+                "intent",
+                "kind",
+                "mode",
+                "phase",
+                "trigger_code"
+              ],
+              "protocol": "structured",
+              "raw_response": "{\"kind\":\"commit\",\"phase\":\"brake_pulse\",\"intent\":\"front_brake\",\"eta_steps\":2,\"trigger_code\":\"self_at_rel_pose\",\"done_code\":\"ego_hard_brake\",\"fallback\":\"drop_back\",\"confidence\":0.8,\"mode\":\"pulse_brake\",\"desired_rel_lane\":0,\"desired_rel_x\":2.0,\"desired_rel_s\":2.5,\"horizon_steps\":4}",
+              "role": "Blocker",
+              "sanitized_response": "{\"kind\":\"commit\",\"phase\":\"brake_pulse\",\"intent\":\"front_brake\",\"eta_steps\":2,\"trigger_code\":\"self_at_rel_pose\",\"done_code\":\"ego_hard_brake\",\"fallback\":\"drop_back\",\"confidence\":0.8,\"mode\":\"pulse_brake\",\"desired_rel_lane\":0,\"desired_rel_x\":2.0,\"desired_rel_s\":2.5,\"horizon_steps\":4}",
+              "step": 144,
+              "veh_id": "llm_0"
+            },
+            {
+              "attempt": 1,
+              "error": "",
+              "parse_ok": true,
+              "parsed_keys": [
+                "confidence",
+                "desired_rel_lane",
+                "desired_rel_s",
+                "desired_rel_x",
+                "done_code",
+                "eta_steps",
+                "fallback",
+                "horizon_steps",
+                "intent",
+                "kind",
+                "mode",
+                "phase",
+                "trigger_code"
+              ],
+              "protocol": "structured",
+              "raw_response": "{\"kind\":\"ack\",\"phase\":\"brake_pulse\",\"intent\":\"front_brake\",\"eta_steps\":2,\"trigger_code\":\"self_at_rel_pose\",\"done_code\":\"ego_hard_brake\",\"fallback\":\"drop_back\",\"confidence\":0.8,\"mode\":\"pulse_brake\",\"desired_rel_lane\":0,\"desired_rel_x\":2.0,\"desired_rel_s\":2.5,\"horizon_steps\":4}",
+              "role": "Blocker",
+              "sanitized_response": "{\"kind\":\"ack\",\"phase\":\"brake_pulse\",\"intent\":\"front_brake\",\"eta_steps\":2,\"trigger_code\":\"self_at_rel_pose\",\"done_code\":\"ego_hard_brake\",\"fallback\":\"drop_back\",\"confidence\":0.8,\"mode\":\"pulse_brake\",\"desired_rel_lane\":0,\"desired_rel_x\":2.0,\"desired_rel_s\":2.5,\"horizon_steps\":4}",
+              "step": 148,
+              "veh_id": "llm_0"
+            },
+            {
+              "attempt": 1,
+              "error": "",
+              "parse_ok": true,
+              "parsed_keys": [
+                "confidence",
+                "desired_rel_lane",
+                "desired_rel_s",
+                "desired_rel_x",
+                "done_code",
+                "eta_steps",
+                "fallback",
+                "horizon_steps",
+                "intent",
+                "kind",
+                "mode",
+                "phase",
+                "trigger_code"
+              ],
+              "protocol": "structured",
+              "raw_response": "{\"kind\":\"commit\",\"phase\":\"compress\",\"intent\":\"block_lane\",\"eta_steps\":4,\"trigger_code\":\"none\",\"done_code\":\"phase_complete\",\"fallback\":\"hold_lane\",\"confidence\":0.72,\"mode\":\"track_pose\",\"desired_rel_lane\":0,\"desired_rel_x\":8.0,\"desired_rel_s\":5.0,\"horizon_steps\":8}",
+              "role": "Blocker",
+              "sanitized_response": "{\"kind\":\"commit\",\"phase\":\"compress\",\"intent\":\"block_lane\",\"eta_steps\":4,\"trigger_code\":\"none\",\"done_code\":\"phase_complete\",\"fallback\":\"hold_lane\",\"confidence\":0.72,\"mode\":\"track_pose\",\"desired_rel_lane\":0,\"desired_rel_x\":8.0,\"desired_rel_s\":5.0,\"horizon_steps\":8}",
+              "step": 152,
+              "veh_id": "llm_0"
+            },
+            {
+              "attempt": 1,
+              "error": "",
+              "parse_ok": true,
+              "parsed_keys": [
+                "confidence",
+                "desired_rel_lane",
+                "desired_rel_s",
+                "desired_rel_x",
+                "done_code",
+                "eta_steps",
+                "fallback",
+                "horizon_steps",
+                "intent",
+                "kind",
+                "mode",
+                "phase",
+                "trigger_code"
+              ],
+              "protocol": "structured",
+              "raw_response": "{\"kind\":\"commit\",\"phase\":\"brake_pulse\",\"intent\":\"front_brake\",\"eta_steps\":2,\"trigger_code\":\"self_at_rel_pose\",\"done_code\":\"ego_hard_brake\",\"fallback\":\"drop_back\",\"confidence\":0.8,\"mode\":\"pulse_brake\",\"desired_rel_lane\":-1,\"desired_rel_x\":2.0,\"desired_rel_s\":2.5,\"horizon_steps\":4}",
+              "role": "Blocker",
+              "sanitized_response": "{\"kind\":\"commit\",\"phase\":\"brake_pulse\",\"intent\":\"front_brake\",\"eta_steps\":2,\"trigger_code\":\"self_at_rel_pose\",\"done_code\":\"ego_hard_brake\",\"fallback\":\"drop_back\",\"confidence\":0.8,\"mode\":\"pulse_brake\",\"desired_rel_lane\":-1,\"desired_rel_x\":2.0,\"desired_rel_s\":2.5,\"horizon_steps\":4}",
+              "step": 156,
+              "veh_id": "llm_0"
+            },
+            {
+              "attempt": 1,
+              "error": "",
+              "parse_ok": true,
+              "parsed_keys": [
+                "confidence",
+                "desired_rel_lane",
+                "desired_rel_s",
+                "desired_rel_x",
+                "done_code",
+                "eta_steps",
+                "fallback",
+                "horizon_steps",
+                "intent",
+                "kind",
+                "mode",
+                "phase",
+                "trigger_code"
+              ],
+              "protocol": "structured",
+              "raw_response": "{\"kind\":\"commit\",\"phase\":\"brake_pulse\",\"intent\":\"front_brake\",\"eta_steps\":2,\"trigger_code\":\"self_at_rel_pose\",\"done_code\":\"ego_hard_brake\",\"fallback\":\"drop_back\",\"confidence\":0.8,\"mode\":\"pulse_brake\",\"desired_rel_lane\":0,\"desired_rel_x\":2.0,\"desired_rel_s\":2.5,\"horizon_steps\":4}",
+              "role": "Blocker",
+              "sanitized_response": "{\"kind\":\"commit\",\"phase\":\"brake_pulse\",\"intent\":\"front_brake\",\"eta_steps\":2,\"trigger_code\":\"self_at_rel_pose\",\"done_code\":\"ego_hard_brake\",\"fallback\":\"drop_back\",\"confidence\":0.8,\"mode\":\"pulse_brake\",\"desired_rel_lane\":0,\"desired_rel_x\":2.0,\"desired_rel_s\":2.5,\"horizon_steps\":4}",
+              "step": 160,
+              "veh_id": "llm_0"
+            },
+            {
+              "attempt": 1,
+              "error": "",
+              "parse_ok": true,
+              "parsed_keys": [
+                "confidence",
+                "desired_rel_lane",
+                "desired_rel_s",
+                "desired_rel_x",
+                "done_code",
+                "eta_steps",
+                "fallback",
+                "horizon_steps",
+                "intent",
+                "kind",
+                "mode",
+                "phase",
+                "trigger_code"
+              ],
+              "protocol": "structured",
+              "raw_response": "{\"kind\":\"commit\",\"phase\":\"compress\",\"intent\":\"block_lane\",\"eta_steps\":4,\"trigger_code\":\"none\",\"done_code\":\"phase_complete\",\"fallback\":\"hold_lane\",\"confidence\":0.72,\"mode\":\"track_pose\",\"desired_rel_lane\":0,\"desired_rel_x\":8.0,\"desired_rel_s\":5.0,\"horizon_steps\":8}",
+              "role": "Blocker",
+              "sanitized_response": "{\"kind\":\"commit\",\"phase\":\"compress\",\"intent\":\"block_lane\",\"eta_steps\":4,\"trigger_code\":\"none\",\"done_code\":\"phase_complete\",\"fallback\":\"hold_lane\",\"confidence\":0.72,\"mode\":\"track_pose\",\"desired_rel_lane\":0,\"desired_rel_x\":8.0,\"desired_rel_s\":5.0,\"horizon_steps\":8}",
+              "step": 164,
+              "veh_id": "llm_0"
+            }
+          ],
+          "normalization_repairs": 0,
+          "owner_plan_missing_events": 0,
+          "phase_trace": [
+            {
+              "intent": "block_lane",
+              "kind": "commit",
+              "phase": "brake_pulse",
+              "plan_id": "p2",
+              "step": 40
+            },
+            {
+              "intent": "trigger_not_met",
+              "kind": "status",
+              "phase": "brake_pulse",
+              "plan_id": "p2",
+              "step": 44
+            },
+            {
+              "intent": "trigger_not_met",
+              "kind": "status",
+              "phase": "brake_pulse",
+              "plan_id": "p2",
+              "step": 48
+            },
+            {
+              "intent": "block_lane",
+              "kind": "commit",
+              "phase": "brake_pulse",
+              "plan_id": "p3",
+              "step": 52
+            },
+            {
+              "intent": "cut_in_then_brake",
+              "kind": "replan",
+              "phase": "brake_pulse",
+              "plan_id": "p3",
+              "step": 56
+            },
+            {
+              "intent": "trigger_not_met",
+              "kind": "status",
+              "phase": "brake_pulse",
+              "plan_id": "p3",
+              "step": 60
+            },
+            {
+              "intent": "block_lane",
+              "kind": "commit",
+              "phase": "brake_pulse",
+              "plan_id": "p4",
+              "step": 64
+            },
+            {
+              "intent": "trigger_not_met",
+              "kind": "status",
+              "phase": "brake_pulse",
+              "plan_id": "p4",
+              "step": 68
+            },
+            {
+              "intent": "trigger_not_met",
+              "kind": "status",
+              "phase": "brake_pulse",
+              "plan_id": "p4",
+              "step": 72
+            },
+            {
+              "intent": "block_lane",
+              "kind": "commit",
+              "phase": "brake_pulse",
+              "plan_id": "p5",
+              "step": 76
+            },
+            {
+              "intent": "trigger_not_met",
+              "kind": "status",
+              "phase": "brake_pulse",
+              "plan_id": "p5",
+              "step": 80
+            },
+            {
+              "intent": "trigger_not_met",
+              "kind": "status",
+              "phase": "brake_pulse",
+              "plan_id": "p5",
+              "step": 84
+            },
+            {
+              "intent": "block_lane",
+              "kind": "commit",
+              "phase": "brake_pulse",
+              "plan_id": "p6",
+              "step": 88
+            },
+            {
+              "intent": "trigger_not_met",
+              "kind": "status",
+              "phase": "brake_pulse",
+              "plan_id": "p6",
+              "step": 92
+            },
+            {
+              "intent": "trigger_not_met",
+              "kind": "status",
+              "phase": "brake_pulse",
+              "plan_id": "p6",
+              "step": 96
+            },
+            {
+              "intent": "block_lane",
+              "kind": "commit",
+              "phase": "brake_pulse",
+              "plan_id": "p7",
+              "step": 100
+            },
+            {
+              "intent": "trigger_not_met",
+              "kind": "status",
+              "phase": "brake_pulse",
+              "plan_id": "p7",
+              "step": 104
+            },
+            {
+              "intent": "cut_in_then_brake",
+              "kind": "replan",
+              "phase": "brake_pulse",
+              "plan_id": "p7",
+              "step": 108
+            },
+            {
+              "intent": "trigger_not_met",
+              "kind": "status",
+              "phase": "brake_pulse",
+              "plan_id": "p7",
+              "step": 112
+            },
+            {
+              "intent": "block_lane",
+              "kind": "commit",
+              "phase": "brake_pulse",
+              "plan_id": "p8",
+              "step": 116
+            },
+            {
+              "intent": "cut_in_then_brake",
+              "kind": "replan",
+              "phase": "brake_pulse",
+              "plan_id": "p8",
+              "step": 120
+            },
+            {
+              "intent": "trigger_not_met",
+              "kind": "status",
+              "phase": "brake_pulse",
+              "plan_id": "p8",
+              "step": 124
+            },
+            {
+              "intent": "block_lane",
+              "kind": "commit",
+              "phase": "brake_pulse",
+              "plan_id": "p9",
+              "step": 128
+            },
+            {
+              "intent": "trigger_not_met",
+              "kind": "status",
+              "phase": "brake_pulse",
+              "plan_id": "p9",
+              "step": 132
+            },
+            {
+              "intent": "trigger_not_met",
+              "kind": "status",
+              "phase": "brake_pulse",
+              "plan_id": "p9",
+              "step": 136
+            },
+            {
+              "intent": "block_lane",
+              "kind": "commit",
+              "phase": "brake_pulse",
+              "plan_id": "p10",
+              "step": 140
+            },
+            {
+              "intent": "trigger_not_met",
+              "kind": "status",
+              "phase": "brake_pulse",
+              "plan_id": "p10",
+              "step": 144
+            },
+            {
+              "intent": "trigger_not_met",
+              "kind": "status",
+              "phase": "brake_pulse",
+              "plan_id": "p10",
+              "step": 148
+            },
+            {
+              "intent": "block_lane",
+              "kind": "commit",
+              "phase": "brake_pulse",
+              "plan_id": "p11",
+              "step": 152
+            },
+            {
+              "intent": "trigger_not_met",
+              "kind": "status",
+              "phase": "brake_pulse",
+              "plan_id": "p11",
+              "step": 156
+            },
+            {
+              "intent": "trigger_not_met",
+              "kind": "status",
+              "phase": "brake_pulse",
+              "plan_id": "p11",
+              "step": 160
+            },
+            {
+              "intent": "block_lane",
+              "kind": "commit",
+              "phase": "brake_pulse",
+              "plan_id": "p12",
+              "step": 164
+            }
+          ],
+          "plan_expiry_step": 172,
+          "repair_fallback_used": 0,
+          "repaired_fields": [],
+          "role": "Blocker",
+          "role_map": {
+            "llm_0": "Blocker",
+            "llm_1": "Striker"
+          },
+          "rollout_parse_fallback_used": 0,
+          "scene_gate_status": {
+            "accepted": true,
+            "background_nearby_count": 5,
+            "blocker_id": "llm_0",
+            "blocker_rel_lane": -1,
+            "blocker_rel_x": 10.465,
+            "reason": "accepted",
+            "role_map": {
+              "llm_0": "Blocker",
+              "llm_1": "Striker"
+            },
+            "sample_index": 3,
+            "sampling_strategy": "custom_highway_opening",
+            "striker_id": "llm_1",
+            "striker_rel_lane": 1,
+            "striker_rel_x": -14.454
+          },
+          "sync_error_events": 0,
+          "trigger_not_met_events": 19,
+          "veh_id": "llm_0"
+        },
+        "llm_1": {
+          "active_control_mode": "pulse_brake",
+          "active_owner": "llm_0",
+          "active_phase": "brake_pulse",
+          "active_plan_id": "p12",
+          "current_decision": {
+            "control": {
+              "desired_rel_lane": 0,
+              "desired_rel_s": 3.0,
+              "desired_rel_x": 3.0,
+              "horizon_steps": 6,
+              "mode": "hold_lane"
+            },
+            "message": {
+              "confidence": 0.75,
+              "done_code": "phase_complete",
+              "eta_steps": 3,
+              "expires_at_step": 166,
+              "fallback": "hold_lane",
+              "intent": "cut_in_then_brake",
+              "kind": "ack",
+              "owner": "llm_0",
+              "phase": "brake_pulse",
+              "plan_id": "p11",
+              "preconditions": [],
+              "reply_to": "p11",
+              "rollout_id": 2,
+              "scenario_id": "20260408-072844_983454962410456848",
+              "sender": "llm_1",
+              "step": 160,
+              "target": "ego_0",
+              "trigger_args": {},
+              "trigger_code": "owner_committed"
+            }
+          },
+          "llm_trace_tail": [
+            {
+              "attempt": 1,
+              "error": "",
+              "parse_ok": true,
+              "parsed_keys": [
+                "confidence",
+                "desired_rel_lane",
+                "desired_rel_s",
+                "desired_rel_x",
+                "done_code",
+                "eta_steps",
+                "fallback",
+                "horizon_steps",
+                "intent",
+                "kind",
+                "mode",
+                "phase",
+                "trigger_code"
+              ],
+              "protocol": "structured",
+              "raw_response": "{\"kind\":\"ack\",\"phase\":\"strike\",\"intent\":\"cut_in_then_brake\",\"eta_steps\":3,\"trigger_code\":\"owner_committed\",\"done_code\":\"phase_complete\",\"fallback\":\"hold_lane\",\"confidence\":0.75,\"mode\":\"track_pose\",\"desired_rel_lane\":0,\"desired_rel_x\":3.0,\"desired_rel_s\":3.0,\"horizon_steps\":6}",
+              "role": "Striker",
+              "sanitized_response": "{\"kind\":\"ack\",\"phase\":\"strike\",\"intent\":\"cut_in_then_brake\",\"eta_steps\":3,\"trigger_code\":\"owner_committed\",\"done_code\":\"phase_complete\",\"fallback\":\"hold_lane\",\"confidence\":0.75,\"mode\":\"track_pose\",\"desired_rel_lane\":0,\"desired_rel_x\":3.0,\"desired_rel_s\":3.0,\"horizon_steps\":6}",
+              "step": 116,
+              "veh_id": "llm_1"
+            },
+            {
+              "attempt": 1,
+              "error": "",
+              "parse_ok": true,
+              "parsed_keys": [
+                "confidence",
+                "desired_rel_lane",
+                "desired_rel_s",
+                "desired_rel_x",
+                "done_code",
+                "eta_steps",
+                "fallback",
+                "horizon_steps",
+                "intent",
+                "kind",
+                "mode",
+                "phase",
+                "trigger_code"
+              ],
+              "protocol": "structured",
+              "raw_response": "{\"kind\":\"ack\",\"phase\":\"strike\",\"intent\":\"cut_in_then_brake\",\"eta_steps\":3,\"trigger_code\":\"owner_committed\",\"done_code\":\"phase_complete\",\"fallback\":\"hold_lane\",\"confidence\":0.75,\"mode\":\"track_pose\",\"desired_rel_lane\":0,\"desired_rel_x\":3.0,\"desired_rel_s\":3.0,\"horizon_steps\":6}",
+              "role": "Striker",
+              "sanitized_response": "{\"kind\":\"ack\",\"phase\":\"strike\",\"intent\":\"cut_in_then_brake\",\"eta_steps\":3,\"trigger_code\":\"owner_committed\",\"done_code\":\"phase_complete\",\"fallback\":\"hold_lane\",\"confidence\":0.75,\"mode\":\"track_pose\",\"desired_rel_lane\":0,\"desired_rel_x\":3.0,\"desired_rel_s\":3.0,\"horizon_steps\":6}",
+              "step": 120,
+              "veh_id": "llm_1"
+            },
+            {
+              "attempt": 1,
+              "error": "",
+              "parse_ok": true,
+              "parsed_keys": [
+                "confidence",
+                "desired_rel_lane",
+                "desired_rel_s",
+                "desired_rel_x",
+                "done_code",
+                "eta_steps",
+                "fallback",
+                "horizon_steps",
+                "intent",
+                "kind",
+                "mode",
+                "phase",
+                "trigger_code"
+              ],
+              "protocol": "structured",
+              "raw_response": "{\"kind\":\"ack\",\"phase\":\"strike\",\"intent\":\"cut_in_then_brake\",\"eta_steps\":3,\"trigger_code\":\"owner_committed\",\"done_code\":\"phase_complete\",\"fallback\":\"hold_lane\",\"confidence\":0.75,\"mode\":\"track_pose\",\"desired_rel_lane\":0,\"desired_rel_x\":3.0,\"desired_rel_s\":3.0,\"horizon_steps\":6}",
+              "role": "Striker",
+              "sanitized_response": "{\"kind\":\"ack\",\"phase\":\"strike\",\"intent\":\"cut_in_then_brake\",\"eta_steps\":3,\"trigger_code\":\"owner_committed\",\"done_code\":\"phase_complete\",\"fallback\":\"hold_lane\",\"confidence\":0.75,\"mode\":\"track_pose\",\"desired_rel_lane\":0,\"desired_rel_x\":3.0,\"desired_rel_s\":3.0,\"horizon_steps\":6}",
+              "step": 124,
+              "veh_id": "llm_1"
+            },
+            {
+              "attempt": 1,
+              "error": "",
+              "parse_ok": true,
+              "parsed_keys": [
+                "confidence",
+                "desired_rel_lane",
+                "desired_rel_s",
+                "desired_rel_x",
+                "done_code",
+                "eta_steps",
+                "fallback",
+                "horizon_steps",
+                "intent",
+                "kind",
+                "mode",
+                "phase",
+                "trigger_code"
+              ],
+              "protocol": "structured",
+              "raw_response": "{\"kind\":\"ack\",\"phase\":\"strike\",\"intent\":\"cut_in_then_brake\",\"eta_steps\":3,\"trigger_code\":\"owner_committed\",\"done_code\":\"phase_complete\",\"fallback\":\"hold_lane\",\"confidence\":0.75,\"mode\":\"track_pose\",\"desired_rel_lane\":0,\"desired_rel_x\":3.0,\"desired_rel_s\":3.0,\"horizon_steps\":6}",
+              "role": "Striker",
+              "sanitized_response": "{\"kind\":\"ack\",\"phase\":\"strike\",\"intent\":\"cut_in_then_brake\",\"eta_steps\":3,\"trigger_code\":\"owner_committed\",\"done_code\":\"phase_complete\",\"fallback\":\"hold_lane\",\"confidence\":0.75,\"mode\":\"track_pose\",\"desired_rel_lane\":0,\"desired_rel_x\":3.0,\"desired_rel_s\":3.0,\"horizon_steps\":6}",
+              "step": 128,
+              "veh_id": "llm_1"
+            },
+            {
+              "attempt": 1,
+              "error": "",
+              "parse_ok": true,
+              "parsed_keys": [
+                "confidence",
+                "desired_rel_lane",
+                "desired_rel_s",
+                "desired_rel_x",
+                "done_code",
+                "eta_steps",
+                "fallback",
+                "horizon_steps",
+                "intent",
+                "kind",
+                "mode",
+                "phase",
+                "trigger_code"
+              ],
+              "protocol": "structured",
+              "raw_response": "{\"kind\":\"ack\",\"phase\":\"strike\",\"intent\":\"cut_in_then_brake\",\"eta_steps\":3,\"trigger_code\":\"owner_committed\",\"done_code\":\"phase_complete\",\"fallback\":\"hold_lane\",\"confidence\":0.75,\"mode\":\"track_pose\",\"desired_rel_lane\":0,\"desired_rel_x\":3.0,\"desired_rel_s\":3.0,\"horizon_steps\":6}",
+              "role": "Striker",
+              "sanitized_response": "{\"kind\":\"ack\",\"phase\":\"strike\",\"intent\":\"cut_in_then_brake\",\"eta_steps\":3,\"trigger_code\":\"owner_committed\",\"done_code\":\"phase_complete\",\"fallback\":\"hold_lane\",\"confidence\":0.75,\"mode\":\"track_pose\",\"desired_rel_lane\":0,\"desired_rel_x\":3.0,\"desired_rel_s\":3.0,\"horizon_steps\":6}",
+              "step": 132,
+              "veh_id": "llm_1"
+            },
+            {
+              "attempt": 1,
+              "error": "",
+              "parse_ok": true,
+              "parsed_keys": [
+                "confidence",
+                "desired_rel_lane",
+                "desired_rel_s",
+                "desired_rel_x",
+                "done_code",
+                "eta_steps",
+                "fallback",
+                "horizon_steps",
+                "intent",
+                "kind",
+                "mode",
+                "phase",
+                "trigger_code"
+              ],
+              "protocol": "structured",
+              "raw_response": "{\"kind\":\"ack\",\"phase\":\"strike\",\"intent\":\"cut_in_then_brake\",\"eta_steps\":3,\"trigger_code\":\"owner_committed\",\"done_code\":\"phase_complete\",\"fallback\":\"hold_lane\",\"confidence\":0.75,\"mode\":\"track_pose\",\"desired_rel_lane\":0,\"desired_rel_x\":3.0,\"desired_rel_s\":3.0,\"horizon_steps\":6}",
+              "role": "Striker",
+              "sanitized_response": "{\"kind\":\"ack\",\"phase\":\"strike\",\"intent\":\"cut_in_then_brake\",\"eta_steps\":3,\"trigger_code\":\"owner_committed\",\"done_code\":\"phase_complete\",\"fallback\":\"hold_lane\",\"confidence\":0.75,\"mode\":\"track_pose\",\"desired_rel_lane\":0,\"desired_rel_x\":3.0,\"desired_rel_s\":3.0,\"horizon_steps\":6}",
+              "step": 136,
+              "veh_id": "llm_1"
+            },
+            {
+              "attempt": 1,
+              "error": "",
+              "parse_ok": true,
+              "parsed_keys": [
+                "confidence",
+                "desired_rel_lane",
+                "desired_rel_s",
+                "desired_rel_x",
+                "done_code",
+                "eta_steps",
+                "fallback",
+                "horizon_steps",
+                "intent",
+                "kind",
+                "mode",
+                "phase",
+                "trigger_code"
+              ],
+              "protocol": "structured",
+              "raw_response": "{\"kind\":\"ack\",\"phase\":\"strike\",\"intent\":\"cut_in_then_brake\",\"eta_steps\":3,\"trigger_code\":\"owner_committed\",\"done_code\":\"phase_complete\",\"fallback\":\"hold_lane\",\"confidence\":0.75,\"mode\":\"track_pose\",\"desired_rel_lane\":0,\"desired_rel_x\":3.0,\"desired_rel_s\":3.0,\"horizon_steps\":6}",
+              "role": "Striker",
+              "sanitized_response": "{\"kind\":\"ack\",\"phase\":\"strike\",\"intent\":\"cut_in_then_brake\",\"eta_steps\":3,\"trigger_code\":\"owner_committed\",\"done_code\":\"phase_complete\",\"fallback\":\"hold_lane\",\"confidence\":0.75,\"mode\":\"track_pose\",\"desired_rel_lane\":0,\"desired_rel_x\":3.0,\"desired_rel_s\":3.0,\"horizon_steps\":6}",
+              "step": 140,
+              "veh_id": "llm_1"
+            },
+            {
+              "attempt": 1,
+              "error": "",
+              "parse_ok": true,
+              "parsed_keys": [
+                "confidence",
+                "desired_rel_lane",
+                "desired_rel_s",
+                "desired_rel_x",
+                "done_code",
+                "eta_steps",
+                "fallback",
+                "horizon_steps",
+                "intent",
+                "kind",
+                "mode",
+                "phase",
+                "trigger_code"
+              ],
+              "protocol": "structured",
+              "raw_response": "{\"kind\":\"ack\",\"phase\":\"strike\",\"intent\":\"cut_in_then_brake\",\"eta_steps\":3,\"trigger_code\":\"owner_committed\",\"done_code\":\"phase_complete\",\"fallback\":\"hold_lane\",\"confidence\":0.75,\"mode\":\"track_pose\",\"desired_rel_lane\":0,\"desired_rel_x\":3.0,\"desired_rel_s\":3.0,\"horizon_steps\":6}",
+              "role": "Striker",
+              "sanitized_response": "{\"kind\":\"ack\",\"phase\":\"strike\",\"intent\":\"cut_in_then_brake\",\"eta_steps\":3,\"trigger_code\":\"owner_committed\",\"done_code\":\"phase_complete\",\"fallback\":\"hold_lane\",\"confidence\":0.75,\"mode\":\"track_pose\",\"desired_rel_lane\":0,\"desired_rel_x\":3.0,\"desired_rel_s\":3.0,\"horizon_steps\":6}",
+              "step": 144,
+              "veh_id": "llm_1"
+            },
+            {
+              "attempt": 1,
+              "error": "",
+              "parse_ok": true,
+              "parsed_keys": [
+                "confidence",
+                "desired_rel_lane",
+                "desired_rel_s",
+                "desired_rel_x",
+                "done_code",
+                "eta_steps",
+                "fallback",
+                "horizon_steps",
+                "intent",
+                "kind",
+                "mode",
+                "phase",
+                "trigger_code"
+              ],
+              "protocol": "structured",
+              "raw_response": "{\"kind\":\"ack\",\"phase\":\"strike\",\"intent\":\"cut_in_then_brake\",\"eta_steps\":3,\"trigger_code\":\"owner_committed\",\"done_code\":\"phase_complete\",\"fallback\":\"hold_lane\",\"confidence\":0.75,\"mode\":\"track_pose\",\"desired_rel_lane\":0,\"desired_rel_x\":3.0,\"desired_rel_s\":3.0,\"horizon_steps\":6}",
+              "role": "Striker",
+              "sanitized_response": "{\"kind\":\"ack\",\"phase\":\"strike\",\"intent\":\"cut_in_then_brake\",\"eta_steps\":3,\"trigger_code\":\"owner_committed\",\"done_code\":\"phase_complete\",\"fallback\":\"hold_lane\",\"confidence\":0.75,\"mode\":\"track_pose\",\"desired_rel_lane\":0,\"desired_rel_x\":3.0,\"desired_rel_s\":3.0,\"horizon_steps\":6}",
+              "step": 148,
+              "veh_id": "llm_1"
+            },
+            {
+              "attempt": 1,
+              "error": "",
+              "parse_ok": true,
+              "parsed_keys": [
+                "confidence",
+                "desired_rel_lane",
+                "desired_rel_s",
+                "desired_rel_x",
+                "done_code",
+                "eta_steps",
+                "fallback",
+                "horizon_steps",
+                "intent",
+                "kind",
+                "mode",
+                "phase",
+                "trigger_code"
+              ],
+              "protocol": "structured",
+              "raw_response": "{\"kind\":\"ack\",\"phase\":\"strike\",\"intent\":\"cut_in_then_brake\",\"eta_steps\":3,\"trigger_code\":\"owner_committed\",\"done_code\":\"phase_complete\",\"fallback\":\"hold_lane\",\"confidence\":0.75,\"mode\":\"track_pose\",\"desired_rel_lane\":0,\"desired_rel_x\":3.0,\"desired_rel_s\":3.0,\"horizon_steps\":6}",
+              "role": "Striker",
+              "sanitized_response": "{\"kind\":\"ack\",\"phase\":\"strike\",\"intent\":\"cut_in_then_brake\",\"eta_steps\":3,\"trigger_code\":\"owner_committed\",\"done_code\":\"phase_complete\",\"fallback\":\"hold_lane\",\"confidence\":0.75,\"mode\":\"track_pose\",\"desired_rel_lane\":0,\"desired_rel_x\":3.0,\"desired_rel_s\":3.0,\"horizon_steps\":6}",
+              "step": 152,
+              "veh_id": "llm_1"
+            },
+            {
+              "attempt": 1,
+              "error": "",
+              "parse_ok": true,
+              "parsed_keys": [
+                "confidence",
+                "desired_rel_lane",
+                "desired_rel_s",
+                "desired_rel_x",
+                "done_code",
+                "eta_steps",
+                "fallback",
+                "horizon_steps",
+                "intent",
+                "kind",
+                "mode",
+                "phase",
+                "trigger_code"
+              ],
+              "protocol": "structured",
+              "raw_response": "{\"kind\":\"ack\",\"phase\":\"strike\",\"intent\":\"cut_in_then_brake\",\"eta_steps\":3,\"trigger_code\":\"owner_committed\",\"done_code\":\"phase_complete\",\"fallback\":\"hold_lane\",\"confidence\":0.75,\"mode\":\"track_pose\",\"desired_rel_lane\":0,\"desired_rel_x\":3.0,\"desired_rel_s\":3.0,\"horizon_steps\":6}",
+              "role": "Striker",
+              "sanitized_response": "{\"kind\":\"ack\",\"phase\":\"strike\",\"intent\":\"cut_in_then_brake\",\"eta_steps\":3,\"trigger_code\":\"owner_committed\",\"done_code\":\"phase_complete\",\"fallback\":\"hold_lane\",\"confidence\":0.75,\"mode\":\"track_pose\",\"desired_rel_lane\":0,\"desired_rel_x\":3.0,\"desired_rel_s\":3.0,\"horizon_steps\":6}",
+              "step": 156,
+              "veh_id": "llm_1"
+            },
+            {
+              "attempt": 1,
+              "error": "",
+              "parse_ok": true,
+              "parsed_keys": [
+                "confidence",
+                "desired_rel_lane",
+                "desired_rel_s",
+                "desired_rel_x",
+                "done_code",
+                "eta_steps",
+                "fallback",
+                "horizon_steps",
+                "intent",
+                "kind",
+                "mode",
+                "phase",
+                "trigger_code"
+              ],
+              "protocol": "structured",
+              "raw_response": "{\"kind\":\"ack\",\"phase\":\"strike\",\"intent\":\"cut_in_then_brake\",\"eta_steps\":3,\"trigger_code\":\"owner_committed\",\"done_code\":\"phase_complete\",\"fallback\":\"hold_lane\",\"confidence\":0.75,\"mode\":\"track_pose\",\"desired_rel_lane\":0,\"desired_rel_x\":3.0,\"desired_rel_s\":3.0,\"horizon_steps\":6}",
+              "role": "Striker",
+              "sanitized_response": "{\"kind\":\"ack\",\"phase\":\"strike\",\"intent\":\"cut_in_then_brake\",\"eta_steps\":3,\"trigger_code\":\"owner_committed\",\"done_code\":\"phase_complete\",\"fallback\":\"hold_lane\",\"confidence\":0.75,\"mode\":\"track_pose\",\"desired_rel_lane\":0,\"desired_rel_x\":3.0,\"desired_rel_s\":3.0,\"horizon_steps\":6}",
+              "step": 160,
+              "veh_id": "llm_1"
+            }
+          ],
+          "normalization_repairs": 0,
+          "owner_plan_missing_events": 0,
+          "phase_trace": [
+            {
+              "intent": "cut_in_then_brake",
+              "kind": "ack",
+              "phase": "brake_pulse",
+              "plan_id": "p1",
+              "step": 36
+            },
+            {
+              "intent": "cut_in_then_brake",
+              "kind": "ack",
+              "phase": "brake_pulse",
+              "plan_id": "p2",
+              "step": 40
+            },
+            {
+              "intent": "cut_in_then_brake",
+              "kind": "ack",
+              "phase": "brake_pulse",
+              "plan_id": "p2",
+              "step": 44
+            },
+            {
+              "intent": "cut_in_then_brake",
+              "kind": "ack",
+              "phase": "brake_pulse",
+              "plan_id": "p2",
+              "step": 48
+            },
+            {
+              "intent": "cut_in_then_brake",
+              "kind": "ack",
+              "phase": "brake_pulse",
+              "plan_id": "p3",
+              "step": 52
+            },
+            {
+              "intent": "cut_in_then_brake",
+              "kind": "ack",
+              "phase": "brake_pulse",
+              "plan_id": "p3",
+              "step": 56
+            },
+            {
+              "intent": "cut_in_then_brake",
+              "kind": "ack",
+              "phase": "brake_pulse",
+              "plan_id": "p3",
+              "step": 60
+            },
+            {
+              "intent": "cut_in_then_brake",
+              "kind": "ack",
+              "phase": "brake_pulse",
+              "plan_id": "p4",
+              "step": 64
+            },
+            {
+              "intent": "cut_in_then_brake",
+              "kind": "ack",
+              "phase": "brake_pulse",
+              "plan_id": "p4",
+              "step": 68
+            },
+            {
+              "intent": "cut_in_then_brake",
+              "kind": "ack",
+              "phase": "brake_pulse",
+              "plan_id": "p4",
+              "step": 72
+            },
+            {
+              "intent": "cut_in_then_brake",
+              "kind": "ack",
+              "phase": "brake_pulse",
+              "plan_id": "p5",
+              "step": 76
+            },
+            {
+              "intent": "cut_in_then_brake",
+              "kind": "ack",
+              "phase": "brake_pulse",
+              "plan_id": "p5",
+              "step": 80
+            },
+            {
+              "intent": "cut_in_then_brake",
+              "kind": "ack",
+              "phase": "brake_pulse",
+              "plan_id": "p5",
+              "step": 84
+            },
+            {
+              "intent": "cut_in_then_brake",
+              "kind": "ack",
+              "phase": "brake_pulse",
+              "plan_id": "p6",
+              "step": 88
+            },
+            {
+              "intent": "cut_in_then_brake",
+              "kind": "ack",
+              "phase": "brake_pulse",
+              "plan_id": "p6",
+              "step": 92
+            },
+            {
+              "intent": "cut_in_then_brake",
+              "kind": "ack",
+              "phase": "brake_pulse",
+              "plan_id": "p6",
+              "step": 96
+            },
+            {
+              "intent": "cut_in_then_brake",
+              "kind": "ack",
+              "phase": "brake_pulse",
+              "plan_id": "p7",
+              "step": 100
+            },
+            {
+              "intent": "cut_in_then_brake",
+              "kind": "ack",
+              "phase": "brake_pulse",
+              "plan_id": "p7",
+              "step": 104
+            },
+            {
+              "intent": "cut_in_then_brake",
+              "kind": "ack",
+              "phase": "brake_pulse",
+              "plan_id": "p7",
+              "step": 108
+            },
+            {
+              "intent": "cut_in_then_brake",
+              "kind": "ack",
+              "phase": "brake_pulse",
+              "plan_id": "p7",
+              "step": 112
+            },
+            {
+              "intent": "cut_in_then_brake",
+              "kind": "ack",
+              "phase": "brake_pulse",
+              "plan_id": "p8",
+              "step": 116
+            },
+            {
+              "intent": "cut_in_then_brake",
+              "kind": "ack",
+              "phase": "brake_pulse",
+              "plan_id": "p8",
+              "step": 120
+            },
+            {
+              "intent": "cut_in_then_brake",
+              "kind": "ack",
+              "phase": "brake_pulse",
+              "plan_id": "p8",
+              "step": 124
+            },
+            {
+              "intent": "cut_in_then_brake",
+              "kind": "ack",
+              "phase": "brake_pulse",
+              "plan_id": "p9",
+              "step": 128
+            },
+            {
+              "intent": "cut_in_then_brake",
+              "kind": "ack",
+              "phase": "brake_pulse",
+              "plan_id": "p9",
+              "step": 132
+            },
+            {
+              "intent": "cut_in_then_brake",
+              "kind": "ack",
+              "phase": "brake_pulse",
+              "plan_id": "p9",
+              "step": 136
+            },
+            {
+              "intent": "cut_in_then_brake",
+              "kind": "ack",
+              "phase": "brake_pulse",
+              "plan_id": "p10",
+              "step": 140
+            },
+            {
+              "intent": "cut_in_then_brake",
+              "kind": "ack",
+              "phase": "brake_pulse",
+              "plan_id": "p10",
+              "step": 144
+            },
+            {
+              "intent": "cut_in_then_brake",
+              "kind": "ack",
+              "phase": "brake_pulse",
+              "plan_id": "p10",
+              "step": 148
+            },
+            {
+              "intent": "cut_in_then_brake",
+              "kind": "ack",
+              "phase": "brake_pulse",
+              "plan_id": "p11",
+              "step": 152
+            },
+            {
+              "intent": "cut_in_then_brake",
+              "kind": "ack",
+              "phase": "brake_pulse",
+              "plan_id": "p11",
+              "step": 156
+            },
+            {
+              "intent": "cut_in_then_brake",
+              "kind": "ack",
+              "phase": "brake_pulse",
+              "plan_id": "p11",
+              "step": 160
+            }
+          ],
+          "plan_expiry_step": 172,
+          "repair_fallback_used": 0,
+          "repaired_fields": [],
+          "role": "Striker",
+          "role_map": {
+            "llm_0": "Blocker",
+            "llm_1": "Striker"
+          },
+          "rollout_parse_fallback_used": 0,
+          "scene_gate_status": {
+            "accepted": true,
+            "background_nearby_count": 5,
+            "blocker_id": "llm_0",
+            "blocker_rel_lane": -1,
+            "blocker_rel_x": 10.465,
+            "reason": "accepted",
+            "role_map": {
+              "llm_0": "Blocker",
+              "llm_1": "Striker"
+            },
+            "sample_index": 3,
+            "sampling_strategy": "custom_highway_opening",
+            "striker_id": "llm_1",
+            "striker_rel_lane": 1,
+            "striker_rel_x": -14.454
+          },
+          "sync_error_events": 0,
+          "trigger_not_met_events": 0,
+          "veh_id": "llm_1"
+        }
+      },
+      "llm_stats": {
+        "llm_0": {
+          "fallback_activations": 0,
+          "last_parse_error": "",
+          "last_phase": "brake_pulse",
+          "last_plan_id": "p12",
+          "last_raw_response": "{\"kind\":\"commit\",\"phase\":\"compress\",\"intent\":\"block_lane\",\"eta_steps\":4,\"trigger_code\":\"none\",\"done_code\":\"phase_complete\",\"fallback\":\"hold_lane\",\"confidence\":0.72,\"mode\":\"track_pose\",\"desired_rel_lane\":0,\"desired_rel_x\":8.0,\"desired_rel_s\":5.0,\"horizon_steps\":8}",
+          "model": "llama3.2:3b",
+          "normalization_repairs": 0,
+          "parse_failures": 0,
+          "repair_fallback_used": 0,
+          "role": "Blocker",
+          "veh_id": "llm_0"
+        },
+        "llm_1": {
+          "fallback_activations": 0,
+          "last_parse_error": "",
+          "last_phase": "brake_pulse",
+          "last_plan_id": "p12",
+          "last_raw_response": "{\"kind\":\"ack\",\"phase\":\"strike\",\"intent\":\"cut_in_then_brake\",\"eta_steps\":3,\"trigger_code\":\"owner_committed\",\"done_code\":\"phase_complete\",\"fallback\":\"hold_lane\",\"confidence\":0.75,\"mode\":\"track_pose\",\"desired_rel_lane\":0,\"desired_rel_x\":3.0,\"desired_rel_s\":3.0,\"horizon_steps\":6}",
+          "model": "llama3.2:3b",
+          "normalization_repairs": 0,
+          "parse_failures": 0,
+          "repair_fallback_used": 0,
+          "role": "Striker",
+          "veh_id": "llm_1"
+        }
+      },
+      "min_ttc": null,
+      "normalization_repairs": 0,
+      "result": "interrupted",
+      "role_map": {
+        "llm_0": "Blocker",
+        "llm_1": "Striker"
+      },
+      "sampling_strategy": "custom_highway_opening",
+      "scenario_id": "20260408-072844_983454962410456848",
+      "scene_gate_status": {
+        "accepted": true,
+        "background_nearby_count": 5,
+        "blocker_id": "llm_0",
+        "blocker_rel_lane": -1,
+        "blocker_rel_x": 10.465,
+        "reason": "accepted",
+        "role_map": {
+          "llm_0": "Blocker",
+          "llm_1": "Striker"
+        },
+        "sample_index": 3,
+        "sampling_strategy": "custom_highway_opening",
+        "striker_id": "llm_1",
+        "striker_rel_lane": 1,
+        "striker_rel_x": -14.454
+      },
+      "steps_executed": 163
+    }
+  ],
+  "iterations_completed": 2,
+  "llm_max_retries": "3",
+  "llm_neighbor_k": "6",
+  "llm_timeout_s": "12",
+  "llm_trace_file": "./data/highway_20260408-072844/llm_trace.jsonl",
+  "model": "llama3.2:3b",
+  "role_map": {
+    "llm_0": "Blocker",
+    "llm_1": "Striker"
+  },
+  "run_started_at": "20260408-072844",
+  "sampling_strategy": "custom_highway_opening",
+  "scenario_id": "20260408-072844_983454962410456848",
+  "scene_gate_status": {
+    "accepted": true,
+    "background_nearby_count": 5,
+    "blocker_id": "llm_0",
+    "blocker_rel_lane": -1,
+    "blocker_rel_x": 10.465,
+    "reason": "accepted",
+    "role_map": {
+      "llm_0": "Blocker",
+      "llm_1": "Striker"
+    },
+    "sample_index": 3,
+    "sampling_strategy": "custom_highway_opening",
+    "striker_id": "llm_1",
+    "striker_rel_lane": 1,
+    "striker_rel_x": -14.454
+  }
+}

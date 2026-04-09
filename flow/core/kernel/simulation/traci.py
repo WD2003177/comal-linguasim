@@ -282,9 +282,11 @@ class TraCISimulation(KernelSimulation):
         if len(self.stored_data) == 0:
             return
 
-        # Get a csv name for the emission file.
-        name = "{}-{}_emission.csv".format(
-            self.master_kernel.network.network.name, run_id)
+        # Get a stable csv name for the emission file.
+        net_obj = self.master_kernel.network.network
+        base_name = getattr(net_obj, "orig_name", getattr(net_obj, "name", "run"))
+        base_name = str(base_name).replace("/", "_").replace(" ", "_")
+        name = "{}_iter{:02d}_emission.csv".format(base_name, int(run_id))
 
         # The name of all stored data-points (excluding id and time)
         stored_ids = [

@@ -1,0 +1,192 @@
+{
+  "exp_tag": "highway",
+  "iterations": [
+    {
+      "crashed": false,
+      "feedback": "FAILED: Too safe. Min TTC was infs. The ego vehicle easily dodged your attack. Decrease 's' to press closer, or execute the cut-in more abruptly.",
+      "iteration": 1,
+      "llm_stats": {
+        "llm_0": {
+          "last_parse_error": "",
+          "model": "llama3.2:3b",
+          "veh_id": "llm_0"
+        },
+        "llm_1": {
+          "last_parse_error": "",
+          "model": "llama3.2:3b",
+          "veh_id": "llm_1"
+        }
+      },
+      "min_ttc": null
+    },
+    {
+      "crashed": false,
+      "feedback": "FAILED: Too safe. Min TTC was 30.37s. The ego vehicle easily dodged your attack. Decrease 's' to press closer, or execute the cut-in more abruptly.",
+      "iteration": 2,
+      "llm_stats": {
+        "llm_0": {
+          "last_parse_error": "",
+          "model": "llama3.2:3b",
+          "veh_id": "llm_0"
+        },
+        "llm_1": {
+          "last_parse_error": "",
+          "model": "llama3.2:3b",
+          "veh_id": "llm_1"
+        }
+      },
+      "min_ttc": 30.374648843538832
+    },
+    {
+      "crashed": false,
+      "feedback": "FAILED: Too safe. Min TTC was infs. The ego vehicle easily dodged your attack. Decrease 's' to press closer, or execute the cut-in more abruptly.",
+      "iteration": 3,
+      "llm_stats": {
+        "llm_0": {
+          "last_parse_error": "",
+          "model": "llama3.2:3b",
+          "veh_id": "llm_0"
+        },
+        "llm_1": {
+          "last_parse_error": "",
+          "model": "llama3.2:3b",
+          "veh_id": "llm_1"
+        }
+      },
+      "min_ttc": null
+    },
+    {
+      "crashed": false,
+      "feedback": "FAILED: Too safe. Min TTC was 10.10s. The ego vehicle easily dodged your attack. Decrease 's' to press closer, or execute the cut-in more abruptly.",
+      "iteration": 4,
+      "llm_stats": {
+        "llm_0": {
+          "last_parse_error": "",
+          "model": "llama3.2:3b",
+          "veh_id": "llm_0"
+        },
+        "llm_1": {
+          "last_parse_error": "",
+          "model": "llama3.2:3b",
+          "veh_id": "llm_1"
+        }
+      },
+      "min_ttc": 10.100793627363435
+    },
+    {
+      "crashed": false,
+      "feedback": "FAILED: Too safe. Min TTC was 77.41s. The ego vehicle easily dodged your attack. Decrease 's' to press closer, or execute the cut-in more abruptly.",
+      "iteration": 5,
+      "llm_stats": {
+        "llm_0": {
+          "last_parse_error": "",
+          "model": "llama3.2:3b",
+          "veh_id": "llm_0"
+        },
+        "llm_1": {
+          "last_parse_error": "",
+          "model": "llama3.2:3b",
+          "veh_id": "llm_1"
+        }
+      },
+      "min_ttc": 77.40874629351609
+    },
+    {
+      "crashed": false,
+      "feedback": "FAILED: Too safe. Min TTC was infs. The ego vehicle easily dodged your attack. Decrease 's' to press closer, or execute the cut-in more abruptly.",
+      "iteration": 6,
+      "llm_stats": {
+        "llm_0": {
+          "last_parse_error": "",
+          "model": "llama3.2:3b",
+          "veh_id": "llm_0"
+        },
+        "llm_1": {
+          "last_parse_error": "",
+          "model": "llama3.2:3b",
+          "veh_id": "llm_1"
+        }
+      },
+      "min_ttc": null
+    },
+    {
+      "crashed": false,
+      "feedback": "FAILED: Too safe. Min TTC was infs. The ego vehicle easily dodged your attack. Decrease 's' to press closer, or execute the cut-in more abruptly.",
+      "iteration": 7,
+      "llm_stats": {
+        "llm_0": {
+          "last_parse_error": "",
+          "model": "llama3.2:3b",
+          "veh_id": "llm_0"
+        },
+        "llm_1": {
+          "last_parse_error": "",
+          "model": "llama3.2:3b",
+          "veh_id": "llm_1"
+        }
+      },
+      "min_ttc": null
+    },
+    {
+      "crashed": false,
+      "feedback": "FAILED: Too safe. Min TTC was infs. The ego vehicle easily dodged your attack. Decrease 's' to press closer, or execute the cut-in more abruptly.",
+      "iteration": 8,
+      "llm_stats": {
+        "llm_0": {
+          "last_parse_error": "",
+          "model": "llama3.2:3b",
+          "veh_id": "llm_0"
+        },
+        "llm_1": {
+          "last_parse_error": "",
+          "model": "llama3.2:3b",
+          "veh_id": "llm_1"
+        }
+      },
+      "min_ttc": null
+    },
+    {
+      "crashed": false,
+      "feedback": "FAILED: Too safe. Min TTC was infs. The ego vehicle easily dodged your attack. Decrease 's' to press closer, or execute the cut-in more abruptly.",
+      "iteration": 9,
+      "llm_stats": {
+        "llm_0": {
+          "last_parse_error": "",
+          "model": "llama3.2:3b",
+          "veh_id": "llm_0"
+        },
+        "llm_1": {
+          "last_parse_error": "",
+          "model": "llama3.2:3b",
+          "veh_id": "llm_1"
+        }
+      },
+      "min_ttc": null
+    },
+    {
+      "crashed": false,
+      "feedback": "FAILED: Too safe. Min TTC was infs. The ego vehicle easily dodged your attack. Decrease 's' to press closer, or execute the cut-in more abruptly.",
+      "iteration": 10,
+      "llm_stats": {
+        "llm_0": {
+          "last_parse_error": "",
+          "model": "llama3.2:3b",
+          "veh_id": "llm_0"
+        },
+        "llm_1": {
+          "last_parse_error": "",
+          "model": "llama3.2:3b",
+          "veh_id": "llm_1"
+        }
+      },
+      "min_ttc": null
+    }
+  ],
+  "llm_heartbeat_s": "5",
+  "llm_long_timeout_s": "30",
+  "llm_max_retries": "3",
+  "llm_neighbor_k": "6",
+  "llm_timeout_s": "12",
+  "model": "llama3.2:3b",
+  "run_started_at": "20260331-052306"
+}

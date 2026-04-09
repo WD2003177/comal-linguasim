@@ -317,6 +317,38 @@ class Env(gym.Env, metaclass=ABCMeta):
         with Pool(mp.cpu_count()) as pool:
             accel = pool.map(get_vehicle_action, [(veh_id, self.k, self) for veh_id in veh_ids])
         return accel
+
+    def _get_coordinated_llm_controllers(self):
+        controllers = []
+        for veh_id in self.k.vehicle.get_controlled_ids():
+            controller = self.k.vehicle.get_acc_controller(veh_id)
+            if controller is None:
+                continue
+            if not hasattr(controller, "uses_coordinated_structured_protocol"):
+                continue
+            if not controller.uses_coordinated_structured_protocol():
+                continue
+            controllers.append(controller)
+        controllers.sort(
+            key=lambda controller: (
+                0 if getattr(controller, "attack_role", "") == "Blocker" else 1,
+                getattr(controller, "veh_id", ""),
+            )
+        )
+        return controllers
+
+    def _run_controlled_planning(self):
+        controllers = self._get_coordinated_llm_controllers()
+        if not controllers:
+            return
+
+        step = int(self.time_counter)
+        self.message_pool.begin_control_cycle(step)
+        snapshot = self.message_pool.snapshot(step, viewer_id="coordinator")
+        for controller in controllers:
+            controller.prepare_for_coordinated_step(self, snapshot=snapshot)
+            snapshot = self.message_pool.snapshot(step, viewer_id=controller.veh_id)
+
     def step(self, rl_actions):
         """Advance the environment by one step.
 
@@ -350,6 +382,7 @@ class Env(gym.Env, metaclass=ABCMeta):
         for _ in range(self.env_params.sims_per_step):
             self.time_counter += 1
             self.step_counter += 1
+            self._run_controlled_planning()
 
             # perform acceleration actions for controlled human-driven vehicles
             if len(self.k.vehicle.get_controlled_ids()) > 0:

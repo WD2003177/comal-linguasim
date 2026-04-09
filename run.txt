@@ -9,3 +9,15 @@ docker run -it --platform linux/amd64 \
 export SUMO_HOME="/root/sumo" && export PATH="$HOME/sumo/bin:$PATH" && export PYTHONPATH="$HOME/sumo/tools:$PYTHONPATH"
 
 python examples/simulate.py highway --no_render --gen_emission
+
+可视化
+python scripts/render_video.py \
+  data/highway_20260408-072844/highway_iter00_emission.csv \
+  --output data/highway_20260408-072844/simulation_replay_clear.mp4 \
+  --figsize 12 6 \
+  --dpi 140 \
+  --marker-size 42 \
+  --x-window 0 \
+  --aspect auto \
+  --frame-step 2 \
+  --fps 15

@@ -45,7 +45,7 @@
     "network": "flow.networks.highway.HighwayNetwork",
     "sim": {
         "color_by_speed": false,
-        "emission_path": "./data",
+        "emission_path": "./data/highway_20260401-020159",
         "force_color_update": false,
         "lateral_resolution": 1.0,
         "no_step_log": true,
