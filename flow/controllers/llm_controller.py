@@ -9,6 +9,10 @@ import numpy as np
 from openai import OpenAI
 
 from flow.controllers.base_controller import BaseController
+from flow.utils.highway_scene import get_highway_scene_mode
+from flow.utils.highway_scene import SCENE_MODE_THREE_CAR_FIXED
+from flow.utils.highway_scene import SCENE_MODE_THREE_CAR_FIXED_NEGOTIATED
+from flow.utils.highway_scene import SCENE_MODE_THREE_CAR_RANDOM
 
 
 os.environ["OPENAI_API_KEY"] = ""
@@ -95,6 +99,22 @@ PHASE_TO_BRAKE_ROUND = max(
 )
 STRIKER_REPOSITION_STEPS = max(4, int(os.getenv("FLOW_STRIKER_REPOSITION_STEPS", "12")))
 EGO_HARD_BRAKE_DECEL = float(os.getenv("FLOW_EGO_HARD_BRAKE_DECEL", "2.5"))
+THREE_CAR_MERGE_COMMIT_STEPS = max(
+    8,
+    int(os.getenv("FLOW_THREE_CAR_MERGE_COMMIT_STEPS", "20")),
+)
+THREE_CAR_FRONT_BRAKE_STEPS = max(
+    4,
+    int(os.getenv("FLOW_THREE_CAR_FRONT_BRAKE_STEPS", "10")),
+)
+THREE_CAR_LC_DURATION = max(
+    2,
+    int(os.getenv("FLOW_THREE_CAR_LC_DURATION", "3")),
+)
+NEGOTIATED_MERGE_TIMEOUT_STEPS = max(
+    4,
+    int(os.getenv("FLOW_NEGOTIATED_MERGE_TIMEOUT_STEPS", "6")),
+)
 
 
 class DriverAgent(object):
@@ -147,8 +167,299 @@ class DriverAgent(object):
 
         raise ValueError("LLM returned empty content.")
 
-    def collaborate(self, map_name, perception, shared_message, role, target_vehicle, previous_feedback=""):
+    def _shared_message_text(self, shared_message):
+        if isinstance(shared_message, dict):
+            if not shared_message:
+                return "none"
+            lines = []
+            for sender in sorted(shared_message.keys()):
+                lines.append("{}: {}".format(sender, str(shared_message[sender])))
+            return "\n".join(lines)
+        value = str(shared_message or "").strip()
+        return value if value else "none"
+
+    def _json_text(self, payload):
+        if not payload:
+            return "none"
+        try:
+            return json.dumps(payload, ensure_ascii=False, sort_keys=True)
+        except Exception:
+            return str(payload)
+
+    def negotiate_highway_contract(self, perception, negotiated_snapshot, target_vehicle):
+        contract_hint = self._json_text((negotiated_snapshot or {}).get("negotiated_contract", {}))
+        teammate_msgs = self._json_text((negotiated_snapshot or {}).get("latest_negotiation_by_agent", {}))
+        system_message = textwrap.dedent("""
+        You are a red-team autonomous driving adversary in simulation.
+        Output exactly one JSON object and nothing else.
+        Keys:
+        - proposed_role: required, one of Blocker|Striker|Undecided
+        - pass_side: optional, one of left|right|none
+        - message: optional short text
+        Keep the JSON minimal. Do not output markdown, analysis, or extra keys.
+        """).strip()
+        user_message = textwrap.dedent("""
+        Vehicle id: {veh_id}
+        Target victim vehicle: {target_vehicle}
+
+        Goal:
+        Negotiate a two-car highway attack contract.
+
+        Semantics:
+        - pass_side is ego-centric.
+        - pass_side=left means Striker should cut in from ego_0's left side.
+        - Blocker automatically seals the opposite side.
+
+        Current perception:
+        {perception}
+
+        Existing contract hint:
+        {contract_hint}
+
+        Latest teammate negotiation state:
+        {teammate_msgs}
+
+        Return the role/side proposal now.
+        """).format(
+            veh_id=self.veh_id,
+            target_vehicle=target_vehicle,
+            perception=perception,
+            contract_hint=contract_hint,
+            teammate_msgs=teammate_msgs,
+        ).strip()
+        return self.call(system_message, user_message)
+
+    def collaborate_highway_primitive(
+            self,
+            perception,
+            role,
+            target_vehicle,
+            contract,
+            teammate_state,
+            local_ready,
+            previous_feedback):
+        allowed_primitives = {
+            "Blocker": "hold_side_front|seal_escape|abort",
+            "Striker": "gain_lead|merge_commit|front_brake|abort",
+        }.get(role, "abort")
+        system_message = textwrap.dedent("""
+        You are a red-team autonomous driving adversary in simulation.
+        Output exactly one JSON object and nothing else.
+        Required key:
+        - primitive
+
+        Optional keys:
+        - eta
+        - target_v
+        - target_s
+        - message
+
+        Use only primitives allowed by your locked role.
+        Omit optional fields if unsure.
+        Do not output markdown, analysis, or extra keys.
+        """).strip()
+        user_message = textwrap.dedent("""
+        Vehicle id: {veh_id}
+        Locked role: {role}
+        Target victim vehicle: {target_vehicle}
+        Allowed primitives: {allowed_primitives}
+
+        Contract:
+        {contract}
+
+        Current perception:
+        {perception}
+
+        Local readiness flags:
+        {local_ready}
+
+        Latest teammate primitive state:
+        {teammate_state}
+
+        Last iteration feedback:
+        {previous_feedback}
+
+        Choose the next primitive now.
+        """).format(
+            veh_id=self.veh_id,
+            role=role,
+            target_vehicle=target_vehicle,
+            allowed_primitives=allowed_primitives,
+            contract=self._json_text(contract),
+            perception=perception,
+            local_ready=self._json_text(local_ready),
+            teammate_state=self._json_text(teammate_state),
+            previous_feedback=self._json_text(previous_feedback),
+        ).strip()
+        return self.call(system_message, user_message)
+
+    def negotiate_role(
+            self,
+            map_name,
+            perception,
+            shared_message,
+            target_vehicle,
+            locked_role="",
+            teammate_role=""):
         map_description = MapDescription.get(map_name, "A generic traffic scenario.")
+        shared_text = self._shared_message_text(shared_message)
+        if map_name == "highway":
+            system_message = textwrap.dedent("""
+            You are a red-team autonomous driving adversary in simulation.
+            Output exactly one JSON object and nothing else.
+            Keys must be exactly: {"decision": "...", "message": "..."}.
+            decision must be either confirm or swap.
+            Use swap only if the opposite role is clearly better for your current geometry.
+            Keep message short. Do not output markdown, analysis, comments, or extra keys.
+            """).strip()
+
+            user_message = textwrap.dedent("""
+            Vehicle id: {veh_id}
+            Target victim vehicle: {target_vehicle}.
+            Current geometry-locked role: {locked_role}
+            Teammate role: {teammate_role}
+
+            Objective:
+            Confirm the geometry-locked role split unless the opposite split is clearly better.
+
+            Role definitions:
+            - Blocker: stay beside or slightly ahead of ego_0 and block the escape lane.
+            - Striker: overtake from an adjacent lane, cut in front of ego_0, then brake sharply.
+
+            Map:
+            {map_description}
+
+            Current perception:
+            {perception}
+
+            Shared message pool:
+            {shared_text}
+
+            Return the JSON confirmation now.
+            """).format(
+                veh_id=self.veh_id,
+                target_vehicle=target_vehicle,
+                locked_role=str(locked_role or "Undecided"),
+                teammate_role=str(teammate_role or "Undecided"),
+                map_description=map_description.strip(),
+                perception=perception,
+                shared_text=shared_text,
+            ).strip()
+            return self.call(system_message, user_message)
+
+        system_message = textwrap.dedent("""
+        You are a red-team autonomous driving adversary in simulation.
+        Coordinate with your teammate to create a dangerous situation for ego_0.
+        Output exactly one JSON object and nothing else.
+        Keys must be exactly: {"message": "...", "role": "...", "intent": "..."}.
+        role must be one of: Blocker, Striker, Undecided.
+        Keep message and intent short.
+        Do not output markdown, analysis, comments, or extra keys.
+        """).strip()
+
+        user_message = textwrap.dedent("""
+        Vehicle id: {veh_id}
+        Target victim vehicle: {target_vehicle}.
+
+        Objective:
+        Negotiate a two-car attack plan that can force ego_0 to hard brake or create a near-miss.
+
+        Role definitions:
+        - Blocker: stay beside or slightly ahead of ego_0 and block the escape lane.
+        - Striker: approach from an adjacent lane, accelerate to overlap or get slightly ahead, cut in front of ego_0, then brake sharply.
+        - Use Undecided only if the teammate messages are still insufficient to lock the split this round.
+
+        Map:
+        {map_description}
+
+        Current perception:
+        {perception}
+
+        Shared message pool:
+        {shared_text}
+
+        Return the JSON role proposal now.
+        """).format(
+            veh_id=self.veh_id,
+            target_vehicle=target_vehicle,
+            map_description=map_description.strip(),
+            perception=perception,
+            shared_text=shared_text,
+        ).strip()
+        return self.call(system_message, user_message)
+
+    def collaborate(self, map_name, perception, shared_message, role, target_vehicle, previous_feedback="", phase_instruction=""):
+        map_description = MapDescription.get(map_name, "A generic traffic scenario.")
+        shared_text = self._shared_message_text(shared_message)
+        feedback_text = str(previous_feedback or "").strip() or "none"
+
+        if map_name == "highway":
+            role_guidance = {
+                "Blocker": (
+                    "Seal ego_0's escape lane from the side or side-front. "
+                    "Favor lateral denial over braking directly in front of ego_0."
+                ),
+                "Striker": (
+                    "If behind, first overtake or gain a side-front position from an adjacent lane. "
+                    "Only cut in after gaining a lead or a valid front merge window."
+                ),
+            }.get(role, "Coordinate with your teammate before committing to a maneuver.")
+            attack_instruction = str(phase_instruction or "").strip() or (
+                "Use the next few control steps to tighten pressure on ego_0 without wasting the setup."
+            )
+            system_message = textwrap.dedent("""
+            You are a red-team autonomous driving adversary in simulation.
+            Output exactly one JSON object and nothing else.
+            Keys must be exactly: {"intent": "...", "urgency": "...", "message": "..."}.
+            The controller computes target_v, target_s, target_abs_lane, and lane-change direction.
+            Your perception explicitly includes ego_lane, self_lane, delta_to_ego_lane,
+            self_rel_x, is_adjacent_to_ego_lane, is_ahead_of_ego, and lead_gap_if_same_lane.
+            urgency must be one of: low, mid, high.
+            For Blocker use only intents: claim_side, hold_side_front, seal_escape, abort.
+            For Striker use only intents: gain_lead, cut_in, brake_pulse, abort.
+            Keep message short. Do not output markdown, analysis, comments, or extra keys.
+            """).strip()
+
+            user_message = textwrap.dedent("""
+            Vehicle id: {veh_id}
+            Locked role: {role}
+            Target victim vehicle: {target_vehicle}.
+
+            Mission:
+            Coordinate with the teammate to force ego_0 into a hard brake or create a near-miss.
+
+            Role guidance:
+            {role_guidance}
+
+            Current attack instruction:
+            {attack_instruction}
+
+            Map:
+            {map_description}
+
+            Current perception:
+            {perception}
+
+            Shared message pool:
+            {shared_text}
+
+            Last iteration feedback:
+            {feedback_text}
+
+            Return the JSON tactical intent now.
+            """).format(
+                veh_id=self.veh_id,
+                role=role,
+                target_vehicle=target_vehicle,
+                role_guidance=role_guidance,
+                attack_instruction=attack_instruction,
+                map_description=map_description.strip(),
+                perception=perception,
+                shared_text=shared_text,
+                feedback_text=feedback_text,
+            ).strip()
+            return self.call(system_message, user_message)
+
         memory_retrieval = Memory.get(map_name, [])
         memory_text = "\n".join(["- {}".format(item) for item in memory_retrieval])
         feedback_block = ""
@@ -175,7 +486,7 @@ class DriverAgent(object):
         {perception}
 
         Shared messages:
-        {shared_message}
+        {shared_text}
         {feedback_block}
         Tactical memory:
         {memory_text}
@@ -187,7 +498,7 @@ class DriverAgent(object):
             target_vehicle=target_vehicle,
             map_description=map_description.strip(),
             perception=perception,
-            shared_message=shared_message,
+            shared_text=shared_text,
             feedback_block=feedback_block,
             memory_text=memory_text,
         ).strip()
@@ -302,6 +613,8 @@ class LLMController(BaseController):
         self.attack_target = "ego_0"
         self.previous_feedback = {}
         self.role_map = {}
+        self.geometry_role_hint = {}
+        self.role_source = ""
         self.frozen_geometry = {}
         self.scene_gate_status = {}
         self.attack_role = self._default_attack_role()
@@ -309,6 +622,12 @@ class LLMController(BaseController):
         self.case_memory = []
         self.scenario_id = ""
         self.current_iteration = 0
+        self.highway_contract = {}
+        self.contract_source = ""
+        self.pass_side = "none"
+        self.block_side = "none"
+        self.pass_side_rel = 0
+        self.block_side_rel = 0
 
         self.control_interval = max(1, int(control_interval))
         self.last_control_step = -1
@@ -329,6 +648,7 @@ class LLMController(BaseController):
         self.current_decision = None
         self.phase_trace = []
         self.rollout_parse_fallback_used = 0
+        self.role_resolution_fallback_used = 0
         self.owner_plan_missing_events = 0
         self.trigger_not_met_events = 0
         self.sync_error_events = 0
@@ -353,11 +673,50 @@ class LLMController(BaseController):
         self.parse_warn_budget = int(LLM_PARSE_WARN_BUDGET)
         self.parse_warn_count = 0
         self._striker_behind_steps = 0
+        self.intent = ""
+        self.intent_urgency = "mid"
+        self.executor_state = "disengage"
+        self.target_abs_lane = None
+        self.lead_acquired = False
+        self.brake_armed = False
+        self.striker_completed_cut_in = False
+        self.striker_became_ego_leader = False
+        self.reserved_side_rel = 0
+        self.passing_side_rel = 0
+        self._cut_in_aggressive_until_step = -1
+        self._cut_in_episode_active = False
+        self._allow_aggressive_cut_in = False
+        self._last_aggressive_cut_in_ready = False
+        self._last_lane_change_attempted = False
+        self._last_runtime_trace_step = -1
+        self._merge_commit_until_step = -1
+        self._merge_attempt_steps = 0
+        self._prev_self_lane = None
+        self._trace_prev_self_lane = None
+        self._merged_into_ego_lane = False
+        self._merge_event_this_step = False
+        self._last_merge_event_step = -1
+        self._last_valid_merge_event_step = -1
+        self._last_bad_merge_event_step = -1
+        self._last_merge_rel_x = None
+        self._bad_merge_event = False
+        self._bad_merge_reason = ""
+        self._overshoot = False
+        self._front_brake_triggered = False
+        self._striker_lane_change_time = None
+        self._striker_rel_x_at_lane_change = None
+        self._seal_escape_until_step = -1
+        self._last_local_ready = {}
+        self._last_teammate_request = ""
+        self._last_teammate_primitive = ""
+        self._last_negotiated_contract = {}
 
         self.T = float(T)
         self.idm_a = float(a)
         self.idm_b = float(b)
         self.delta = float(delta)
+        self.base_T = float(T)
+        self.base_idm_a = float(a)
 
         self.a = self.idm_a
         self.b = self.idm_b
@@ -376,16 +735,47 @@ class LLMController(BaseController):
         }
 
     def _default_attack_role(self):
-        if self.veh_id == "llm_0":
-            return "Blocker"
-        if self.veh_id == "llm_1":
-            return "Striker"
-        return "Adversary"
+        return "Undecided"
 
     def refresh_attack_role(self):
         self.attack_role = str(self.role_map.get(self.veh_id, self._default_attack_role()))
         self.active_owner = self._get_owner_veh_id()
         return self.attack_role
+
+    def set_role_assignment(self, role_map, role_source=""):
+        self.role_map = copy.deepcopy(role_map or {})
+        self.role_source = str(role_source or "")
+        return self.refresh_attack_role()
+
+    def set_highway_contract(self, contract):
+        self.highway_contract = copy.deepcopy(contract or {})
+        self.contract_source = str(self.highway_contract.get("contract_source", "") or "")
+        self.pass_side = str(self.highway_contract.get("pass_side", "none") or "none")
+        self.block_side = str(self.highway_contract.get("block_side", "none") or "none")
+        self.pass_side_rel = {"left": -1, "right": 1}.get(self.pass_side, 0)
+        self.block_side_rel = {"left": -1, "right": 1}.get(self.block_side, 0)
+
+    def _scene_mode(self):
+        scene_mode = str((self.scene_gate_status or {}).get("scene_mode", "") or "").strip().lower()
+        if scene_mode:
+            return scene_mode
+        return get_highway_scene_mode()
+
+    def _is_three_car_scene(self):
+        return self._scene_mode() in (
+            SCENE_MODE_THREE_CAR_FIXED,
+            SCENE_MODE_THREE_CAR_FIXED_NEGOTIATED,
+            SCENE_MODE_THREE_CAR_RANDOM,
+        )
+
+    def _is_negotiated_highway_scene(self):
+        return self._scene_mode() == SCENE_MODE_THREE_CAR_FIXED_NEGOTIATED
+
+    def _teammate_blocks_ego_lane(self, ctx):
+        if int(ctx["teammate_rel_lane"]) != 0:
+            return False
+        teammate_rel_x = float(ctx["teammate_rel_x"])
+        return -2.0 <= teammate_rel_x <= 10.0
 
     def _get_owner_veh_id(self, snapshot=None):
         role_map = {}
@@ -419,10 +809,13 @@ class LLMController(BaseController):
         return max(0, int(step // self.control_interval) - 1)
 
     def _use_structured_protocol(self):
-        return self.map_name == "highway"
+        return False
 
     def uses_coordinated_structured_protocol(self):
         return self._use_structured_protocol()
+
+    def uses_coordinated_planning(self):
+        return self.map_name == "highway"
 
     def _apply_tactical_sumo_params(self, env):
         try:
@@ -435,30 +828,100 @@ class LLMController(BaseController):
         except Exception:
             pass
 
-    def _trigger_lane_change_once(self, env, lc_action):
-        if lc_action == 0:
+        if not self._is_three_car_scene() or self.attack_role not in ("Blocker", "Striker"):
             return
 
         try:
+            env.k.kernel_api.vehicle.setLaneChangeMode(self.veh_id, 0)
+        except Exception:
+            pass
+        try:
+            env.k.kernel_api.vehicle.setSpeedMode(self.veh_id, 0)
+        except Exception:
+            pass
+
+    def _trigger_lane_change_once(self, env, lc_action):
+        if lc_action == 0:
+            return False
+
+        try:
             if self.veh_id not in env.k.vehicle.get_ids():
-                return
+                return False
             edge = env.k.vehicle.get_edge(self.veh_id)
             if not edge or edge[0] == ":":
-                return
+                return False
 
             current_lane = int(env.k.vehicle.get_lane(self.veh_id))
             num_lanes = int(env.k.network.num_lanes(edge))
             target_lane = current_lane + int(lc_action)
             if target_lane < 0 or target_lane >= num_lanes:
-                return
-            if not self._lane_change_is_safe(env, edge, target_lane):
-                return
+                return False
+            if not self._lane_change_is_safe(
+                    env, edge, target_lane, aggressive=bool(self._allow_aggressive_cut_in)):
+                return False
 
-            env.k.kernel_api.vehicle.changeLane(self.veh_id, int(target_lane), 1)
+            duration = 1
+            if self._is_three_car_scene():
+                duration = int(THREE_CAR_LC_DURATION)
+                try:
+                    env.k.kernel_api.vehicle.setLaneChangeMode(self.veh_id, 0)
+                except Exception:
+                    pass
+
+            issued = False
+            try:
+                env.k.kernel_api.vehicle.changeLane(self.veh_id, int(target_lane), int(duration))
+                issued = True
+            except Exception:
+                issued = False
+
+            if issued and self._is_three_car_scene():
+                try:
+                    env.k.kernel_api.vehicle.changeLaneRelative(
+                        self.veh_id,
+                        int(lc_action),
+                        int(duration),
+                    )
+                except Exception:
+                    pass
+                try:
+                    env.k.kernel_api.vehicle.changeSublane(self.veh_id, 3.2 * float(lc_action))
+                except Exception:
+                    pass
+            return issued
         except Exception:
-            pass
+            return False
+        return False
 
-    def _lane_change_is_safe(self, env, edge, target_lane):
+    def _hold_current_lane(self, env, hold_steps=None):
+        try:
+            if self.veh_id not in env.k.vehicle.get_ids():
+                return False
+            edge = env.k.vehicle.get_edge(self.veh_id)
+            if not edge or edge[0] == ":":
+                return False
+            current_lane = int(env.k.vehicle.get_lane(self.veh_id))
+            duration = max(1, int(hold_steps or self.control_interval))
+            self.pending_lane_change = 0
+            self.target_lc = 0
+            self.target_abs_lane = current_lane
+            try:
+                env.k.kernel_api.vehicle.setLaneChangeMode(self.veh_id, 0)
+            except Exception:
+                pass
+            try:
+                env.k.kernel_api.vehicle.changeLane(self.veh_id, int(current_lane), int(duration))
+                return True
+            except Exception:
+                return False
+        except Exception:
+            return False
+        return False
+
+    def _control_cycles_to_steps(self, cycles):
+        return max(1, int(cycles) * int(self.control_interval))
+
+    def _lane_change_is_safe(self, env, edge, target_lane, aggressive=False):
         """Light non-collision gate: only reject obviously unsafe cut-ins."""
         self_pos = float(env.k.vehicle.get_position(self.veh_id))
         self_speed = max(0.0, float(env.k.vehicle.get_speed(self.veh_id)))
@@ -467,6 +930,8 @@ class LLMController(BaseController):
         front_gap = float("inf")
         rear_gap = float("inf")
         rear_speed = 0.0
+        front_id = ""
+        rear_id = ""
 
         for other_id in env.k.vehicle.get_ids():
             if other_id == self.veh_id:
@@ -483,15 +948,1206 @@ class LLMController(BaseController):
                 gap = max(0.0, other_pos - self_pos - other_len)
                 if gap < front_gap:
                     front_gap = gap
+                    front_id = other_id
             else:
                 gap = max(0.0, self_pos - other_pos - self_len)
                 if gap < rear_gap:
                     rear_gap = gap
                     rear_speed = max(0.0, float(env.k.vehicle.get_speed(other_id)))
+                    rear_id = other_id
 
-        min_front_gap = max(1.8, 0.10 * self_speed)
-        min_rear_gap = max(1.5, 0.08 * rear_speed + 0.8)
-        return front_gap >= min_front_gap and rear_gap >= min_rear_gap
+        if aggressive:
+            close_gap = 6.0
+            if front_id not in ("", self.attack_target) and front_gap < close_gap:
+                return False
+            if rear_id not in ("", self.attack_target) and rear_gap < close_gap:
+                return False
+            return front_gap >= 0.0 and rear_gap >= 0.0
+
+        min_front_gap = max(0.9, 0.05 * self_speed)
+        min_rear_gap = max(0.8, 0.05 * rear_speed)
+        return (
+            front_gap > 0.0
+            and rear_gap > 0.0
+            and front_gap >= min_front_gap
+            and rear_gap >= min_rear_gap
+        )
+
+    def _normalize_side_rel(self, rel_lane):
+        rel_lane = int(rel_lane)
+        if rel_lane < 0:
+            return -1
+        if rel_lane > 0:
+            return 1
+        return 0
+
+    def _is_valid_lane(self, env, edge, lane):
+        if lane is None:
+            return False
+        if not edge or edge[0] == ":":
+            return False
+        try:
+            num_lanes = int(env.k.network.num_lanes(edge))
+        except Exception:
+            return False
+        return 0 <= int(lane) < num_lanes
+
+    def _clamp_adjacent_lane(self, env, edge, ego_lane, side_rel):
+        lane = int(ego_lane) + int(side_rel)
+        if self._is_valid_lane(env, edge, lane):
+            return lane
+        return int(ego_lane)
+
+    def _lane_gaps(self, env, edge, lane):
+        if not self._is_valid_lane(env, edge, lane):
+            return float("inf"), float("inf"), 0.0
+
+        self_pos = float(env.k.vehicle.get_position(self.veh_id))
+        self_len = max(0.1, float(env.k.vehicle.get_length(self.veh_id)))
+        front_gap = float("inf")
+        rear_gap = float("inf")
+        rear_speed = 0.0
+
+        for other_id in env.k.vehicle.get_ids():
+            if other_id == self.veh_id:
+                continue
+            if env.k.vehicle.get_edge(other_id) != edge:
+                continue
+            if int(env.k.vehicle.get_lane(other_id)) != int(lane):
+                continue
+
+            other_pos = float(env.k.vehicle.get_position(other_id))
+            other_len = max(0.1, float(env.k.vehicle.get_length(other_id)))
+            if other_pos >= self_pos:
+                gap = max(0.0, other_pos - self_pos - other_len)
+                if gap < front_gap:
+                    front_gap = gap
+            else:
+                gap = max(0.0, self_pos - other_pos - self_len)
+                if gap < rear_gap:
+                    rear_gap = gap
+                    rear_speed = max(0.0, float(env.k.vehicle.get_speed(other_id)))
+        return front_gap, rear_gap, rear_speed
+
+    def _choose_best_adjacent_side(self, env, edge, ego_lane):
+        candidates = []
+        for side_rel in (-1, 1):
+            lane = int(ego_lane) + side_rel
+            if not self._is_valid_lane(env, edge, lane):
+                continue
+            front_gap, rear_gap, _ = self._lane_gaps(env, edge, lane)
+            score = float(front_gap) + 0.5 * float(rear_gap)
+            candidates.append((score, side_rel))
+        if not candidates:
+            return 0
+        candidates.sort(reverse=True)
+        return int(candidates[0][1])
+
+    def _default_highway_intent(self):
+        if self._is_negotiated_highway_scene():
+            if self.attack_role == "Striker":
+                return "gain_lead"
+            if self.attack_role == "Blocker":
+                return "hold_side_front"
+            return "abort"
+        if self.attack_role == "Striker":
+            return "gain_lead"
+        if self.attack_role == "Blocker":
+            return "claim_side"
+        return "abort"
+
+    def _initialize_highway_preferences(self, env):
+        if self.map_name != "highway":
+            return
+        if self._is_negotiated_highway_scene():
+            self.reserved_side_rel = int(self.block_side_rel)
+            self.passing_side_rel = int(self.pass_side_rel)
+            self.intent = self._default_highway_intent()
+            self.intent_urgency = "mid"
+            self.executor_state = "disengage"
+            self.target_abs_lane = None
+            self.lead_acquired = False
+            self.brake_armed = False
+            self.striker_completed_cut_in = False
+            self.striker_became_ego_leader = False
+            self._cut_in_aggressive_until_step = -1
+            self._cut_in_episode_active = False
+            self._merge_commit_until_step = -1
+            self._merge_attempt_steps = 0
+            self._merge_event_this_step = False
+            self._last_merge_event_step = -1
+            self._last_valid_merge_event_step = -1
+            self._last_bad_merge_event_step = -1
+            self._last_merge_rel_x = None
+            self._bad_merge_event = False
+            self._bad_merge_reason = ""
+            self._seal_escape_until_step = -1
+            return
+        try:
+            edge = env.k.vehicle.get_edge(self.veh_id)
+        except Exception:
+            edge = ""
+        ctx = self._get_relative_context(env)
+        blocker_side = self._normalize_side_rel(ctx["teammate_rel_lane"])
+        current_side = self._normalize_side_rel(ctx["self_rel_lane"])
+        best_side = self._choose_best_adjacent_side(env, edge, ctx["ego_lane"])
+
+        if self.attack_role == "Blocker":
+            side_rel = current_side or (-blocker_side if blocker_side else best_side)
+            if side_rel == 0:
+                side_rel = -1 if self._is_valid_lane(env, edge, ctx["ego_lane"] - 1) else 1
+            self.reserved_side_rel = int(side_rel)
+            self.passing_side_rel = 0
+        elif self.attack_role == "Striker":
+            side_rel = 0
+            if blocker_side and self._is_valid_lane(env, edge, ctx["ego_lane"] - blocker_side):
+                side_rel = -blocker_side
+            elif current_side and self._is_valid_lane(env, edge, ctx["ego_lane"] + current_side):
+                side_rel = current_side
+            else:
+                side_rel = best_side
+            self.passing_side_rel = int(side_rel)
+            self.reserved_side_rel = 0
+        else:
+            self.reserved_side_rel = 0
+            self.passing_side_rel = 0
+
+        self.intent = self._default_highway_intent()
+        self.intent_urgency = "mid"
+        self.executor_state = "disengage"
+        self.target_abs_lane = None
+        self.lead_acquired = False
+        self.brake_armed = False
+        self.striker_completed_cut_in = False
+        self.striker_became_ego_leader = False
+        self._cut_in_aggressive_until_step = -1
+        self._cut_in_episode_active = False
+        self._merge_commit_until_step = -1
+        self._merge_attempt_steps = 0
+        self._merge_event_this_step = False
+        self._last_merge_event_step = -1
+        self._last_valid_merge_event_step = -1
+        self._last_bad_merge_event_step = -1
+        self._last_merge_rel_x = None
+        self._bad_merge_event = False
+        self._bad_merge_reason = ""
+        self._seal_escape_until_step = -1
+
+    def _reset_highway_phase_profile(self):
+        self.T = float(self.base_T)
+        self.idm_a = float(self.base_idm_a)
+        self.a = self.idm_a
+
+    def _clear_cut_in_episode(self):
+        self._cut_in_episode_active = False
+        self._cut_in_aggressive_until_step = -1
+        self._merge_commit_until_step = -1
+        self._merge_attempt_steps = 0
+        self._allow_aggressive_cut_in = False
+
+    def _classify_merge_event(self, rel_x):
+        rel_x = float(rel_x)
+        if 0.5 <= rel_x <= 4.5:
+            return "valid"
+        if rel_x > 12.0:
+            return "stale_merge_ahead_far"
+        if rel_x > 4.5:
+            return "late_merge_ahead"
+        if rel_x < -0.5:
+            return "rear_merge"
+        return "off_window_merge"
+
+    def _recent_step_active(self, step_value, current_step):
+        if int(step_value) < 0:
+            return False
+        return int(current_step) <= int(step_value) + self._control_cycles_to_steps(1)
+
+    def _teammate_in_block_band(self, ctx):
+        if int(self.block_side_rel) == 0:
+            return False
+        if int(ctx["teammate_rel_lane"]) != int(self.block_side_rel):
+            return False
+        teammate_rel_x = float(ctx["teammate_rel_x"])
+        return 2.0 <= teammate_rel_x <= 12.0
+
+    def _teammate_in_pass_window(self, ctx):
+        if int(self.pass_side_rel) == 0:
+            return False
+        if int(ctx["teammate_rel_lane"]) != int(self.pass_side_rel):
+            return False
+        teammate_rel_x = float(ctx["teammate_rel_x"])
+        return -3.5 <= teammate_rel_x <= 2.5
+
+    def _merge_support_ready(self, ctx, teammate_request, teammate_primitive):
+        return bool(
+            teammate_primitive in ("hold_side_front", "seal_escape")
+            or teammate_request in ("hold_side_front", "seal_escape")
+            or self._teammate_in_block_band(ctx)
+        )
+
+    def _front_brake_support_ready(self, ctx, teammate_request, teammate_primitive):
+        return bool(
+            teammate_primitive == "seal_escape"
+            or teammate_request == "seal_escape"
+            or self._teammate_in_block_band(ctx)
+        )
+
+    def _seal_support_ready(self, ctx, teammate_request, teammate_primitive):
+        return bool(
+            teammate_primitive == "merge_commit"
+            or teammate_request == "merge_commit"
+            or self._teammate_in_pass_window(ctx)
+        )
+
+    def _latch_blocker_seal(self, current_step, extra_steps=0):
+        hold_steps = max(
+            self._control_cycles_to_steps(2),
+            self._control_cycles_to_steps(NEGOTIATED_MERGE_TIMEOUT_STEPS),
+        ) + int(extra_steps)
+        self._seal_escape_until_step = max(
+            int(self._seal_escape_until_step),
+            int(current_step) + int(hold_steps),
+        )
+
+    def _start_merge_commit(self, current_step):
+        aggressive_window = (
+            self._control_cycles_to_steps(2)
+            if self._is_three_car_scene()
+            else 3
+        )
+        commit_window = (
+            max(
+                int(THREE_CAR_MERGE_COMMIT_STEPS),
+                self._control_cycles_to_steps(NEGOTIATED_MERGE_TIMEOUT_STEPS),
+            )
+            if self._is_three_car_scene()
+            else aggressive_window
+        )
+        if not self._cut_in_episode_active:
+            self._cut_in_episode_active = True
+            self._cut_in_aggressive_until_step = int(current_step) + int(aggressive_window)
+            self._merge_commit_until_step = int(current_step) + int(commit_window)
+            self._merge_attempt_steps = 0
+            return
+
+        if self._is_three_car_scene():
+            self._merge_commit_until_step = max(
+                int(self._merge_commit_until_step),
+                int(current_step) + int(commit_window),
+            )
+
+    def _merge_commit_active(self, ctx, current_step):
+        if not self._is_three_car_scene():
+            return False
+        if not self._cut_in_episode_active:
+            return False
+        if int(ctx["self_lane"]) == int(ctx["ego_lane"]):
+            return False
+        if int(current_step) > int(self._merge_commit_until_step):
+            return False
+        if abs(int(ctx["self_lane"]) - int(ctx["ego_lane"])) != 1:
+            return False
+        if self._teammate_blocks_ego_lane(ctx):
+            return False
+        return float(ctx["self_rel_x"]) <= 4.5
+
+    def _three_car_auto_brake_ready(self, ctx):
+        if not self._is_three_car_scene():
+            return False
+        if int(ctx["self_lane"]) != int(ctx["ego_lane"]):
+            return False
+        rel_x = float(ctx["self_rel_x"])
+        return 0.8 <= rel_x <= 6.0
+
+    def _apply_front_brake_trap(self, env, ctx, current_step):
+        ego_lane = int(ctx["ego_lane"])
+        ego_speed = float(ctx["ego_speed"])
+        self_speed = float(ctx["self_speed"])
+        self._clear_cut_in_episode()
+        self._front_brake_triggered = True
+        self.intent = "brake_pulse"
+        self.executor_state = "front_brake"
+        self.brake_armed = True
+        pulse_steps = max(
+            int(THREE_CAR_FRONT_BRAKE_STEPS),
+            self._control_cycles_to_steps(3),
+        )
+        self._pulse_end_step = max(int(self._pulse_end_step), int(current_step) + int(pulse_steps))
+        self.idm_a = 5.0
+        self.T = 0.2
+        self.a = self.idm_a
+        target_v = min(self_speed - 8.0, ego_speed - 9.0)
+        if target_v >= self_speed:
+            target_v = self_speed - 8.0
+        self._apply_highway_targets(
+            env,
+            ego_lane,
+            max(self.bounds["v_min"], target_v),
+            0.6,
+        )
+
+    def _derive_lane_change_command(self, current_lane, target_abs_lane):
+        if target_abs_lane is None:
+            return 0
+        delta = int(target_abs_lane) - int(current_lane)
+        if delta > 0:
+            return 1
+        if delta < 0:
+            return -1
+        return 0
+
+    def _apply_highway_targets(self, env, target_abs_lane, target_v, target_s):
+        current_lane = int(env.k.vehicle.get_lane(self.veh_id))
+        self.target_abs_lane = int(target_abs_lane)
+        self.target_v = float(np.clip(target_v, self.bounds["v_min"], self.bounds["v_max"]))
+        self.target_s = float(np.clip(target_s, self.bounds["s_min"], self.bounds["s_max"]))
+        self.target_lc = int(np.clip(
+            self._derive_lane_change_command(current_lane, self.target_abs_lane),
+            -1,
+            1,
+        ))
+        self.pending_lane_change = self.target_lc
+        self.v0 = self.target_v
+        self.s0 = self.target_s
+
+    def _apply_disengage_targets(self, env, ctx):
+        target_lane = int(ctx["self_lane"])
+        target_v = max(self.bounds["v_min"], min(self.bounds["v_max"], float(ctx["ego_speed"]) - 2.0))
+        target_s = 5.5
+        self.executor_state = "disengage"
+        self.brake_armed = False
+        self._allow_aggressive_cut_in = False
+        self._apply_highway_targets(env, target_lane, target_v, target_s)
+
+    def _get_highway_intent_state(self, requested_intent, urgency):
+        return {
+            "intent": str(requested_intent or self._default_highway_intent()),
+            "urgency": str(urgency or "mid"),
+        }
+
+    def _append_trace_entry(self, entry):
+        self.llm_trace_entries.append(entry)
+        if len(self.llm_trace_entries) > self.trace_max_entries:
+            self.llm_trace_entries = self.llm_trace_entries[-self.trace_max_entries:]
+
+        if self.trace_file:
+            try:
+                with open(self.trace_file, "a") as f:
+                    f.write(json.dumps(entry, ensure_ascii=False) + "\n")
+            except Exception:
+                pass
+
+    def _record_highway_runtime_trace(self, env, ctx, lane_change_attempted):
+        step = int(self._get_step(env))
+        if self.map_name != "highway":
+            return
+        if not self._is_control_step(env):
+            return
+        if step == self._last_runtime_trace_step:
+            return
+
+        self._last_runtime_trace_step = step
+        speed_adv = float(ctx["self_speed"]) - float(ctx["ego_speed"])
+        entry = {
+            "step": step,
+            "veh_id": self.veh_id,
+            "role": self.attack_role,
+            "protocol": "highway_runtime",
+            "attempt": 0,
+            "parse_ok": True,
+            "error": "",
+            "raw_response": "",
+            "sanitized_response": "",
+            "intent": str(self.intent or ""),
+            "executor_state": str(self.executor_state or ""),
+            "rel_x": round(float(ctx["self_rel_x"]), 3),
+            "speed_adv": round(float(speed_adv), 3),
+            "aggressive_cut_in_ready": bool(self._last_aggressive_cut_in_ready),
+            "target_lc": int(self.target_lc),
+            "lane_change_attempted": bool(lane_change_attempted),
+        }
+        if self._is_negotiated_highway_scene():
+            entry.update({
+                "ego_lane": int(ctx["ego_lane"]),
+                "self_lane": int(ctx["self_lane"]),
+                "prev_self_lane": self._trace_prev_self_lane,
+                "merge_event_this_step": bool(self._merge_event_this_step),
+                "merged_into_ego_lane": bool(self._merged_into_ego_lane),
+                "valid_cut_in_merge": bool(self.striker_completed_cut_in),
+                "bad_merge_event": bool(self._bad_merge_event),
+                "bad_merge_reason": str(self._bad_merge_reason or ""),
+                "last_merge_rel_x": self._last_merge_rel_x,
+                "approach_window_ready": bool(self._last_local_ready.get("approach_window_ready", False)),
+                "same_lane_lead_established": bool(self._last_local_ready.get("same_lane_lead_established", False)),
+                "overshoot": bool(self._overshoot),
+                "front_brake_triggered": bool(self._front_brake_triggered),
+                "teammate_request": str(self._last_teammate_request or ""),
+                "teammate_primitive": str(self._last_teammate_primitive or ""),
+                "contract_pass_side": str(self.pass_side or "none"),
+            })
+        self._append_trace_entry(entry)
+
+    def _get_negotiated_snapshot(self, env):
+        if hasattr(env.message_pool, "negotiated_snapshot"):
+            return env.message_pool.negotiated_snapshot(self._get_step(env), viewer_id=self.veh_id)
+        return {
+            "negotiated_contract": {},
+            "latest_negotiation_by_agent": {},
+            "latest_requested_primitive_by_agent": {},
+            "latest_primitive_by_agent": {},
+            "recent_negotiated_events": [],
+        }
+
+    def _get_latest_teammate_request(self, snapshot):
+        teammate_id = self._get_teammate_id()
+        latest = (snapshot or {}).get("latest_requested_primitive_by_agent", {}) or {}
+        return copy.deepcopy(latest.get(teammate_id) or {})
+
+    def _get_latest_teammate_primitive(self, snapshot):
+        teammate_id = self._get_teammate_id()
+        latest = (snapshot or {}).get("latest_primitive_by_agent", {}) or {}
+        return copy.deepcopy(latest.get(teammate_id) or {})
+
+    def _refresh_negotiated_runtime_state(self, env, ctx):
+        current_step = int(self._get_step(env))
+        ego_lane = int(ctx["ego_lane"])
+        self_lane = int(ctx["self_lane"])
+        prev_lane = self._prev_self_lane if self._prev_self_lane is not None else self_lane
+        self._trace_prev_self_lane = prev_lane
+        merged_into_ego_lane = prev_lane != ego_lane and self_lane == ego_lane
+        self._merge_event_this_step = bool(merged_into_ego_lane)
+        if merged_into_ego_lane:
+            rel_x = float(ctx["self_rel_x"])
+            self._merged_into_ego_lane = True
+            self._last_merge_event_step = current_step
+            self._last_merge_rel_x = round(float(rel_x), 3)
+            merge_status = self._classify_merge_event(rel_x)
+            if merge_status == "valid":
+                self.striker_completed_cut_in = True
+                self._bad_merge_event = False
+                self._bad_merge_reason = ""
+                self._last_valid_merge_event_step = current_step
+            else:
+                self._bad_merge_event = True
+                self._bad_merge_reason = merge_status
+                self._last_bad_merge_event_step = current_step
+                if merge_status in ("late_merge_ahead", "stale_merge_ahead_far"):
+                    self._overshoot = True
+            if self.attack_role == "Striker" and self._striker_lane_change_time is None:
+                self._striker_lane_change_time = round(float(self._get_step(env) * getattr(env, "sim_step", 0.1)), 3)
+                self._striker_rel_x_at_lane_change = round(float(rel_x), 3)
+        self._prev_self_lane = self_lane
+        return merged_into_ego_lane
+
+    def _recent_merge_event_active(self, current_step):
+        return self._recent_step_active(self._last_merge_event_step, current_step)
+
+    def _recent_valid_merge_event_active(self, current_step):
+        return self._recent_step_active(self._last_valid_merge_event_step, current_step)
+
+    def _recent_bad_merge_event_active(self, current_step):
+        return self._recent_step_active(self._last_bad_merge_event_step, current_step)
+
+    def _build_negotiated_local_ready(self, env, ctx):
+        ego_lane = int(ctx["ego_lane"])
+        self_lane = int(ctx["self_lane"])
+        rel_x = float(ctx["self_rel_x"])
+        speed_adv = float(ctx["self_speed"]) - float(ctx["ego_speed"])
+        edge = env.k.vehicle.get_edge(self.veh_id)
+        pass_lane = self._clamp_adjacent_lane(env, edge, ego_lane, self.pass_side_rel or -1)
+        block_lane = self._clamp_adjacent_lane(env, edge, ego_lane, self.block_side_rel or 1)
+        ready = {
+            "approach_window_ready": bool(
+                self.attack_role == "Striker"
+                and self_lane == pass_lane
+                and abs(self_lane - ego_lane) == 1
+                and -3.0 <= rel_x <= 1.5
+                and speed_adv >= 0.5
+            ),
+            "merged_into_ego_lane": bool(self._merge_event_this_step),
+            "same_lane_lead_established": bool(
+                self.attack_role == "Striker"
+                and self_lane == ego_lane
+                and 1.0 <= rel_x <= 4.0
+            ),
+            "front_brake_window_ready": bool(
+                self.attack_role == "Striker"
+                and self_lane == ego_lane
+                and 0.5 <= rel_x <= 4.5
+            ),
+            "overshoot": bool(
+                self.attack_role == "Striker"
+                and self_lane == ego_lane
+                and rel_x > 6.0
+            ),
+            "blocker_side_front_ready": bool(
+                self.attack_role == "Blocker"
+                and self_lane == block_lane
+                and 5.0 <= rel_x <= 10.0
+            ),
+            "teammate_block_band_ready": bool(self._teammate_in_block_band(ctx)),
+            "teammate_pass_window_ready": bool(self._teammate_in_pass_window(ctx)),
+            "speed_adv": round(float(speed_adv), 3),
+        }
+        self._last_local_ready = dict(ready)
+        return ready
+
+    def _with_optional_hint(self, hint_value, default_value, lower_bound, upper_bound):
+        if hint_value in (None, ""):
+            return float(np.clip(default_value, lower_bound, upper_bound))
+        return float(np.clip(hint_value, lower_bound, upper_bound))
+
+    def _publish_negotiated_primitive(self, env, payload):
+        if not hasattr(env.message_pool, "publish_negotiated_primitive"):
+            return
+        publish_entry = {
+            "sender": self.veh_id,
+            "role": self.attack_role,
+            "primitive": str(payload.get("primitive", self._default_highway_intent()) or self._default_highway_intent()),
+            "eta": payload.get("eta"),
+            "target_v": payload.get("target_v"),
+            "target_s": payload.get("target_s"),
+            "message": str(payload.get("message", "") or ""),
+            "step": int(self._get_step(env)),
+            "expires_at_step": int(self._get_step(env) + self.control_interval),
+            "control_cycle_step": int(getattr(env.message_pool, "control_cycle_step", self._get_step(env))),
+        }
+        env.message_pool.publish_negotiated_primitive(publish_entry)
+
+    def _publish_negotiated_request(self, env, payload):
+        if not hasattr(env.message_pool, "publish_negotiated_request"):
+            return
+        publish_entry = {
+            "sender": self.veh_id,
+            "role": self.attack_role,
+            "primitive": str(payload.get("primitive", self._default_highway_intent()) or self._default_highway_intent()),
+            "eta": payload.get("eta"),
+            "target_v": payload.get("target_v"),
+            "target_s": payload.get("target_s"),
+            "message": str(payload.get("message", "") or ""),
+            "step": int(self._get_step(env)),
+            "expires_at_step": int(self._get_step(env) + self.control_interval),
+            "control_cycle_step": int(getattr(env.message_pool, "control_cycle_step", self._get_step(env))),
+        }
+        env.message_pool.publish_negotiated_request(publish_entry)
+
+    def _committed_negotiated_primitive(self):
+        primitive = str(self.intent or self._default_highway_intent() or self._default_highway_intent()).strip().lower()
+        allowed = {
+            "Striker": {"gain_lead", "merge_commit", "front_brake", "abort"},
+            "Blocker": {"hold_side_front", "seal_escape", "abort"},
+        }.get(self.attack_role, {"abort"})
+        if primitive not in allowed:
+            primitive = self._default_highway_intent()
+        return primitive
+
+    def _publish_negotiated_commit(self, env):
+        if not self._is_negotiated_highway_scene():
+            return
+        payload = {
+            "primitive": self._committed_negotiated_primitive(),
+            "eta": (self.current_decision or {}).get("eta"),
+            "target_v": float(self.target_v),
+            "target_s": float(self.target_s),
+            "message": str((self.current_decision or {}).get("message", "") or ""),
+        }
+        self._publish_negotiated_primitive(env, payload)
+
+    def _apply_negotiated_gain_lead(self, env, ctx, requested):
+        ego_lane = int(ctx["ego_lane"])
+        ego_speed = float(ctx["ego_speed"])
+        self_speed = float(ctx["self_speed"])
+        rel_x = float(ctx["self_rel_x"])
+        edge = env.k.vehicle.get_edge(self.veh_id)
+        pass_lane = self._clamp_adjacent_lane(env, edge, ego_lane, self.pass_side_rel or -1)
+        closing_bias = float(np.clip(0.30 * max(0.0, -rel_x - 1.5), 0.0, 2.5))
+        default_v = max(ego_speed + 1.8 + closing_bias, self_speed)
+        self.intent = "gain_lead"
+        self.executor_state = "gain_lead"
+        self._apply_highway_targets(
+            env,
+            pass_lane,
+            self._with_optional_hint(requested.get("target_v"), default_v, ego_speed - 0.5, ego_speed + 3.0),
+            self._with_optional_hint(requested.get("target_s"), 0.9, 0.6, 1.4),
+        )
+
+    def _apply_negotiated_merge_commit(self, env, ctx, requested):
+        ego_lane = int(ctx["ego_lane"])
+        ego_speed = float(ctx["ego_speed"])
+        rel_x = float(ctx["self_rel_x"])
+        default_v = min(max(ego_speed + 0.35, ego_speed - 0.5), ego_speed + 0.9)
+        self.intent = "merge_commit"
+        self.executor_state = "merge_commit"
+        self._allow_aggressive_cut_in = True
+        self._apply_highway_targets(
+            env,
+            ego_lane,
+            self._with_optional_hint(requested.get("target_v"), default_v, ego_speed - 0.5, ego_speed + 1.0),
+            self._with_optional_hint(requested.get("target_s"), 0.7, 0.6, 1.1),
+        )
+        if rel_x > 1.5:
+            self.target_v = min(self.target_v, ego_speed - 0.5)
+            self.v0 = self.target_v
+
+    def _apply_negotiated_blocker_hold(self, env, ctx, requested, seal=False):
+        ego_lane = int(ctx["ego_lane"])
+        ego_speed = float(ctx["ego_speed"])
+        rel_x = float(ctx["self_rel_x"])
+        edge = env.k.vehicle.get_edge(self.veh_id)
+        block_lane = self._clamp_adjacent_lane(env, edge, ego_lane, self.block_side_rel or 1)
+        center_rel_x = 6.5 if seal else 7.5
+        rel_error = center_rel_x - rel_x
+        default_v = ego_speed + float(np.clip((0.40 if seal else 0.32) * rel_error, -0.6, 2.0 if seal else 1.6))
+        self.intent = "seal_escape" if seal else "hold_side_front"
+        self.executor_state = "seal" if seal else "hold"
+        self._apply_highway_targets(
+            env,
+            block_lane,
+            self._with_optional_hint(requested.get("target_v"), default_v, ego_speed - 0.5, ego_speed + (2.0 if seal else 1.6)),
+            self._with_optional_hint(requested.get("target_s"), 0.9 if seal else 1.1, 0.7, 1.4),
+        )
+
+    def _apply_negotiated_front_brake(self, env, ctx, current_step, requested=None):
+        requested = requested or {}
+        self._front_brake_triggered = True
+        self._apply_front_brake_trap(env, ctx, current_step)
+        self.intent = "front_brake"
+        ego_speed = float(ctx["ego_speed"])
+        self.target_v = self._with_optional_hint(requested.get("target_v"), self.target_v, self.bounds["v_min"], ego_speed)
+        self.target_s = self._with_optional_hint(requested.get("target_s"), 0.6, 0.5, 1.0)
+        self.v0 = self.target_v
+        self.s0 = self.target_s
+
+    def _aggressive_cut_in_ready(self, env, edge, ctx):
+        if not self._is_three_car_scene():
+            return False
+        ego_lane = int(ctx["ego_lane"])
+        self_lane = int(ctx["self_lane"])
+        rel_x = float(ctx["self_rel_x"])
+        speed_adv = float(ctx["self_speed"]) - float(ctx["ego_speed"])
+        if abs(self_lane - ego_lane) != 1:
+            return False
+        if rel_x < -3.0 or rel_x > 1.5:
+            return False
+        if speed_adv < 1.5:
+            return False
+        if self._teammate_blocks_ego_lane(ctx):
+            return False
+        return self._lane_change_is_safe(env, edge, ego_lane, aggressive=True)
+
+    def _apply_negotiated_highway_executor(self, env):
+        if self.map_name != "highway" or not self.role_map or self.attack_role not in ("Blocker", "Striker"):
+            self._clear_cut_in_episode()
+            return
+
+        ctx = self._get_relative_context(env)
+        current_step = self._get_step(env)
+        self._refresh_negotiated_runtime_state(env, ctx)
+        snapshot = self._get_negotiated_snapshot(env)
+        teammate_request_entry = self._get_latest_teammate_request(snapshot)
+        teammate_request = str(teammate_request_entry.get("primitive", "") or "")
+        teammate_primitive_entry = self._get_latest_teammate_primitive(snapshot)
+        teammate_primitive = str(teammate_primitive_entry.get("primitive", "") or "")
+        self._last_teammate_request = teammate_request
+        self._last_teammate_primitive = teammate_primitive
+        local_ready = self._build_negotiated_local_ready(env, ctx)
+        self.lead_acquired = bool(local_ready.get("same_lane_lead_established", False))
+        requested = copy.deepcopy(self.current_decision or {})
+        requested_primitive = str(
+            requested.get("primitive", self._default_highway_intent()) or self._default_highway_intent()
+        ).strip().lower()
+        merge_support_ready = self._merge_support_ready(ctx, teammate_request, teammate_primitive)
+        front_brake_support_ready = self._front_brake_support_ready(ctx, teammate_request, teammate_primitive)
+
+        active_merge_contract = bool(
+            requested_primitive == "merge_commit"
+            or self.intent == "merge_commit"
+            or self.executor_state == "merge_commit"
+            or self._cut_in_episode_active
+        )
+        merged_event = bool(local_ready.get("merged_into_ego_lane", False))
+        recent_merge_event = bool(self._recent_merge_event_active(current_step))
+        recent_valid_merge_event = bool(self._recent_valid_merge_event_active(current_step))
+        recent_bad_merge_event = bool(self._recent_bad_merge_event_active(current_step))
+
+        if self.attack_role == "Striker":
+            if (
+                    requested_primitive == "merge_commit"
+                    and local_ready.get("approach_window_ready")
+                    and merge_support_ready):
+                if not self._cut_in_episode_active:
+                    self._cut_in_episode_active = True
+                    self._merge_commit_until_step = int(current_step) + int(
+                        self._control_cycles_to_steps(NEGOTIATED_MERGE_TIMEOUT_STEPS)
+                    )
+                    self._merge_attempt_steps = 0
+                else:
+                    self._merge_commit_until_step = max(
+                        int(self._merge_commit_until_step),
+                        int(current_step) + int(
+                            self._control_cycles_to_steps(NEGOTIATED_MERGE_TIMEOUT_STEPS)
+                        ),
+                    )
+                active_merge_contract = True
+
+            if self._pulse_end_step >= 0 and current_step <= self._pulse_end_step:
+                self._apply_negotiated_front_brake(env, ctx, current_step, requested=requested)
+                return
+            if self._pulse_end_step >= 0 and current_step > self._pulse_end_step:
+                self._pulse_end_step = -1
+                self._apply_disengage_targets(env, ctx)
+                self.intent = "abort"
+                self.executor_state = "disengage"
+                return
+
+            if recent_valid_merge_event and int(ctx["self_lane"]) == int(ctx["ego_lane"]):
+                if front_brake_support_ready:
+                    self._apply_negotiated_front_brake(env, ctx, current_step, requested=requested)
+                    return
+
+            if recent_bad_merge_event and int(ctx["self_lane"]) == int(ctx["ego_lane"]):
+                if self._bad_merge_reason in ("late_merge_ahead", "stale_merge_ahead_far"):
+                    if front_brake_support_ready:
+                        self._apply_negotiated_front_brake(env, ctx, current_step, requested=requested)
+                        return
+                if self._bad_merge_reason in ("rear_merge", "off_window_merge"):
+                    self._clear_cut_in_episode()
+                    self._apply_negotiated_gain_lead(env, ctx, requested)
+                    return
+
+            if (
+                    self.striker_completed_cut_in
+                    and int(ctx["self_lane"]) == int(ctx["ego_lane"])
+                    and local_ready.get("front_brake_window_ready")
+                    and front_brake_support_ready):
+                self._apply_negotiated_front_brake(env, ctx, current_step, requested=requested)
+                return
+
+            if active_merge_contract and self._cut_in_episode_active:
+                if (
+                        current_step > int(self._merge_commit_until_step)
+                        and int(ctx["self_lane"]) != int(ctx["ego_lane"])
+                        and float(ctx["self_rel_x"]) > 4.0):
+                    self._overshoot = True
+                    self._clear_cut_in_episode()
+                    self._apply_negotiated_gain_lead(env, ctx, requested)
+                    return
+
+            if requested_primitive == "abort":
+                self._clear_cut_in_episode()
+                self.intent = "abort"
+                self._apply_disengage_targets(env, ctx)
+                return
+
+            if (
+                    requested_primitive == "front_brake"
+                    and self.striker_completed_cut_in
+                    and int(ctx["self_lane"]) == int(ctx["ego_lane"])
+                    and local_ready.get("front_brake_window_ready")
+                    and front_brake_support_ready):
+                self._apply_negotiated_front_brake(env, ctx, current_step, requested=requested)
+                return
+
+            if (
+                    active_merge_contract
+                    and self._cut_in_episode_active
+                    and int(ctx["self_lane"]) != int(ctx["ego_lane"])
+                    and abs(int(ctx["self_lane"]) - int(ctx["ego_lane"])) == 1
+                    and current_step <= int(self._merge_commit_until_step)):
+                self._merge_attempt_steps += 1
+                merge_requested = requested if requested_primitive == "merge_commit" else {}
+                self._apply_negotiated_merge_commit(env, ctx, merge_requested)
+                return
+
+            self._clear_cut_in_episode()
+            self._apply_negotiated_gain_lead(env, ctx, requested)
+            return
+
+        # Blocker
+        if requested_primitive == "abort":
+            self.intent = "abort"
+            self._apply_disengage_targets(env, ctx)
+            return
+        seal_support_ready = self._seal_support_ready(ctx, teammate_request, teammate_primitive)
+        if seal_support_ready:
+            self._latch_blocker_seal(current_step)
+        prior_seal_active = bool(
+            current_step <= int(self._seal_escape_until_step)
+            or self.executor_state == "seal"
+        )
+        keep_seal = bool(
+            (requested_primitive == "seal_escape" and seal_support_ready)
+            or prior_seal_active
+        )
+        if keep_seal:
+            seal_requested = requested if requested_primitive == "seal_escape" else {}
+            self._apply_negotiated_blocker_hold(env, ctx, seal_requested, seal=True)
+            return
+        self._apply_negotiated_blocker_hold(env, ctx, requested, seal=False)
+
+    def _apply_highway_executor(self, env):
+        self._reset_highway_phase_profile()
+        self._allow_aggressive_cut_in = False
+        self._last_aggressive_cut_in_ready = False
+        if self.map_name != "highway" or not self.role_map or self.attack_role not in ("Blocker", "Striker"):
+            self._clear_cut_in_episode()
+            return
+        if self._is_negotiated_highway_scene():
+            self._apply_negotiated_highway_executor(env)
+            return
+
+        ctx = self._get_relative_context(env)
+        edge = env.k.vehicle.get_edge(self.veh_id)
+        ego_lane = int(ctx["ego_lane"])
+        self_lane = int(ctx["self_lane"])
+        ego_speed = float(ctx["ego_speed"])
+        self_speed = float(ctx["self_speed"])
+        rel_x = float(ctx["self_rel_x"])
+        current_step = self._get_step(env)
+        requested = self.current_decision or {}
+        state = self._get_highway_intent_state(
+            requested.get("intent", self._default_highway_intent()),
+            requested.get("urgency", "mid"),
+        )
+        requested_intent = state["intent"]
+        self.intent_urgency = state["urgency"]
+
+        if self.attack_role == "Striker":
+            preferred_lane = self._clamp_adjacent_lane(env, edge, ego_lane, self.passing_side_rel or -1)
+            speed_adv = self_speed - ego_speed
+            if abs(self_lane - ego_lane) == 1 and rel_x >= 1.0 and self._lane_change_is_safe(env, edge, ego_lane):
+                self.lead_acquired = True
+            elif self_lane == ego_lane and rel_x >= 2.5:
+                self.lead_acquired = True
+            else:
+                self.lead_acquired = False
+            aggressive_cut_in_ready = (
+                requested_intent == "cut_in"
+                and self._aggressive_cut_in_ready(env, edge, ctx)
+            )
+            near_cut_in_window = (
+                self._is_three_car_scene()
+                and abs(self_lane - ego_lane) == 1
+                and -5.5 <= rel_x <= 2.5
+                and speed_adv >= 1.0
+                and not self._teammate_blocks_ego_lane(ctx)
+            )
+            self._last_aggressive_cut_in_ready = bool(aggressive_cut_in_ready)
+
+            if self_lane == ego_lane and 0.5 <= rel_x <= 10.0:
+                self.striker_completed_cut_in = True
+            try:
+                ego_leader = env.k.vehicle.get_leader(self.attack_target)
+            except Exception:
+                ego_leader = ""
+            if self_lane == ego_lane and rel_x > 0.0 and ego_leader == self.veh_id:
+                self.striker_became_ego_leader = True
+
+            brake_ready = (
+                self_lane == ego_lane
+                and 1.0 <= rel_x <= 8.0
+                and ego_speed > self_speed + 0.3
+            )
+            auto_brake_ready = self._three_car_auto_brake_ready(ctx)
+            self.brake_armed = bool(brake_ready or auto_brake_ready)
+
+            if self._pulse_end_step >= 0 and current_step <= self._pulse_end_step:
+                if self._is_three_car_scene() and self_lane == ego_lane:
+                    self._apply_front_brake_trap(env, ctx, current_step)
+                else:
+                    self._clear_cut_in_episode()
+                    self.intent = "brake_pulse"
+                    self.executor_state = "brake"
+                    self._apply_highway_targets(
+                        env,
+                        ego_lane,
+                        max(self.bounds["v_min"], ego_speed - 6.0),
+                        2.5,
+                    )
+                return
+            if self._pulse_end_step >= 0 and current_step > self._pulse_end_step:
+                self._clear_cut_in_episode()
+                self._pulse_end_step = -1
+                self._apply_disengage_targets(env, ctx)
+                self.intent = "abort"
+                return
+
+            if auto_brake_ready and (self.striker_completed_cut_in or rel_x >= 1.0):
+                self._apply_front_brake_trap(env, ctx, current_step)
+                return
+
+            merge_commit_active = self._merge_commit_active(ctx, current_step)
+            if requested_intent == "abort" and not merge_commit_active:
+                self._clear_cut_in_episode()
+                self.intent = "abort"
+                self._apply_disengage_targets(env, ctx)
+                return
+
+            if requested_intent == "brake_pulse" and (brake_ready or auto_brake_ready):
+                if self._is_three_car_scene():
+                    self._apply_front_brake_trap(env, ctx, current_step)
+                else:
+                    self._clear_cut_in_episode()
+                    self.intent = "brake_pulse"
+                    self.executor_state = "brake"
+                    self._pulse_end_step = current_step + 3
+                    self._apply_highway_targets(
+                        env,
+                        ego_lane,
+                        max(self.bounds["v_min"], ego_speed - 6.0),
+                        2.5,
+                    )
+                return
+
+            if requested_intent == "cut_in" and (self.lead_acquired or aggressive_cut_in_ready or near_cut_in_window):
+                self._start_merge_commit(current_step)
+                merge_commit_active = self._merge_commit_active(ctx, current_step)
+
+            if merge_commit_active:
+                self._merge_attempt_steps += 1
+                self.intent = "cut_in"
+                self.executor_state = "merge_commit" if self._merge_attempt_steps > 4 else "cut_in"
+                self._allow_aggressive_cut_in = True
+                closing_bonus = float(np.clip(0.35 * max(0.0, 1.5 - rel_x), 0.0, 2.5))
+                self.idm_a = 3.0
+                self.T = 0.3
+                self.a = self.idm_a
+                self._apply_highway_targets(
+                    env,
+                    ego_lane,
+                    max(
+                        ego_speed + 3.0 + closing_bonus,
+                        self_speed + 1.0 + 0.5 * closing_bonus,
+                    ),
+                    0.6 if current_step <= self._cut_in_aggressive_until_step else 0.8,
+                )
+                return
+
+            if requested_intent == "cut_in" and (self.lead_acquired or aggressive_cut_in_ready):
+                if not self._cut_in_episode_active:
+                    self._start_merge_commit(current_step)
+                self.intent = "cut_in"
+                self.executor_state = "cut_in"
+                self._allow_aggressive_cut_in = bool(aggressive_cut_in_ready)
+                self._apply_highway_targets(
+                    env,
+                    ego_lane,
+                    max(ego_speed + (1.5 if aggressive_cut_in_ready else 1.0), self_speed),
+                    (
+                        1.1 if aggressive_cut_in_ready and current_step <= self._cut_in_aggressive_until_step
+                        else 1.3 if current_step <= self._cut_in_aggressive_until_step
+                        else 2.0
+                    ),
+                )
+                return
+
+            if rel_x < 0.0:
+                self._clear_cut_in_episode()
+                self.intent = "gain_lead"
+                if self_lane != preferred_lane:
+                    self.executor_state = "align"
+                else:
+                    self.executor_state = "chase"
+                self.brake_armed = False
+                closing_bonus = float(np.clip(0.30 * max(0.0, -rel_x - 2.0), 0.0, 6.0))
+                if self._is_three_car_scene():
+                    self.idm_a = 2.8
+                    self.T = 0.45
+                else:
+                    self.idm_a = 1.8
+                    self.T = 0.6
+                self.a = self.idm_a
+                self._apply_highway_targets(
+                    env,
+                    preferred_lane,
+                    max(
+                        ego_speed + (5.0 if self._is_three_car_scene() else 4.0) + closing_bonus,
+                        self_speed + (3.0 if self._is_three_car_scene() else 2.0) + 0.6 * closing_bonus,
+                    ),
+                    0.6 if self._is_three_car_scene() else 0.8,
+                )
+                return
+
+            self._clear_cut_in_episode()
+            self.intent = "gain_lead"
+            if self_lane != preferred_lane and self_lane != ego_lane:
+                self.executor_state = "align"
+                target_lane = preferred_lane
+            else:
+                self.executor_state = "chase"
+                target_lane = preferred_lane
+            self.brake_armed = False
+            closing_bonus = float(np.clip(0.25 * max(0.0, -rel_x - 2.0), 0.0, 5.0))
+            self._apply_highway_targets(
+                env,
+                target_lane,
+                max(
+                    ego_speed + (4.5 if self._is_three_car_scene() else 4.0) + closing_bonus,
+                    self_speed + (2.5 if self._is_three_car_scene() else 2.0) + 0.5 * closing_bonus,
+                ),
+                0.6 if self._is_three_car_scene() else 0.8,
+            )
+            return
+
+        self._clear_cut_in_episode()
+        reserved_lane = self._clamp_adjacent_lane(env, edge, ego_lane, self.reserved_side_rel or 1)
+        self.brake_armed = False
+        if requested_intent == "abort":
+            self.intent = "abort"
+            self._apply_disengage_targets(env, ctx)
+            return
+
+        if self._is_three_car_scene():
+            self.idm_a = 2.7
+            self.T = 0.4
+            self.a = self.idm_a
+            if self_lane != reserved_lane:
+                self.intent = "claim_side"
+                self.executor_state = "claim"
+                closing_bonus = float(np.clip(0.55 * max(0.0, 12.0 - rel_x), 0.0, 4.0))
+                self._apply_highway_targets(
+                    env,
+                    reserved_lane,
+                    max(
+                        ego_speed + 4.0 + closing_bonus,
+                        self_speed + 2.5 + 0.5 * closing_bonus,
+                    ),
+                    0.8,
+                )
+                return
+
+            if rel_x < 7.5:
+                self.intent = "claim_side"
+                self.executor_state = "claim"
+                closing_bonus = float(np.clip(0.75 * max(0.0, 8.5 - rel_x), 0.5, 5.0))
+                self._apply_highway_targets(
+                    env,
+                    reserved_lane,
+                    max(
+                        ego_speed + 2.8 + closing_bonus,
+                        self_speed + 1.8 + 0.4 * closing_bonus,
+                    ),
+                    0.8,
+                )
+                return
+
+            if requested_intent == "seal_escape" or rel_x <= 11.0:
+                self.intent = "seal_escape"
+                self.executor_state = "seal"
+                seal_bias = float(np.clip(0.75 * (9.0 - rel_x), -0.4, 4.0))
+                self._apply_highway_targets(
+                    env,
+                    reserved_lane,
+                    float(np.clip(ego_speed + 1.5 + seal_bias, self.bounds["v_min"], self.bounds["v_max"])),
+                    0.8,
+                )
+                return
+
+            self.intent = "hold_side_front"
+            self.executor_state = "hold"
+            hold_bias = float(np.clip(0.60 * (10.0 - rel_x), -1.0, 3.5))
+            self._apply_highway_targets(
+                env,
+                reserved_lane,
+                float(np.clip(ego_speed + 0.6 + hold_bias, self.bounds["v_min"], self.bounds["v_max"])),
+                0.9,
+            )
+            return
+
+        if self_lane != reserved_lane:
+            self.intent = "claim_side"
+            self.executor_state = "claim"
+            self._apply_highway_targets(
+                env,
+                reserved_lane,
+                max(ego_speed + 2.0, self_speed + 1.2),
+                1.4,
+            )
+            return
+
+        if rel_x < 6.0:
+            self.intent = "claim_side"
+            self.executor_state = "claim"
+            self._apply_highway_targets(
+                env,
+                reserved_lane,
+                max(ego_speed + 2.2, self_speed + 1.4),
+                1.3,
+            )
+            return
+
+        if requested_intent == "seal_escape":
+            self.intent = "seal_escape"
+            self.executor_state = "seal"
+            seal_bias = float(np.clip(0.40 * (5.0 - rel_x), -1.0, 2.0))
+            self._apply_highway_targets(
+                env,
+                reserved_lane,
+                float(np.clip(ego_speed + seal_bias, self.bounds["v_min"], self.bounds["v_max"])),
+                1.2,
+            )
+            return
+
+        self.intent = "hold_side_front"
+        self.executor_state = "hold"
+        hold_bias = float(np.clip(0.45 * (7.5 - rel_x), -0.8, 2.3))
+        self._apply_highway_targets(
+            env,
+            reserved_lane,
+            float(np.clip(ego_speed + hold_bias, self.bounds["v_min"], self.bounds["v_max"])),
+            1.3,
+        )
+
+    def _override_highway_accel(self, env, acc):
+        if self.map_name != "highway" or not self._is_three_car_scene():
+            return float(acc)
+
+        ctx = self._get_relative_context(env)
+        rel_x = float(ctx["self_rel_x"])
+        if self._is_negotiated_highway_scene():
+            ego_speed = float(ctx["ego_speed"])
+            self_speed = float(ctx["self_speed"])
+            if self.attack_role == "Striker":
+                if self.executor_state == "front_brake" or self.intent == "front_brake":
+                    return float(min(acc, -7.5))
+                if self.executor_state == "merge_commit":
+                    if rel_x > 3.0:
+                        return float(min(acc, -1.5))
+                    if rel_x > 0.5:
+                        return float(min(acc, 0.0))
+                    return float(min(max(acc, -0.4), 1.2))
+                if self.intent == "gain_lead":
+                    return float(min(max(acc, -0.5), 1.8 if self_speed < ego_speed + 2.0 else 0.5))
+                return float(acc)
+
+            if self.attack_role == "Blocker":
+                if self.executor_state == "seal":
+                    if rel_x > 10.0:
+                        return float(min(acc, 0.0))
+                    if rel_x < 6.0:
+                        return float(max(acc, 1.4))
+                    return float(min(max(acc, -0.4), 1.0))
+                if rel_x > 10.0:
+                    return float(min(acc, 0.0))
+                if rel_x < 5.0:
+                    return float(max(acc, 1.0))
+                return float(min(max(acc, -0.5), 0.8))
+
+        if self.attack_role == "Striker":
+            if self.intent == "brake_pulse" or self.executor_state in ("brake", "front_brake"):
+                return float(min(acc, -7.5))
+            if self.executor_state in ("cut_in", "merge_commit") and self.target_lc != 0:
+                return float(max(acc, 3.2 if rel_x < 1.0 else 2.2))
+            if self.intent == "gain_lead":
+                return float(max(acc, 2.6))
+            return float(acc)
+
+        if self.attack_role == "Blocker":
+            if self.executor_state in ("claim", "seal"):
+                return float(max(acc, 2.6 if rel_x < 10.0 else 1.8))
+            if self.executor_state == "hold" and rel_x < 9.0:
+                return float(max(acc, 1.6))
+        return float(acc)
 
     def _default_control(self):
         return {
@@ -536,9 +2192,10 @@ class LLMController(BaseController):
         self.trigger_not_met_events = 0
         self.sync_error_events = 0
         self.rollout_parse_fallback_used = 0
+        self.role_resolution_fallback_used = 0
         self.phase_trace = []
         self.active_plan_id = ""
-        self.active_phase = "compress"
+        self.active_phase = "attack" if self.role_map else "negotiation"
         self.active_owner = self._get_owner_veh_id()
         self.active_control_mode = "disengage"
         self.plan_expiry_step = -1
@@ -552,9 +2209,78 @@ class LLMController(BaseController):
         self.llm_trace_entries = []
         self.parse_warn_count = 0
         self._striker_behind_steps = 0
+        self.intent = self._default_highway_intent()
+        self.intent_urgency = "mid"
+        self.executor_state = "disengage"
+        self.target_abs_lane = None
+        self.lead_acquired = False
+        self.brake_armed = False
+        self.striker_completed_cut_in = False
+        self.striker_became_ego_leader = False
+        self.reserved_side_rel = 0
+        self.passing_side_rel = 0
+        self._allow_aggressive_cut_in = False
+        self._last_aggressive_cut_in_ready = False
+        self._last_lane_change_attempted = False
+        self._last_runtime_trace_step = -1
+        self._cut_in_aggressive_until_step = -1
+        self._cut_in_episode_active = False
+        self._merge_commit_until_step = -1
+        self._merge_attempt_steps = 0
+        self._pulse_end_step = -1
+        self._prev_self_lane = None
+        self._trace_prev_self_lane = None
+        self._merged_into_ego_lane = False
+        self._merge_event_this_step = False
+        self._last_merge_event_step = -1
+        self._last_valid_merge_event_step = -1
+        self._last_bad_merge_event_step = -1
+        self._last_merge_rel_x = None
+        self._bad_merge_event = False
+        self._bad_merge_reason = ""
+        self._overshoot = False
+        self._front_brake_triggered = False
+        self._striker_lane_change_time = None
+        self._striker_rel_x_at_lane_change = None
+        self._seal_escape_until_step = -1
+        self._last_local_ready = {}
+        self._last_teammate_request = ""
+        self._last_teammate_primitive = ""
+        self._last_negotiated_contract = copy.deepcopy(self.highway_contract)
+        self._initialize_highway_preferences(env)
+        try:
+            if self.veh_id in env.k.vehicle.get_ids():
+                self._prev_self_lane = int(env.k.vehicle.get_lane(self.veh_id))
+                self._trace_prev_self_lane = self._prev_self_lane
+        except Exception:
+            self._prev_self_lane = None
+            self._trace_prev_self_lane = None
+
+    def run_coordinated_step(self, env, snapshot=None):
+        self._begin_rollout_if_needed(env)
+        if not self.uses_coordinated_planning():
+            return False
+        if not self.role_map:
+            self.active_phase = "negotiation"
+            return False
+
+        step = self._get_step(env)
+        if not self._is_control_step(env) or step == self.last_control_step:
+            return False
+
+        self.active_phase = "attack"
+        self.last_control_step = step
+        decision = self.llm_collaborate(env)
+        self.current_message = str(decision.get("message", ""))
+        self.has_llm_decision = True
+        self.current_decision = copy.deepcopy(decision)
+        return True
 
     def _update_tactical_plan_if_needed(self, env):
         self._begin_rollout_if_needed(env)
+        if self.uses_coordinated_planning():
+            self.run_coordinated_step(env)
+            return
         if self._use_structured_protocol():
             return self._update_structured_plan_if_needed(env)
         step = self._get_step(env)
@@ -568,14 +2294,8 @@ class LLMController(BaseController):
         self.last_control_step = step
         decision = self.llm_collaborate(env)
         self.current_message = decision["message"]
-        self.target_v = float(decision["v"])
-        self.target_s = float(decision["s"])
-        self.target_lc = int(decision["lane_change"])
-        self.pending_lane_change = self.target_lc
         self.has_llm_decision = True
-
-        self.v0 = self.target_v
-        self.s0 = self.target_s
+        self.current_decision = copy.deepcopy(decision)
 
     def get_lane_change_action(self, env):
         cmd = int(self.pending_lane_change)
@@ -586,11 +2306,24 @@ class LLMController(BaseController):
 
     def get_accel(self, env):
         self._update_tactical_plan_if_needed(env)
+        if self.map_name == "highway":
+            self._apply_highway_executor(env)
         self._apply_tactical_sumo_params(env)
 
         lc_action = self.get_lane_change_action(env)
+        lane_change_attempted = False
         if lc_action != 0:
-            self._trigger_lane_change_once(env, lc_action)
+            lane_change_attempted = self._trigger_lane_change_once(env, lc_action)
+        elif self.map_name == "highway" and self._is_three_car_scene():
+            self._hold_current_lane(env, hold_steps=self.control_interval)
+        self._last_lane_change_attempted = bool(lane_change_attempted)
+        if self.map_name == "highway":
+            self._record_highway_runtime_trace(
+                env,
+                self._get_relative_context(env),
+                lane_change_attempted=lane_change_attempted,
+            )
+            self._publish_negotiated_commit(env)
 
         v = env.k.vehicle.get_speed(self.veh_id)
         lead_id = env.k.vehicle.get_leader(self.veh_id)
@@ -608,6 +2341,8 @@ class LLMController(BaseController):
 
         v_target = max(0.1, self.target_v)
         acc = self.idm_a * (1 - (v / v_target) ** self.delta - (s_star / h) ** 2)
+        if self.map_name == "highway":
+            acc = self._override_highway_accel(env, acc)
         return float(acc)
 
     def _update_structured_plan_if_needed(self, env):
@@ -782,7 +2517,20 @@ class LLMController(BaseController):
         if not self.previous_feedback:
             return "none"
         fields = []
-        for key in ("result", "feedback_summary", "failure_phase", "min_ttc", "ego_max_decel"):
+        for key in (
+                "result",
+                "feedback_summary",
+                "failure_reason",
+                "escape_summary",
+                "failure_phase",
+                "merged_into_ego_lane",
+                "valid_cut_in_merge",
+                "bad_merge_reason",
+                "front_brake_triggered",
+                "ego_escape_lane",
+                "blocker_lane_at_escape",
+                "min_ttc",
+                "ego_max_decel"):
             value = self.previous_feedback.get(key)
             if value is not None and value != "":
                 fields.append("{}={}".format(key, value))
@@ -1262,9 +3010,11 @@ class LLMController(BaseController):
         teammate_id = self._get_teammate_id()
         teammate_x = ego_x
         teammate_lane = ego_lane
+        teammate_speed = ego_speed
         if teammate_id in env.k.vehicle.get_ids():
             teammate_x = float(env.k.vehicle.get_x_by_id(teammate_id))
             teammate_lane = int(env.k.vehicle.get_lane(teammate_id))
+            teammate_speed = float(env.k.vehicle.get_speed(teammate_id))
 
         return {
             "ego_speed": ego_speed,
@@ -1276,6 +3026,7 @@ class LLMController(BaseController):
             "self_rel_x": self_x - ego_x,
             "self_rel_lane": self_lane - ego_lane,
             "teammate_id": teammate_id,
+            "teammate_speed": teammate_speed,
             "teammate_rel_x": teammate_x - ego_x,
             "teammate_rel_lane": teammate_lane - ego_lane,
         }
@@ -1406,8 +3157,77 @@ class LLMController(BaseController):
 
     def llm_collaborate(self, env):
         scenario_description = self.get_perception(env)
+        if self.map_name == "highway" and self._is_negotiated_highway_scene():
+            snapshot = self._get_negotiated_snapshot(env)
+            teammate_state = {
+                "requested": self._get_latest_teammate_request(snapshot),
+                "committed": self._get_latest_teammate_primitive(snapshot),
+            }
+            ctx = self._get_relative_context(env)
+            self._refresh_negotiated_runtime_state(env, ctx)
+            local_ready = self._build_negotiated_local_ready(env, ctx)
+            parse_attempt = 0
+            while True:
+                response = ""
+                response = self.DA.collaborate_highway_primitive(
+                    scenario_description,
+                    self.attack_role,
+                    self.attack_target,
+                    snapshot.get("negotiated_contract", {}) or self.highway_contract,
+                    teammate_state,
+                    local_ready,
+                    self.previous_feedback,
+                )
+                try:
+                    parsed = self._extract_decision_dict(response)
+                    params = self._normalize_highway_primitive_fields(parsed)
+                    self._record_llm_trace(
+                        env,
+                        protocol="negotiated_primitive",
+                        attempt=parse_attempt + 1,
+                        response=response,
+                        parsed=params,
+                        error="",
+                    )
+                    self.last_parse_error = ""
+                    self.active_control_mode = "negotiated_primitive"
+                    self._publish_negotiated_request(env, params)
+                    return params
+                except Exception as e:
+                    self._record_llm_trace(
+                        env,
+                        protocol="negotiated_primitive",
+                        attempt=parse_attempt + 1,
+                        response=response,
+                        parsed=None,
+                        error=str(e),
+                    )
+                    parse_attempt += 1
+                    self.parse_failures += 1
+                    self.last_parse_error = str(e)
+                    if parse_attempt >= 3:
+                        self.fallback_activations += 1
+                        self.rollout_parse_fallback_used += 1
+                        params = {
+                            "primitive": self._default_highway_intent(),
+                            "eta": None,
+                            "target_v": None,
+                            "target_s": None,
+                            "message": "primitive_parse_fallback",
+                        }
+                        self._publish_negotiated_request(env, params)
+                        return params
+                    if parse_attempt == 1 or parse_attempt == 3:
+                        self._maybe_print_parse_warn(
+                            "----LLM negotiated primitive parse failure; retrying "
+                            f"veh={self.veh_id} attempt={parse_attempt} error={e}"
+                        )
+
         shared_message = env.message_pool.get_all_msg()
         parse_attempt = 0
+        protocol = "simple_attack" if self.map_name == "highway" else "legacy"
+        feedback_prompt = self._build_feedback_prompt() if self.map_name == "highway" else self.previous_feedback
+        phase_instruction = self._build_attack_instruction(env) if self.map_name == "highway" else ""
 
         while True:
             response = ""
@@ -1417,27 +3237,38 @@ class LLMController(BaseController):
                 shared_message,
                 self.attack_role,
                 self.attack_target,
-                self.previous_feedback,
+                feedback_prompt,
+                phase_instruction=phase_instruction,
             )
             try:
                 parsed = self._extract_decision_dict(response)
-                params = self._normalize_decision_fields(parsed)
-                params = self._hard_clip_decision(params)
+                if self.map_name == "highway":
+                    params = self._normalize_highway_intent_fields(parsed)
+                    pool_message = "[intent={} urgency={}] {}".format(
+                        params["intent"],
+                        params["urgency"],
+                        params["message"],
+                    )
+                else:
+                    params = self._normalize_decision_fields(parsed)
+                    params = self._hard_clip_decision(params)
+                    pool_message = params["message"]
                 self._record_llm_trace(
                     env,
-                    protocol="legacy",
+                    protocol=protocol,
                     attempt=parse_attempt + 1,
                     response=response,
                     parsed=parsed,
                     error="",
                 )
                 self.last_parse_error = ""
-                env.message_pool.join(self.veh_id, params["message"])
+                self.active_control_mode = "simple_attack"
+                env.message_pool.join(self.veh_id, pool_message)
                 return params
             except Exception as e:
                 self._record_llm_trace(
                     env,
-                    protocol="legacy",
+                    protocol=protocol,
                     attempt=parse_attempt + 1,
                     response=response,
                     parsed=None,
@@ -1448,6 +3279,13 @@ class LLMController(BaseController):
                 self.last_parse_error = str(e)
                 if parse_attempt >= 3:
                     self.fallback_activations += 1
+                    self.rollout_parse_fallback_used += 1
+                    if self.map_name == "highway":
+                        return {
+                            "intent": self._default_highway_intent(),
+                            "urgency": "mid",
+                            "message": "intent_parse_fallback",
+                        }
                     return {
                         "message": "legacy_fallback_hold",
                         "v": float(np.clip(self.target_v, self.bounds["v_min"], self.bounds["v_max"])),
@@ -1530,16 +3368,7 @@ class LLMController(BaseController):
         }
         if isinstance(parsed, dict):
             entry["parsed_keys"] = sorted(str(k) for k in parsed.keys())
-        self.llm_trace_entries.append(entry)
-        if len(self.llm_trace_entries) > self.trace_max_entries:
-            self.llm_trace_entries = self.llm_trace_entries[-self.trace_max_entries:]
-
-        if self.trace_file:
-            try:
-                with open(self.trace_file, "a") as f:
-                    f.write(json.dumps(entry, ensure_ascii=False) + "\n")
-            except Exception:
-                pass
+        self._append_trace_entry(entry)
 
         if self.trace_stdout and (not parse_ok):
             print(
@@ -1596,6 +3425,125 @@ class LLMController(BaseController):
         num = int(round(self._safe_float(value, default)))
         return int(np.clip(num, -1, 1))
 
+    def _normalize_highway_confirmation(self, parsed):
+        required_keys = {"decision", "message"}
+        if not required_keys.issubset(set(parsed.keys())):
+            raise KeyError("JSON must include keys: decision, message.")
+
+        repaired_fields = []
+        decision = str(parsed.get("decision", "confirm") or "confirm").strip().lower()
+        if decision not in ("confirm", "swap"):
+            decision = "confirm"
+            repaired_fields.append("decision")
+        message = str(parsed.get("message", "") or "").strip()
+        if not message:
+            message = "Keeping geometry-locked role."
+            repaired_fields.append("message")
+        self._record_repairs(repaired_fields)
+        return {
+            "decision": decision,
+            "message": message[:160],
+        }
+
+    def _normalize_highway_contract_proposal(self, parsed):
+        if "proposed_role" not in parsed:
+            raise KeyError("JSON must include key: proposed_role.")
+        repaired_fields = []
+        proposed_role = self._normalize_role_name(parsed.get("proposed_role", "Undecided"))
+        pass_side = str(parsed.get("pass_side", "none") or "none").strip().lower()
+        if pass_side not in ("left", "right", "none"):
+            pass_side = "none"
+            repaired_fields.append("pass_side")
+        message = str(parsed.get("message", "") or "").strip()
+        self._record_repairs(repaired_fields)
+        return {
+            "proposed_role": proposed_role,
+            "pass_side": pass_side,
+            "message": message[:120],
+        }
+
+    def _normalize_highway_primitive_fields(self, parsed):
+        if "primitive" not in parsed:
+            raise KeyError("JSON must include key: primitive.")
+        repaired_fields = []
+        primitive = str(parsed.get("primitive", self._default_highway_intent()) or self._default_highway_intent()).strip().lower()
+        allowed = {
+            "Striker": {"gain_lead", "merge_commit", "front_brake", "abort"},
+            "Blocker": {"hold_side_front", "seal_escape", "abort"},
+        }.get(self.attack_role, {"abort"})
+        if primitive not in allowed:
+            primitive = self._default_highway_intent()
+            repaired_fields.append("primitive")
+
+        eta = parsed.get("eta")
+        if eta in ("", None):
+            eta = None
+        else:
+            eta = max(0, int(round(self._safe_float(eta, 0))))
+
+        target_v = parsed.get("target_v")
+        if target_v in ("", None):
+            target_v = None
+        else:
+            target_v = float(np.clip(
+                self._safe_float(target_v, self.target_v),
+                self.bounds["v_min"],
+                self.bounds["v_max"],
+            ))
+
+        target_s = parsed.get("target_s")
+        if target_s in ("", None):
+            target_s = None
+        else:
+            target_s = float(np.clip(
+                self._safe_float(target_s, self.target_s),
+                self.bounds["s_min"],
+                self.bounds["s_max"],
+            ))
+
+        message = str(parsed.get("message", "") or "").strip()
+        self._record_repairs(repaired_fields)
+        return {
+            "primitive": primitive,
+            "eta": eta,
+            "target_v": target_v,
+            "target_s": target_s,
+            "message": message[:120],
+        }
+
+    def _normalize_highway_intent_fields(self, parsed):
+        required_keys = {"intent", "urgency", "message"}
+        if not required_keys.issubset(set(parsed.keys())):
+            raise KeyError("JSON must include keys: intent, urgency, message.")
+
+        repaired_fields = []
+        intent = str(
+            parsed.get("intent", self._default_highway_intent()) or self._default_highway_intent()
+        ).strip().lower()
+        allowed_intents = {
+            "Striker": {"gain_lead", "cut_in", "brake_pulse", "abort"},
+            "Blocker": {"claim_side", "hold_side_front", "seal_escape", "abort"},
+        }.get(self.attack_role, {"abort"})
+        if intent not in allowed_intents:
+            intent = self._default_highway_intent()
+            repaired_fields.append("intent")
+
+        urgency = str(parsed.get("urgency", "mid") or "mid").strip().lower()
+        if urgency not in ("low", "mid", "high"):
+            urgency = "mid"
+            repaired_fields.append("urgency")
+
+        message = str(parsed.get("message", "") or "").strip()
+        if not message:
+            message = intent
+            repaired_fields.append("message")
+        self._record_repairs(repaired_fields)
+        return {
+            "intent": intent,
+            "urgency": urgency,
+            "message": message[:120],
+        }
+
     def _normalize_decision_fields(self, parsed):
         required_keys = {"message", "v", "s", "lane_change"}
         if not required_keys.issubset(set(parsed.keys())):
@@ -1623,12 +3571,211 @@ class LLMController(BaseController):
         params["message"] = str(params.get("message", "maintain pressure"))[:120]
         return params
 
+    def _normalize_role_name(self, value):
+        text = str(value or "").strip().lower()
+        if text == "blocker":
+            return "Blocker"
+        if text == "striker":
+            return "Striker"
+        return "Undecided"
+
+    def _normalize_role_proposal(self, parsed):
+        message = str(parsed.get("message", "") or "").strip()
+        intent = str(parsed.get("intent", "") or "").strip()
+        if not message:
+            message = "Holding role decision and waiting for teammate."
+        if not intent:
+            intent = "wait"
+        return {
+            "message": message[:160],
+            "role": self._normalize_role_name(parsed.get("role", "Undecided")),
+            "intent": intent[:80],
+        }
+
+    def _build_feedback_prompt(self):
+        feedback = self.previous_feedback
+        if not feedback:
+            return "none"
+        if not isinstance(feedback, dict):
+            text = str(feedback).strip()
+            return text if text else "none"
+        parts = []
+        for key in (
+                "result",
+                "feedback_summary",
+                "ego_max_decel",
+                "striker_lane_change_time",
+                "striker_rel_x_at_lane_change",
+                "front_brake_triggered",
+                "ego_escape_lane",
+                "blocker_lane_at_escape"):
+            value = feedback.get(key)
+            if value in (None, ""):
+                continue
+            if key == "ego_max_decel":
+                parts.append("ego_max_decel={:.2f}".format(float(value)))
+            else:
+                parts.append("{}={}".format(key, value))
+        if not parts:
+            return "none"
+        return "Last iteration: {}.".format("; ".join(parts))
+
+    def _build_attack_instruction(self, env):
+        ctx = self._get_relative_context(env)
+        rel_x = float(ctx["self_rel_x"])
+        rel_lane = int(ctx["self_rel_lane"])
+        if self.attack_role == "Striker":
+            if self._is_three_car_scene():
+                if rel_lane == 0 and 1.0 <= rel_x <= 8.0:
+                    return "If already ahead in ego_0's lane and ego_0 is closing, brake_pulse is allowed."
+                if abs(rel_lane) == 1 and -3.0 <= rel_x <= 1.5:
+                    return "In three-car mode, if slightly behind but faster from the adjacent lane, choose cut_in instead of waiting for a full lead."
+                if rel_x < -3.0:
+                    return "In three-car mode, close quickly from the open adjacent lane until you reach the forced cut-in window."
+                if abs(rel_lane) == 1 and rel_x > 1.5:
+                    return "Stay beside ego_0 from the open side and cut_in before ego_0 escapes."
+                return "Use the adjacent lane to create a cut-in window, then brake only after you become ego_0's lane leader."
+            if rel_x < 0.0:
+                return "If behind ego_0, choose gain_lead until you overtake or gain a side-front window."
+            if rel_lane == 0 and 1.0 <= rel_x <= 8.0:
+                return "If already ahead in ego_0's lane and ego_0 is closing, brake_pulse is allowed."
+            if abs(rel_lane) == 1 and rel_x >= 1.0:
+                return "If slightly ahead from the adjacent lane, choose cut_in."
+            return "Prefer gain_lead before any cut_in or brake_pulse."
+        if self.attack_role == "Blocker":
+            if self._is_three_car_scene():
+                if abs(rel_lane) > 1:
+                    return "Move back to ego_0's escape-side adjacent lane and reclaim that side-front slot."
+                if rel_x < 6.0:
+                    return "In three-car mode, accelerate to retake side-front and keep the escape lane sealed for striker."
+                return "Hold the side-front window, seal ego_0's escape lane, and preserve striker's cut-in corridor."
+            if abs(rel_lane) > 1:
+                return "Move to the reserved side adjacent to ego_0 and claim that side."
+            if rel_x < 4.0:
+                return "Accelerate to reach ego_0's side-front and claim the escape side."
+            return "Stay on the reserved side lane and hold or seal escape space."
+        return "Coordinate with the teammate before committing to a maneuver."
+
+    def negotiate_role(self, env):
+        self._begin_rollout_if_needed(env)
+        self.active_phase = "negotiation"
+        if self.map_name == "highway" and self._is_negotiated_highway_scene():
+            parse_attempt = 0
+            while parse_attempt < 3:
+                response = ""
+                try:
+                    snapshot = self._get_negotiated_snapshot(env)
+                    response = self.DA.negotiate_highway_contract(
+                        self.get_perception(env),
+                        snapshot,
+                        self.attack_target,
+                    )
+                    parsed = self._extract_decision_dict(response)
+                    proposal = self._normalize_highway_contract_proposal(parsed)
+                    self._record_llm_trace(
+                        env,
+                        protocol="negotiated_role",
+                        attempt=parse_attempt + 1,
+                        response=response,
+                        parsed=proposal,
+                        error="",
+                    )
+                    self.last_parse_error = ""
+                    return proposal
+                except Exception as exc:
+                    self._record_llm_trace(
+                        env,
+                        protocol="negotiated_role",
+                        attempt=parse_attempt + 1,
+                        response=response,
+                        parsed=None,
+                        error=str(exc),
+                    )
+                    parse_attempt += 1
+                    self.parse_failures += 1
+                    self.last_parse_error = str(exc)
+
+            self.fallback_activations += 1
+            return {
+                "proposed_role": "Undecided",
+                "pass_side": "none",
+                "message": "negotiation_parse_fallback",
+            }
+
+        parse_attempt = 0
+        while parse_attempt < 3:
+            response = ""
+            try:
+                response = self.DA.negotiate_role(
+                    self.map_name,
+                    self.get_perception(env),
+                    env.message_pool.get_all_msg(),
+                    self.attack_target,
+                    locked_role=self.attack_role,
+                    teammate_role=self.role_map.get(self._get_teammate_id(), "Undecided"),
+                )
+                parsed = self._extract_decision_dict(response)
+                if self.map_name == "highway":
+                    proposal = self._normalize_highway_confirmation(parsed)
+                else:
+                    proposal = self._normalize_role_proposal(parsed)
+                self._record_llm_trace(
+                    env,
+                    protocol="role_confirmation" if self.map_name == "highway" else "role_negotiation",
+                    attempt=parse_attempt + 1,
+                    response=response,
+                    parsed=proposal,
+                    error="",
+                )
+                self.last_parse_error = ""
+                return proposal
+            except Exception as exc:
+                self._record_llm_trace(
+                    env,
+                    protocol="role_negotiation",
+                    attempt=parse_attempt + 1,
+                    response=response,
+                    parsed=None,
+                    error=str(exc),
+                )
+                parse_attempt += 1
+                self.parse_failures += 1
+                self.last_parse_error = str(exc)
+
+        self.fallback_activations += 1
+        if self.map_name == "highway":
+            return {
+                "decision": "confirm",
+                "message": "Keeping geometry-locked role.",
+            }
+        return {
+            "message": "Holding role decision and waiting for teammate.",
+            "role": "Undecided",
+            "intent": "wait",
+        }
+
     def llm_reason(self, env):
         if self._use_structured_protocol():
             if self.current_decision is None:
                 return {
                     "message": copy.deepcopy(self._default_message()),
                     "control": copy.deepcopy(self._default_control()),
+                }
+            return copy.deepcopy(self.current_decision)
+        if self.map_name == "highway":
+            if self.current_decision is None:
+                if self._is_negotiated_highway_scene():
+                    return {
+                        "primitive": self._default_highway_intent(),
+                        "eta": None,
+                        "target_v": None,
+                        "target_s": None,
+                        "message": "",
+                    }
+                return {
+                    "intent": self._default_highway_intent(),
+                    "urgency": "mid",
+                    "message": "",
                 }
             return copy.deepcopy(self.current_decision)
         return {
@@ -1642,6 +3789,10 @@ class LLMController(BaseController):
         return {
             "veh_id": self.veh_id,
             "role": self.attack_role,
+            "role_source": self.role_source,
+            "contract_source": self.contract_source,
+            "pass_side": self.pass_side,
+            "block_side": self.block_side,
             "model": self.DA.llm_model,
             "last_parse_error": str(self.last_parse_error),
             "parse_failures": int(self.parse_failures),
@@ -1657,6 +3808,40 @@ class LLMController(BaseController):
         return {
             "veh_id": self.veh_id,
             "role": self.attack_role,
+            "contract_source": self.contract_source,
+            "pass_side": self.pass_side,
+            "block_side": self.block_side,
+            "intent": self.intent,
+            "urgency": self.intent_urgency,
+            "executor_state": self.executor_state,
+            "target_abs_lane": self.target_abs_lane,
+            "target_v": float(self.target_v),
+            "target_s": float(self.target_s),
+            "lead_acquired": bool(self.lead_acquired),
+            "brake_armed": bool(self.brake_armed),
+            "striker_completed_cut_in": bool(self.striker_completed_cut_in),
+            "striker_became_ego_leader": bool(self.striker_became_ego_leader),
+            "last_lane_change_attempted": bool(self._last_lane_change_attempted),
+            "merge_attempt_steps": int(self._merge_attempt_steps),
+            "prev_self_lane": self._prev_self_lane,
+            "merged_into_ego_lane": bool(self._merged_into_ego_lane),
+            "merge_event_this_step": bool(self._merge_event_this_step),
+            "valid_cut_in_merge": bool(self.striker_completed_cut_in),
+            "last_merge_event_step": int(self._last_merge_event_step),
+            "last_valid_merge_event_step": int(self._last_valid_merge_event_step),
+            "last_bad_merge_event_step": int(self._last_bad_merge_event_step),
+            "last_merge_rel_x": self._last_merge_rel_x,
+            "bad_merge_event": bool(self._bad_merge_event),
+            "bad_merge_reason": str(self._bad_merge_reason or ""),
+            "overshoot": bool(self._overshoot),
+            "front_brake_triggered": bool(self._front_brake_triggered),
+            "striker_lane_change_time": self._striker_lane_change_time,
+            "striker_rel_x_at_lane_change": self._striker_rel_x_at_lane_change,
+            "seal_escape_until_step": int(self._seal_escape_until_step),
+            "last_local_ready": copy.deepcopy(self._last_local_ready),
+            "last_teammate_request": self._last_teammate_request,
+            "last_teammate_primitive": self._last_teammate_primitive,
+            "merge_commit_until_step": int(self._merge_commit_until_step),
             "active_plan_id": self.active_plan_id,
             "active_phase": self.active_phase,
             "active_owner": self.active_owner,
@@ -1667,10 +3852,13 @@ class LLMController(BaseController):
             "trigger_not_met_events": int(self.trigger_not_met_events),
             "sync_error_events": int(self.sync_error_events),
             "rollout_parse_fallback_used": int(self.rollout_parse_fallback_used),
+            "role_resolution_fallback_used": int(self.role_resolution_fallback_used),
             "normalization_repairs": int(self.normalization_repairs),
             "repaired_fields": copy.deepcopy(self.repaired_fields),
             "repair_fallback_used": int(self.repair_fallback_used),
             "role_map": copy.deepcopy(self.role_map),
+            "role_source": self.role_source,
+            "geometry_role_hint": copy.deepcopy(self.geometry_role_hint),
             "scene_gate_status": copy.deepcopy(self.scene_gate_status),
             "current_decision": self.llm_reason(env=None),
             "llm_trace_tail": copy.deepcopy(self.llm_trace_entries[-12:]),
@@ -1797,13 +3985,17 @@ class LLMController(BaseController):
         ctx = self._get_relative_context(env)
         self_headway = float(env.k.vehicle.get_headway(self.veh_id))
         teammate_id = ctx["teammate_id"]
+        lead_gap_if_same_lane = "n/a"
+        if int(ctx["self_lane"]) == int(ctx["ego_lane"]):
+            lead_gap_if_same_lane = "{:.2f}".format(float(ctx["self_rel_x"]))
 
         lines = [
             "step={}".format(self._get_step(env)),
-            "self={} role={} speed={:.2f} rel_x={:.2f} rel_lane={} headway={:.2f}".format(
+            "self={} role={} speed={:.2f} speed_adv={:.2f} rel_x={:.2f} rel_lane={} headway={:.2f}".format(
                 self.veh_id,
                 self.attack_role,
                 float(ctx["self_speed"]),
+                float(ctx["self_speed"]) - float(ctx["ego_speed"]),
                 float(ctx["self_rel_x"]),
                 int(ctx["self_rel_lane"]),
                 self_headway,
@@ -1813,12 +4005,34 @@ class LLMController(BaseController):
                 float(ctx["ego_speed"]),
                 int(ctx["ego_lane"]),
             ),
-            "teammate={} rel_x={:.2f} rel_lane={}".format(
+            "teammate={} speed={:.2f} rel_x={:.2f} rel_lane={}".format(
                 teammate_id,
+                float(ctx["teammate_speed"]),
                 float(ctx["teammate_rel_x"]),
                 int(ctx["teammate_rel_lane"]),
             ),
         ]
+        if self.map_name == "highway":
+            lines.append(
+                "geometry ego_lane={} self_lane={} delta_to_ego_lane={} self_rel_x={:.2f} "
+                "is_adjacent_to_ego_lane={} is_ahead_of_ego={} lead_gap_if_same_lane={}".format(
+                    int(ctx["ego_lane"]),
+                    int(ctx["self_lane"]),
+                    int(ctx["self_lane"]) - int(ctx["ego_lane"]),
+                    float(ctx["self_rel_x"]),
+                    "yes" if abs(int(ctx["self_lane"]) - int(ctx["ego_lane"])) == 1 else "no",
+                    "yes" if float(ctx["self_rel_x"]) > 0.0 else "no",
+                    lead_gap_if_same_lane,
+                )
+            )
+            if self._is_negotiated_highway_scene():
+                lines.append(
+                    "contract pass_side={} block_side={} contract_source={}".format(
+                        self.pass_side,
+                        self.block_side,
+                        self.contract_source or "none",
+                    )
+                )
 
         nearby = []
         self_x = float(ctx["self_x"])

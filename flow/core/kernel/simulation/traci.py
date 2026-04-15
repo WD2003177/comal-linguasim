@@ -273,9 +273,10 @@ class TraCISimulation(KernelSimulation):
 
         Parameters
         ----------
-        run_id : int
-            the rollout number, appended to the name of the emission file. Used
-            to store emission files from multiple rollouts run sequentially.
+        run_id : int or str
+            the rollout number or label, appended to the name of the emission
+            file. Used to store emission files from multiple rollouts run
+            sequentially.
         """
         # If there is no stored data, ignore this operation. This is to ensure
         # that data isn't deleted if the operation is called twice.
@@ -286,7 +287,15 @@ class TraCISimulation(KernelSimulation):
         net_obj = self.master_kernel.network.network
         base_name = getattr(net_obj, "orig_name", getattr(net_obj, "name", "run"))
         base_name = str(base_name).replace("/", "_").replace(" ", "_")
-        name = "{}_iter{:02d}_emission.csv".format(base_name, int(run_id))
+        if isinstance(run_id, str):
+            label = str(run_id).strip() or "iter00"
+            safe_label = "".join(
+                ch if ch.isalnum() or ch in ("-", "_") else "_"
+                for ch in label
+            )
+            name = "{}_{}_emission.csv".format(base_name, safe_label)
+        else:
+            name = "{}_iter{:02d}_emission.csv".format(base_name, int(run_id))
 
         # The name of all stored data-points (excluding id and time)
         stored_ids = [

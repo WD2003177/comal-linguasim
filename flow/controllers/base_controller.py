@@ -91,6 +91,14 @@ class BaseController(metaclass=ABCMeta):
 
         self.car_following_params = car_following_params
 
+    def uses_coordinated_planning(self):
+        """Whether this controller participates in env-level planning hooks."""
+        return False
+
+    def run_coordinated_step(self, env, snapshot=None):
+        """Optional env-level planning hook. Returns True when work was done."""
+        return False
+
     @abstractmethod
     def get_accel(self, env):
         """Return the acceleration of the controller."""

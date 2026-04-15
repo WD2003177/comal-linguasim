@@ -9,12 +9,7 @@ import os
 import sys
 from datetime import datetime
 
-from flow.core.experiment import Experiment
-from flow.core.params import AimsunParams
-from flow.utils.highway_scene import SCENE_GATE_SAMPLE_BUDGET
-from flow.utils.highway_scene import sample_and_freeze_scene
-from flow.utils.rllib import FlowParamsEncoder
-
+from flow.utils.highway_scene import SCENE_MODE_THREE_CAR_FIXED_NEGOTIATED
 
 MAX_ITERATIONS = 10
 HARD_BRAKE_DECEL = 2.5
@@ -71,39 +66,336 @@ def iter_llm_controllers(env_instance):
     return controllers
 
 
-def collect_llm_stats(env_instance):
+def collect_llm_stats(env_instance, controllers=None):
     stats = {}
-    for veh_id, controller in iter_llm_controllers(env_instance).items():
+    controller_map = controllers if controllers is not None else iter_llm_controllers(env_instance)
+    for veh_id, controller in controller_map.items():
         if hasattr(controller, "get_runtime_stats"):
             stats[veh_id] = controller.get_runtime_stats()
     return stats
 
 
-def collect_llm_diagnostics(env_instance):
+def collect_llm_diagnostics(env_instance, controllers=None):
     diagnostics = {}
-    for veh_id, controller in iter_llm_controllers(env_instance).items():
+    controller_map = controllers if controllers is not None else iter_llm_controllers(env_instance)
+    for veh_id, controller in controller_map.items():
         if hasattr(controller, "get_rollout_diagnostics"):
             diagnostics[veh_id] = controller.get_rollout_diagnostics()
     return diagnostics
+
+
+def _scene_mode_from_context(scenario_context):
+    gate = scenario_context.get("scene_gate_status", {}) or {}
+    return str(gate.get("scene_mode", "") or "").strip().lower()
+
+
+def _uses_negotiated_contract(scenario_context):
+    return _scene_mode_from_context(scenario_context) == SCENE_MODE_THREE_CAR_FIXED_NEGOTIATED
+
+
+def _normalize_pass_side(value):
+    text = str(value or "").strip().lower()
+    if text in ("left", "right"):
+        return text
+    return "none"
+
+
+def _opposite_side(side):
+    if side == "left":
+        return "right"
+    if side == "right":
+        return "left"
+    return "none"
+
+
+def _infer_geometry_pass_side(scenario_context):
+    geometry = dict(scenario_context.get("frozen_geometry", {}) or {})
+    geometry_role_hint = dict(scenario_context.get("geometry_role_hint", {}) or {})
+    striker_id = next((veh_id for veh_id, role in geometry_role_hint.items() if role == "Striker"), "")
+    striker = geometry.get(striker_id, {}) if striker_id else {}
+    rel_lane = int(striker.get("rel_lane_to_ego", 0) or 0)
+    if rel_lane < 0:
+        return "left"
+    if rel_lane > 0:
+        return "right"
+    blocker_id = next((veh_id for veh_id, role in geometry_role_hint.items() if role == "Blocker"), "")
+    blocker = geometry.get(blocker_id, {}) if blocker_id else {}
+    blocker_rel_lane = int(blocker.get("rel_lane_to_ego", 0) or 0)
+    if blocker_rel_lane < 0:
+        return "right"
+    if blocker_rel_lane > 0:
+        return "left"
+    return "left"
+
+
+def _build_negotiated_contract_payload(scenario_context):
+    pass_side = _normalize_pass_side(scenario_context.get("pass_side", "none"))
+    block_side = _normalize_pass_side(scenario_context.get("block_side", _opposite_side(pass_side)))
+    if pass_side == "none" and block_side in ("left", "right"):
+        pass_side = _opposite_side(block_side)
+    if block_side == "none" and pass_side in ("left", "right"):
+        block_side = _opposite_side(pass_side)
+    return {
+        "role_map": dict(scenario_context.get("role_map", {}) or {}),
+        "pass_side": pass_side,
+        "block_side": block_side,
+        "contract_source": str(scenario_context.get("contract_source", "") or ""),
+    }
+
+
+def _apply_contract_context(env, controllers, scenario_context):
+    contract_payload = _build_negotiated_contract_payload(scenario_context)
+    if hasattr(env.message_pool, "set_negotiated_contract"):
+        env.message_pool.set_negotiated_contract(contract_payload if _uses_negotiated_contract(scenario_context) else {})
+    for controller in controllers.values():
+        if hasattr(controller, "set_highway_contract"):
+            controller.set_highway_contract(contract_payload)
+
+
+def apply_role_context(controllers, scenario_context):
+    role_map = dict(scenario_context.get("role_map", {}) or {})
+    role_source = str(scenario_context.get("role_source", "") or "")
+    geometry_role_hint = dict(scenario_context.get("geometry_role_hint", {}) or {})
+    for controller in controllers.values():
+        controller.geometry_role_hint = dict(geometry_role_hint)
+        if hasattr(controller, "set_role_assignment"):
+            controller.set_role_assignment(role_map, role_source=role_source)
+        else:
+            controller.role_map = dict(role_map)
+            controller.role_source = role_source
+            if hasattr(controller, "refresh_attack_role"):
+                controller.refresh_attack_role()
+
+
+def _refresh_assignment_context(env, controllers, scenario_context):
+    apply_role_context(controllers, scenario_context)
+    _apply_contract_context(env, controllers, scenario_context)
+    for controller in controllers.values():
+        if hasattr(controller, "_initialize_highway_preferences"):
+            controller._initialize_highway_preferences(env)
 
 
 def inject_rollout_context(env, rolling_feedback, case_memory, scenario_context, iteration):
     controllers = iter_llm_controllers(env)
     initial_signatures = {}
     env.message_pool.set_scenario_context(scenario_context)
+    _refresh_assignment_context(env, controllers, scenario_context)
     for veh_id, controller in controllers.items():
         controller.previous_feedback = rolling_feedback
         controller.case_memory = case_memory
         controller.scenario_id = scenario_context.get("scenario_id", "")
         controller.current_iteration = iteration
         controller.frozen_geometry = scenario_context.get("frozen_geometry", {})
-        controller.role_map = scenario_context.get("role_map", {})
         controller.scene_gate_status = scenario_context.get("scene_gate_status", {})
-        if hasattr(controller, "refresh_attack_role"):
-            controller.refresh_attack_role()
+        if hasattr(controller, "_begin_rollout_if_needed"):
+            controller._begin_rollout_if_needed(env)
         if hasattr(controller, "get_state_signature"):
             initial_signatures[veh_id] = controller.get_state_signature(env, phase="compress")
     return controllers, initial_signatures
+
+
+def _format_role_pool_message(proposal):
+    if "decision" in proposal:
+        return "[decision={decision}] {message}".format(
+            decision=str(proposal.get("decision", "confirm")),
+            message=str(proposal.get("message", "")),
+        )
+    return "[role={role} intent={intent}] {message}".format(
+        role=str(proposal.get("role", "Undecided")),
+        intent=str(proposal.get("intent", "wait")),
+        message=str(proposal.get("message", "")),
+    )
+
+
+def _maybe_lock_negotiated_role_map(proposals):
+    blockers = [veh_id for veh_id, payload in proposals.items() if payload.get("proposed_role") == "Blocker"]
+    strikers = [veh_id for veh_id, payload in proposals.items() if payload.get("proposed_role") == "Striker"]
+    if len(blockers) == 1 and len(strikers) == 1 and blockers[0] != strikers[0]:
+        return {
+            blockers[0]: "Blocker",
+            strikers[0]: "Striker",
+        }
+    return {}
+
+
+def _maybe_lock_negotiated_pass_side(proposals):
+    sides = []
+    for payload in proposals.values():
+        side = _normalize_pass_side(payload.get("pass_side", "none"))
+        if side in ("left", "right"):
+            sides.append(side)
+    if not sides:
+        return "none"
+    if len(set(sides)) == 1:
+        return sides[0]
+    return "none"
+
+
+def _maybe_lock_role_map(proposals):
+    blockers = [veh_id for veh_id, payload in proposals.items() if payload.get("role") == "Blocker"]
+    strikers = [veh_id for veh_id, payload in proposals.items() if payload.get("role") == "Striker"]
+    if len(blockers) == 1 and len(strikers) == 1 and blockers[0] != strikers[0]:
+        return {
+            blockers[0]: "Blocker",
+            strikers[0]: "Striker",
+        }
+    return {}
+
+
+def resolve_roles_for_rollout(env, controllers, scenario_context, iteration):
+    role_map = dict(scenario_context.get("role_map", {}) or {})
+    if role_map:
+        _refresh_assignment_context(env, controllers, scenario_context)
+        env.message_pool.set_scenario_context(scenario_context)
+        return role_map
+
+    if _uses_negotiated_contract(scenario_context):
+        ordered_ids = sorted(controllers.keys())
+        proposals = {}
+        env.message_pool.begin_control_cycle(0)
+        env.message_pool.set_scenario_context(scenario_context)
+        if hasattr(env.message_pool, "set_negotiated_contract"):
+            env.message_pool.set_negotiated_contract({})
+
+        for _ in range(2):
+            for veh_id in ordered_ids:
+                controller = controllers[veh_id]
+                controller.active_phase = "negotiation"
+                if hasattr(controller, "negotiate_role"):
+                    proposal = controller.negotiate_role(env)
+                else:
+                    proposal = {
+                        "proposed_role": "Undecided",
+                        "pass_side": "none",
+                        "message": "",
+                    }
+                proposals[veh_id] = proposal
+                if hasattr(env.message_pool, "publish_negotiated_negotiation"):
+                    env.message_pool.publish_negotiated_negotiation({
+                        "sender": veh_id,
+                        "proposed_role": proposal.get("proposed_role", "Undecided"),
+                        "pass_side": proposal.get("pass_side", "none"),
+                        "message": proposal.get("message", ""),
+                        "step": 0,
+                        "control_cycle_step": 0,
+                    })
+
+            locked_role_map = _maybe_lock_negotiated_role_map(proposals)
+            locked_pass_side = _maybe_lock_negotiated_pass_side(proposals)
+            if locked_role_map and locked_pass_side in ("left", "right"):
+                scenario_context["role_map"] = dict(locked_role_map)
+                scenario_context["role_source"] = "llm_negotiated"
+                scenario_context["pass_side"] = locked_pass_side
+                scenario_context["block_side"] = _opposite_side(locked_pass_side)
+                scenario_context["contract_source"] = "negotiated"
+                env.message_pool.set_scenario_context(scenario_context)
+                _refresh_assignment_context(env, controllers, scenario_context)
+                return dict(locked_role_map)
+
+        fallback = dict(scenario_context.get("geometry_role_hint", {}) or {})
+        fallback_pass_side = _infer_geometry_pass_side(scenario_context)
+        scenario_context["role_map"] = fallback
+        scenario_context["role_source"] = "geometry_fallback" if fallback else ""
+        scenario_context["pass_side"] = fallback_pass_side
+        scenario_context["block_side"] = _opposite_side(fallback_pass_side)
+        scenario_context["contract_source"] = "fallback_geometry" if fallback else ""
+        env.message_pool.set_scenario_context(scenario_context)
+        _refresh_assignment_context(env, controllers, scenario_context)
+        for controller in controllers.values():
+            controller.active_phase = "fallback" if fallback else "negotiation"
+            if fallback:
+                controller.role_resolution_fallback_used = 1
+        return fallback
+
+    geometry_hint = dict(scenario_context.get("geometry_role_hint", {}) or {})
+    if geometry_hint:
+        scenario_context["role_map"] = dict(geometry_hint)
+        scenario_context["role_source"] = "geometry_locked"
+        env.message_pool.set_scenario_context(scenario_context)
+        _refresh_assignment_context(env, controllers, scenario_context)
+
+        ordered_ids = sorted(controllers.keys())
+        proposals = {}
+        for veh_id in ordered_ids:
+            controller = controllers[veh_id]
+            controller.active_phase = "negotiation"
+            if hasattr(controller, "negotiate_role"):
+                proposal = controller.negotiate_role(env)
+            else:
+                proposal = {
+                    "decision": "confirm",
+                    "message": "Keeping geometry-locked role.",
+                }
+            proposals[veh_id] = proposal
+            env.message_pool.join(veh_id, _format_role_pool_message(proposal))
+
+        if ordered_ids and all(
+                str(proposals.get(veh_id, {}).get("decision", "confirm")).strip().lower() == "swap"
+                for veh_id in ordered_ids):
+            swapped = {}
+            for veh_id, role in geometry_hint.items():
+                if role == "Blocker":
+                    swapped[veh_id] = "Striker"
+                elif role == "Striker":
+                    swapped[veh_id] = "Blocker"
+            if len(swapped) == len(geometry_hint) and sorted(swapped.values()) == ["Blocker", "Striker"]:
+                scenario_context["role_map"] = dict(swapped)
+                scenario_context["role_source"] = "llm_swapped"
+            else:
+                scenario_context["role_source"] = "geometry_locked"
+        elif ordered_ids and all(
+                str(proposals.get(veh_id, {}).get("decision", "confirm")).strip().lower() == "confirm"
+                for veh_id in ordered_ids):
+            scenario_context["role_source"] = "llm_confirmed_geometry"
+        else:
+            scenario_context["role_source"] = "geometry_locked"
+
+        env.message_pool.set_scenario_context(scenario_context)
+        _refresh_assignment_context(env, controllers, scenario_context)
+        return dict(scenario_context.get("role_map", {}) or {})
+
+    ordered_ids = sorted(controllers.keys())
+    proposals = {}
+    for _ in range(2):
+        for veh_id in ordered_ids:
+            controller = controllers[veh_id]
+            controller.active_phase = "negotiation"
+            if hasattr(controller, "negotiate_role"):
+                proposal = controller.negotiate_role(env)
+            else:
+                proposal = {
+                    "message": "Holding role decision and waiting for teammate.",
+                    "role": "Undecided",
+                    "intent": "wait",
+                }
+            proposals[veh_id] = proposal
+            env.message_pool.join(veh_id, _format_role_pool_message(proposal))
+
+        locked = _maybe_lock_role_map(proposals)
+        if locked:
+            scenario_context["role_map"] = dict(locked)
+            scenario_context["role_source"] = "llm_negotiated"
+            env.message_pool.set_scenario_context(scenario_context)
+            _refresh_assignment_context(env, controllers, scenario_context)
+            return locked
+
+    fallback = dict(scenario_context.get("geometry_role_hint", {}) or {})
+    scenario_context["role_map"] = fallback
+    scenario_context["role_source"] = "geometry_fallback" if fallback else ""
+    env.message_pool.set_scenario_context(scenario_context)
+    _refresh_assignment_context(env, controllers, scenario_context)
+    for controller in controllers.values():
+        controller.active_phase = "fallback" if fallback else "negotiation"
+        if fallback:
+            controller.role_resolution_fallback_used = 1
+    return fallback
+
+
+def _format_emission_label(iteration_index, partial=False):
+    label = "iter{:02d}".format(max(0, int(iteration_index)))
+    if partial:
+        label += "_partial"
+    return label
 
 
 def compute_min_ttc(env):
@@ -162,25 +454,107 @@ def choose_failure_phase(diagnostics):
     for diag in diagnostics.values():
         if diag.get("active_phase"):
             return diag.get("active_phase")
-    return "setup"
+    return "attack"
 
 
-def determine_feedback_summary(crashed, success, diagnostics, failure_phase):
+def _escape_direction(initial_lane, escape_lane):
+    if initial_lane is None or escape_lane is None:
+        return "unknown"
+    if int(escape_lane) < int(initial_lane):
+        return "left"
+    if int(escape_lane) > int(initial_lane):
+        return "right"
+    return "same_lane"
+
+
+def build_feedback_reason(
+        crashed,
+        success,
+        too_safe,
+        diagnostics,
+        failure_phase,
+        contract_source="",
+        striker_diag=None,
+        ego_escape_lane=None,
+        blocker_lane_at_escape=None,
+        initial_ego_lane=None):
     if crashed:
-        return "collision_on_strike"
-    if any(diag.get("rollout_parse_fallback_used", 0) > 0 for diag in diagnostics.values()):
-        return "parse_fallback_used"
-    if any(diag.get("owner_plan_missing_events", 0) > 0 for diag in diagnostics.values()):
-        return "owner_plan_missing"
-    if any(diag.get("trigger_not_met_events", 0) > 0 for diag in diagnostics.values()):
-        return "trigger_not_met"
+        return "collision_on_attack"
     if success:
         return "success"
-    if failure_phase in ("setup", "compress"):
-        return "blocker_late"
-    if failure_phase in ("strike", "brake_pulse"):
-        return "striker_early"
-    return "ego_escaped_right"
+
+    striker_diag = striker_diag or {}
+    front_brake_triggered = bool(striker_diag.get("front_brake_triggered", False))
+    observed_merge = bool(
+        striker_diag.get("merged_into_ego_lane", False)
+        or striker_diag.get("striker_lane_change_time") is not None
+    )
+    valid_cut_in = bool(striker_diag.get("striker_completed_cut_in", False))
+    lane_change_attempted = bool(
+        striker_diag.get("last_lane_change_attempted", False)
+        or int(striker_diag.get("merge_attempt_steps", 0) or 0) > 0
+    )
+    bad_merge_reason = str(striker_diag.get("bad_merge_reason", "") or "")
+    if bad_merge_reason == "rear_merge":
+        return "rear_merge_into_ego_lane"
+    if bad_merge_reason == "off_window_merge":
+        return "off_window_merge"
+    if bad_merge_reason == "late_merge_ahead":
+        return "late_merge_ahead_with_brake_fallback" if front_brake_triggered else "late_merge_ahead"
+    if bad_merge_reason == "stale_merge_ahead_far":
+        return "stale_merge_ahead_far_with_brake_fallback" if front_brake_triggered else "stale_merge_ahead_far"
+    if bool(striker_diag.get("overshoot", False)):
+        return "merge_overshoot"
+    if valid_cut_in and not front_brake_triggered:
+        return "cut_in_without_front_brake"
+    if observed_merge and not valid_cut_in and not front_brake_triggered:
+        return "merge_observed_outside_valid_window"
+    if front_brake_triggered and not success:
+        return "front_brake_without_enough_pressure"
+    if lane_change_attempted and not observed_merge:
+        return "merge_commit_without_lane_change"
+
+    escape_direction = _escape_direction(initial_ego_lane, ego_escape_lane)
+    if ego_escape_lane is not None:
+        if blocker_lane_at_escape is None:
+            return "ego_escaped_{}".format(escape_direction)
+        if int(blocker_lane_at_escape) != int(ego_escape_lane):
+            return "ego_escaped_{}_unblocked".format(escape_direction)
+        return "ego_escaped_{}_past_blocker".format(escape_direction)
+
+    if too_safe:
+        return "too_safe_no_attack_pressure"
+    if any(diag.get("rollout_parse_fallback_used", 0) > 0 for diag in diagnostics.values()):
+        return "parse_fallback_used"
+    if failure_phase == "negotiation" and contract_source == "negotiated":
+        return "coordination_unstable"
+    if failure_phase == "fallback" and contract_source == "negotiated":
+        return "geometry_fallback"
+    if any(diag.get("role_resolution_fallback_used", 0) > 0 for diag in diagnostics.values()):
+        return "role_resolution_fallback"
+    return "attack_did_not_converge"
+
+
+def build_escape_summary(initial_ego_lane, ego_escape_lane, blocker_lane_at_escape):
+    if ego_escape_lane is None:
+        return ""
+    direction = _escape_direction(initial_ego_lane, ego_escape_lane)
+    if blocker_lane_at_escape is None:
+        return "ego_escaped_{}".format(direction)
+    if int(blocker_lane_at_escape) == int(ego_escape_lane):
+        return "ego_escaped_{}_through_blocker_lane".format(direction)
+    return "ego_escaped_{}_through_open_side".format(direction)
+
+
+def determine_feedback_summary(crashed, success, too_safe, diagnostics, failure_phase, **kwargs):
+    return build_feedback_reason(
+        crashed=crashed,
+        success=success,
+        too_safe=too_safe,
+        diagnostics=diagnostics,
+        failure_phase=failure_phase,
+        **kwargs
+    )
 
 
 def build_run_meta(
@@ -201,6 +575,11 @@ def build_run_meta(
         "llm_max_retries": "3",
         "llm_neighbor_k": os.getenv("FLOW_LLM_NEIGHBOR_K", "6"),
         "role_map": scenario_context.get("role_map", {}),
+        "role_source": scenario_context.get("role_source", ""),
+        "contract_source": scenario_context.get("contract_source", ""),
+        "pass_side": scenario_context.get("pass_side", "none"),
+        "block_side": scenario_context.get("block_side", "none"),
+        "geometry_role_hint": scenario_context.get("geometry_role_hint", {}),
         "frozen_geometry": scenario_context.get("frozen_geometry", {}),
         "scene_gate_status": scenario_context.get("scene_gate_status", {}),
         "sampling_strategy": scenario_context.get("sampling_strategy", ""),
@@ -220,6 +599,12 @@ def persist_run_meta(run_output_dir, run_meta):
 
 
 if __name__ == "__main__":
+    from flow.core.experiment import Experiment
+    from flow.core.params import AimsunParams
+    from flow.utils.highway_scene import SCENE_GATE_SAMPLE_BUDGET
+    from flow.utils.highway_scene import sample_and_freeze_scene
+    from flow.utils.rllib import FlowParamsEncoder
+
     flags = parse_args(sys.argv[1:])
     run_started_at = datetime.now().strftime("%Y%m%d-%H%M%S")
 
@@ -303,10 +688,10 @@ if __name__ == "__main__":
         env.terminate()
         raise SystemExit(1)
     print(
-        "Scene frozen: scenario_id={} sample_index={} role_map={}".format(
+        "Scene frozen: scenario_id={} sample_index={} geometry_role_hint={}".format(
             scenario_id,
             (scenario_context.get("scene_gate_status") or {}).get("sample_index", ""),
-            scenario_context.get("role_map", {}),
+            scenario_context.get("geometry_role_hint", {}),
         ),
         flush=True,
     )
@@ -338,10 +723,36 @@ if __name__ == "__main__":
             env.message_pool.set_scenario_context(scenario_context)
             controllers, initial_signatures = inject_rollout_context(
                 env, rolling_feedback, case_memory, scenario_context, iteration + 1)
+            resolved_role_map = resolve_roles_for_rollout(env, controllers, scenario_context, iteration + 1)
+            if resolved_role_map:
+                print(
+                    "Iteration {}/{} roles locked | source={} | role_map={}".format(
+                        iteration + 1,
+                        MAX_ITERATIONS,
+                        scenario_context.get("role_source", ""),
+                        resolved_role_map,
+                    ),
+                    flush=True,
+                )
+            else:
+                print(
+                    "Iteration {}/{} roles unresolved; controllers remain undecided".format(
+                        iteration + 1,
+                        MAX_ITERATIONS,
+                    ),
+                    flush=True,
+                )
 
             prev_ego_speed = None
+            prev_ego_lane = None
+            initial_ego_lane = None
+            ego_escape_lane = None
+            blocker_lane_at_escape = None
+            blocker_id = next((veh_id for veh_id, role in (scenario_context.get("role_map", {}) or {}).items() if role == "Blocker"), "")
             if "ego_0" in env.k.vehicle.get_ids():
                 prev_ego_speed = float(env.k.vehicle.get_speed("ego_0"))
+                prev_ego_lane = int(env.k.vehicle.get_lane("ego_0"))
+                initial_ego_lane = prev_ego_lane
 
             for _ in range(env.env_params.horizon):
                 action = rl_actions(state)
@@ -351,10 +762,16 @@ if __name__ == "__main__":
 
                 if "ego_0" in env.k.vehicle.get_ids():
                     ego_speed = float(env.k.vehicle.get_speed("ego_0"))
+                    ego_lane = int(env.k.vehicle.get_lane("ego_0"))
                     if prev_ego_speed is not None:
                         ego_decel = max(0.0, (prev_ego_speed - ego_speed) / max(env.sim_step, 1e-3))
                         ego_max_decel = max(ego_max_decel, ego_decel)
                     prev_ego_speed = ego_speed
+                    if prev_ego_lane is not None and ego_lane != prev_ego_lane and ego_escape_lane is None:
+                        ego_escape_lane = ego_lane
+                        if blocker_id and blocker_id in env.k.vehicle.get_ids():
+                            blocker_lane_at_escape = int(env.k.vehicle.get_lane(blocker_id))
+                    prev_ego_lane = ego_lane
 
                 min_ttc = min(min_ttc, compute_min_ttc(env))
                 current_min_ttc = min_ttc
@@ -393,27 +810,70 @@ if __name__ == "__main__":
                 and ego_max_decel < HARD_BRAKE_DECEL
             )
 
-            diagnostics = collect_llm_diagnostics(env)
-            llm_stats = collect_llm_stats(env)
+            diagnostics = collect_llm_diagnostics(env, controllers=controllers)
+            llm_stats = collect_llm_stats(env, controllers=controllers)
             failure_phase = choose_failure_phase(diagnostics)
-            sync_error = any(
-                diag.get("owner_plan_missing_events", 0) > 0 or diag.get("sync_error_events", 0) > 0
-                for diag in diagnostics.values()
+            sync_error = any(diag.get("role_resolution_fallback_used", 0) > 0 for diag in diagnostics.values())
+            striker_diag = next(
+                (diag for diag in diagnostics.values() if diag.get("role") == "Striker"),
+                {},
             )
-            feedback_summary = determine_feedback_summary(crashed, success, diagnostics, failure_phase)
+            feedback_summary = determine_feedback_summary(
+                crashed,
+                success,
+                too_safe,
+                diagnostics,
+                failure_phase,
+                contract_source=scenario_context.get("contract_source", ""),
+                striker_diag=striker_diag,
+                ego_escape_lane=ego_escape_lane,
+                blocker_lane_at_escape=blocker_lane_at_escape,
+                initial_ego_lane=initial_ego_lane,
+            )
+            failure_reason = build_feedback_reason(
+                crashed=crashed,
+                success=success,
+                too_safe=too_safe,
+                diagnostics=diagnostics,
+                failure_phase=failure_phase,
+                contract_source=scenario_context.get("contract_source", ""),
+                striker_diag=striker_diag,
+                ego_escape_lane=ego_escape_lane,
+                blocker_lane_at_escape=blocker_lane_at_escape,
+                initial_ego_lane=initial_ego_lane,
+            )
+            escape_summary = build_escape_summary(initial_ego_lane, ego_escape_lane, blocker_lane_at_escape)
 
             feedback = {
                 "scenario_id": scenario_id,
                 "iteration": iteration + 1,
                 "result": "success" if success else ("collision" if crashed else "too_safe" if too_safe else "failed"),
                 "feedback_summary": feedback_summary,
+                "failure_reason": failure_reason,
+                "escape_summary": escape_summary,
                 "min_ttc": None if min_ttc == float("inf") else round(float(min_ttc), 3),
                 "ego_max_decel": round(float(ego_max_decel), 3),
                 "hard_brake_event": bool(hard_brake_event),
                 "failure_phase": failure_phase,
                 "sync_error": bool(sync_error),
                 "collision": bool(crashed),
+                "contract_source": scenario_context.get("contract_source", ""),
+                "role_source": scenario_context.get("role_source", ""),
                 "scene_gate_status": scenario_context.get("scene_gate_status", {}),
+                "striker_completed_cut_in": bool(striker_diag.get("striker_completed_cut_in", False)),
+                "merged_into_ego_lane": bool(striker_diag.get("merged_into_ego_lane", False)),
+                "valid_cut_in_merge": bool(striker_diag.get("valid_cut_in_merge", False)),
+                "striker_lane_change_time": striker_diag.get("striker_lane_change_time"),
+                "striker_rel_x_at_lane_change": striker_diag.get("striker_rel_x_at_lane_change"),
+                "front_brake_triggered": bool(striker_diag.get("front_brake_triggered", False)),
+                "last_lane_change_attempted": bool(striker_diag.get("last_lane_change_attempted", False)),
+                "merge_attempt_steps": int(striker_diag.get("merge_attempt_steps", 0) or 0),
+                "bad_merge_event": bool(striker_diag.get("bad_merge_event", False)),
+                "bad_merge_reason": str(striker_diag.get("bad_merge_reason", "") or ""),
+                "last_merge_rel_x": striker_diag.get("last_merge_rel_x"),
+                "overshoot": bool(striker_diag.get("overshoot", False)),
+                "ego_escape_lane": ego_escape_lane,
+                "blocker_lane_at_escape": blocker_lane_at_escape,
             }
 
             for veh_id, controller in controllers.items():
@@ -438,6 +898,8 @@ if __name__ == "__main__":
                     "sync_error": feedback["sync_error"],
                     "collision": feedback["collision"],
                     "feedback_summary": feedback["feedback_summary"],
+                    "failure_reason": feedback["failure_reason"],
+                    "escape_summary": feedback["escape_summary"],
                 })
 
             case_memory = case_memory[-120:]
@@ -460,14 +922,34 @@ if __name__ == "__main__":
                 "iteration": iteration + 1,
                 "scenario_id": scenario_id,
                 "role_map": scenario_context.get("role_map", {}),
+                "role_source": scenario_context.get("role_source", ""),
                 "scene_gate_status": scenario_context.get("scene_gate_status", {}),
                 "sampling_strategy": scenario_context.get("sampling_strategy", ""),
+                "contract_source": scenario_context.get("contract_source", ""),
+                "pass_side": scenario_context.get("pass_side", "none"),
+                "block_side": scenario_context.get("block_side", "none"),
                 "crashed": bool(crashed),
                 "result": feedback["result"],
                 "feedback_summary": feedback_summary,
+                "failure_reason": feedback["failure_reason"],
+                "escape_summary": feedback["escape_summary"],
                 "min_ttc": feedback["min_ttc"],
                 "ego_max_decel": feedback["ego_max_decel"],
                 "hard_brake_event": feedback["hard_brake_event"],
+                "striker_lane_change_time": feedback["striker_lane_change_time"],
+                "striker_rel_x_at_lane_change": feedback["striker_rel_x_at_lane_change"],
+                "front_brake_triggered": feedback["front_brake_triggered"],
+                "merged_into_ego_lane": feedback["merged_into_ego_lane"],
+                "striker_completed_cut_in": feedback["striker_completed_cut_in"],
+                "valid_cut_in_merge": feedback["valid_cut_in_merge"],
+                "last_lane_change_attempted": feedback["last_lane_change_attempted"],
+                "merge_attempt_steps": feedback["merge_attempt_steps"],
+                "bad_merge_event": feedback["bad_merge_event"],
+                "bad_merge_reason": feedback["bad_merge_reason"],
+                "last_merge_rel_x": feedback["last_merge_rel_x"],
+                "overshoot": feedback["overshoot"],
+                "ego_escape_lane": feedback["ego_escape_lane"],
+                "blocker_lane_at_escape": feedback["blocker_lane_at_escape"],
                 "failure_phase": failure_phase,
                 "sync_error": bool(sync_error),
                 "feedback": feedback,
@@ -480,7 +962,9 @@ if __name__ == "__main__":
             })
 
             if flags.gen_emission and env.simulator == "traci":
-                env.k.simulation.save_emission(run_id=iteration)
+                env.k.simulation.save_emission(
+                    run_id=_format_emission_label(iteration)
+                )
 
             if flags.gen_emission and run_output_dir is not None:
                 run_meta = build_run_meta(
@@ -500,11 +984,24 @@ if __name__ == "__main__":
                 break
     except KeyboardInterrupt:
         interrupted = True
+        if flags.gen_emission and env.simulator == "traci" and current_iteration > 0 and current_step_in_iteration > 0:
+            try:
+                env.k.simulation.save_emission(
+                    run_id=_format_emission_label(current_iteration - 1, partial=True)
+                )
+            except Exception:
+                pass
         if current_iteration > 0 and (
                 (not iteration_logs) or iteration_logs[-1].get("iteration") != current_iteration):
             try:
-                interrupted_diagnostics = collect_llm_diagnostics(env)
-                interrupted_stats = collect_llm_stats(env)
+                interrupted_diagnostics = collect_llm_diagnostics(
+                    env,
+                    controllers=locals().get("controllers"),
+                )
+                interrupted_stats = collect_llm_stats(
+                    env,
+                    controllers=locals().get("controllers"),
+                )
             except Exception:
                 interrupted_diagnostics = {}
                 interrupted_stats = {}

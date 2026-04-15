@@ -324,17 +324,12 @@ class Env(gym.Env, metaclass=ABCMeta):
             controller = self.k.vehicle.get_acc_controller(veh_id)
             if controller is None:
                 continue
-            if not hasattr(controller, "uses_coordinated_structured_protocol"):
+            if not hasattr(controller, "uses_coordinated_planning"):
                 continue
-            if not controller.uses_coordinated_structured_protocol():
+            if not controller.uses_coordinated_planning():
                 continue
             controllers.append(controller)
-        controllers.sort(
-            key=lambda controller: (
-                0 if getattr(controller, "attack_role", "") == "Blocker" else 1,
-                getattr(controller, "veh_id", ""),
-            )
-        )
+        controllers.sort(key=lambda controller: getattr(controller, "veh_id", ""))
         return controllers
 
     def _run_controlled_planning(self):
@@ -346,7 +341,7 @@ class Env(gym.Env, metaclass=ABCMeta):
         self.message_pool.begin_control_cycle(step)
         snapshot = self.message_pool.snapshot(step, viewer_id="coordinator")
         for controller in controllers:
-            controller.prepare_for_coordinated_step(self, snapshot=snapshot)
+            controller.run_coordinated_step(self, snapshot=snapshot)
             snapshot = self.message_pool.snapshot(step, viewer_id=controller.veh_id)
 
     def step(self, rl_actions):

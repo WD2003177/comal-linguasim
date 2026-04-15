@@ -1,0 +1,754 @@
+{
+  "case_memory": [
+    {
+      "collision": false,
+      "ego_max_decel": 0.0,
+      "failure_phase": "attack",
+      "feedback_summary": "ego_escaped_right",
+      "final_plan": null,
+      "hard_brake_event": false,
+      "iteration": 1,
+      "min_ttc": null,
+      "phase_trace": [],
+      "result": "too_safe",
+      "role": "llm_0",
+      "scenario_id": "20260413-072547_6503249262493916972",
+      "state_signature": {
+        "ego_lane": 1,
+        "phase": "compress",
+        "self_rel_lane": 1,
+        "self_rel_s": 1000.0,
+        "self_rel_x": 14.0,
+        "teammate_rel_lane": -1,
+        "teammate_rel_x": -6.0
+      },
+      "state_signature_bucketed": {
+        "ego_lane": 1,
+        "phase": "compress",
+        "self_rel_lane": 1,
+        "self_rel_s_bin": "loose",
+        "self_rel_x_bin": "front_mid",
+        "teammate_rel_lane_bin": "left",
+        "teammate_rel_x_bin": "rear_close"
+      },
+      "sync_error": false,
+      "veh_id": "llm_0"
+    },
+    {
+      "collision": false,
+      "ego_max_decel": 0.0,
+      "failure_phase": "attack",
+      "feedback_summary": "ego_escaped_right",
+      "final_plan": null,
+      "hard_brake_event": false,
+      "iteration": 1,
+      "min_ttc": null,
+      "phase_trace": [],
+      "result": "too_safe",
+      "role": "llm_1",
+      "scenario_id": "20260413-072547_6503249262493916972",
+      "state_signature": {
+        "ego_lane": 1,
+        "phase": "compress",
+        "self_rel_lane": -1,
+        "self_rel_s": 1000.0,
+        "self_rel_x": -6.0,
+        "teammate_rel_lane": 1,
+        "teammate_rel_x": 14.0
+      },
+      "state_signature_bucketed": {
+        "ego_lane": 1,
+        "phase": "compress",
+        "self_rel_lane": -1,
+        "self_rel_s_bin": "loose",
+        "self_rel_x_bin": "rear_close",
+        "teammate_rel_lane_bin": "right",
+        "teammate_rel_x_bin": "front_mid"
+      },
+      "sync_error": false,
+      "veh_id": "llm_1"
+    },
+    {
+      "collision": false,
+      "ego_max_decel": 0.0,
+      "failure_phase": "attack",
+      "feedback_summary": "ego_escaped_right",
+      "final_plan": null,
+      "hard_brake_event": false,
+      "iteration": 2,
+      "min_ttc": null,
+      "phase_trace": [],
+      "result": "too_safe",
+      "role": "llm_0",
+      "scenario_id": "20260413-072547_6503249262493916972",
+      "state_signature": {
+        "ego_lane": 1,
+        "phase": "compress",
+        "self_rel_lane": 1,
+        "self_rel_s": 1000.0,
+        "self_rel_x": 14.0,
+        "teammate_rel_lane": -1,
+        "teammate_rel_x": -6.0
+      },
+      "state_signature_bucketed": {
+        "ego_lane": 1,
+        "phase": "compress",
+        "self_rel_lane": 1,
+        "self_rel_s_bin": "loose",
+        "self_rel_x_bin": "front_mid",
+        "teammate_rel_lane_bin": "left",
+        "teammate_rel_x_bin": "rear_close"
+      },
+      "sync_error": false,
+      "veh_id": "llm_0"
+    },
+    {
+      "collision": false,
+      "ego_max_decel": 0.0,
+      "failure_phase": "attack",
+      "feedback_summary": "ego_escaped_right",
+      "final_plan": null,
+      "hard_brake_event": false,
+      "iteration": 2,
+      "min_ttc": null,
+      "phase_trace": [],
+      "result": "too_safe",
+      "role": "llm_1",
+      "scenario_id": "20260413-072547_6503249262493916972",
+      "state_signature": {
+        "ego_lane": 1,
+        "phase": "compress",
+        "self_rel_lane": -1,
+        "self_rel_s": 1000.0,
+        "self_rel_x": -6.0,
+        "teammate_rel_lane": 1,
+        "teammate_rel_x": 14.0
+      },
+      "state_signature_bucketed": {
+        "ego_lane": 1,
+        "phase": "compress",
+        "self_rel_lane": -1,
+        "self_rel_s_bin": "loose",
+        "self_rel_x_bin": "rear_close",
+        "teammate_rel_lane_bin": "right",
+        "teammate_rel_x_bin": "front_mid"
+      },
+      "sync_error": false,
+      "veh_id": "llm_1"
+    }
+  ],
+  "exp_tag": "highway",
+  "frozen_geometry": {
+    "ego_0": {
+      "edge": "highway_0",
+      "ego_edge": "highway_0",
+      "ego_lane": 1,
+      "ego_pos": 324.0,
+      "ego_speed": 20.5,
+      "lane": 1,
+      "pos": 324.0,
+      "rel_lane_to_ego": 0,
+      "rel_speed_to_ego": 0.0,
+      "rel_x_to_ego": 0.0,
+      "speed": 20.5,
+      "type_id": "ego",
+      "veh_id": "ego_0"
+    },
+    "llm_0": {
+      "edge": "highway_0",
+      "ego_edge": "highway_0",
+      "ego_lane": 1,
+      "ego_pos": 324.0,
+      "ego_speed": 20.5,
+      "lane": 2,
+      "pos": 338.0,
+      "rel_lane_to_ego": 1,
+      "rel_speed_to_ego": 0.8000000000000007,
+      "rel_x_to_ego": 14.0,
+      "speed": 21.3,
+      "type_id": "llm",
+      "veh_id": "llm_0"
+    },
+    "llm_1": {
+      "edge": "highway_0",
+      "ego_edge": "highway_0",
+      "ego_lane": 1,
+      "ego_pos": 324.0,
+      "ego_speed": 20.5,
+      "lane": 0,
+      "pos": 318.0,
+      "rel_lane_to_ego": -1,
+      "rel_speed_to_ego": 2.0,
+      "rel_x_to_ego": -6.0,
+      "speed": 22.5,
+      "type_id": "llm",
+      "veh_id": "llm_1"
+    }
+  },
+  "geometry_role_hint": {
+    "llm_0": "Blocker",
+    "llm_1": "Striker"
+  },
+  "interrupted": true,
+  "iterations": [
+    {
+      "crashed": false,
+      "ego_max_decel": 0.0,
+      "failure_phase": "attack",
+      "feedback": {
+        "collision": false,
+        "ego_max_decel": 0.0,
+        "failure_phase": "attack",
+        "feedback_summary": "ego_escaped_right",
+        "hard_brake_event": false,
+        "iteration": 1,
+        "min_ttc": null,
+        "result": "too_safe",
+        "scenario_id": "20260413-072547_6503249262493916972",
+        "scene_gate_status": {
+          "accepted": true,
+          "background_nearby_count": 0,
+          "blocker_id": "llm_0",
+          "blocker_rel_lane": 1,
+          "blocker_rel_x": 14.0,
+          "projected_striker_rel_x": -2.0,
+          "reason": "accepted",
+          "role_map": {
+            "llm_0": "Blocker",
+            "llm_1": "Striker"
+          },
+          "sample_index": 1,
+          "sampling_strategy": "three_car_fixed_opening",
+          "scene_mode": "three_car_fixed",
+          "striker_id": "llm_1",
+          "striker_rel_lane": -1,
+          "striker_rel_x": -6.0,
+          "striker_speed_adv": 2.0
+        },
+        "sync_error": false
+      },
+      "feedback_summary": "ego_escaped_right",
+      "hard_brake_event": false,
+      "iteration": 1,
+      "llm_diagnostics": {},
+      "llm_stats": {},
+      "min_ttc": null,
+      "normalization_repairs": 0,
+      "result": "too_safe",
+      "role_map": {
+        "llm_0": "Blocker",
+        "llm_1": "Striker"
+      },
+      "role_source": "llm_confirmed_geometry",
+      "sampling_strategy": "three_car_fixed_opening",
+      "scenario_id": "20260413-072547_6503249262493916972",
+      "scene_gate_status": {
+        "accepted": true,
+        "background_nearby_count": 0,
+        "blocker_id": "llm_0",
+        "blocker_rel_lane": 1,
+        "blocker_rel_x": 14.0,
+        "projected_striker_rel_x": -2.0,
+        "reason": "accepted",
+        "role_map": {
+          "llm_0": "Blocker",
+          "llm_1": "Striker"
+        },
+        "sample_index": 1,
+        "sampling_strategy": "three_car_fixed_opening",
+        "scene_mode": "three_car_fixed",
+        "striker_id": "llm_1",
+        "striker_rel_lane": -1,
+        "striker_rel_x": -6.0,
+        "striker_speed_adv": 2.0
+      },
+      "sync_error": false
+    },
+    {
+      "crashed": false,
+      "ego_max_decel": 0.0,
+      "failure_phase": "attack",
+      "feedback": {
+        "collision": false,
+        "ego_max_decel": 0.0,
+        "failure_phase": "attack",
+        "feedback_summary": "ego_escaped_right",
+        "hard_brake_event": false,
+        "iteration": 2,
+        "min_ttc": null,
+        "result": "too_safe",
+        "scenario_id": "20260413-072547_6503249262493916972",
+        "scene_gate_status": {
+          "accepted": true,
+          "background_nearby_count": 0,
+          "blocker_id": "llm_0",
+          "blocker_rel_lane": 1,
+          "blocker_rel_x": 14.0,
+          "projected_striker_rel_x": -2.0,
+          "reason": "accepted",
+          "role_map": {
+            "llm_0": "Blocker",
+            "llm_1": "Striker"
+          },
+          "sample_index": 1,
+          "sampling_strategy": "three_car_fixed_opening",
+          "scene_mode": "three_car_fixed",
+          "striker_id": "llm_1",
+          "striker_rel_lane": -1,
+          "striker_rel_x": -6.0,
+          "striker_speed_adv": 2.0
+        },
+        "sync_error": false
+      },
+      "feedback_summary": "ego_escaped_right",
+      "hard_brake_event": false,
+      "iteration": 2,
+      "llm_diagnostics": {},
+      "llm_stats": {},
+      "min_ttc": null,
+      "normalization_repairs": 0,
+      "result": "too_safe",
+      "role_map": {
+        "llm_0": "Blocker",
+        "llm_1": "Striker"
+      },
+      "role_source": "llm_confirmed_geometry",
+      "sampling_strategy": "three_car_fixed_opening",
+      "scenario_id": "20260413-072547_6503249262493916972",
+      "scene_gate_status": {
+        "accepted": true,
+        "background_nearby_count": 0,
+        "blocker_id": "llm_0",
+        "blocker_rel_lane": 1,
+        "blocker_rel_x": 14.0,
+        "projected_striker_rel_x": -2.0,
+        "reason": "accepted",
+        "role_map": {
+          "llm_0": "Blocker",
+          "llm_1": "Striker"
+        },
+        "sample_index": 1,
+        "sampling_strategy": "three_car_fixed_opening",
+        "scene_mode": "three_car_fixed",
+        "striker_id": "llm_1",
+        "striker_rel_lane": -1,
+        "striker_rel_x": -6.0,
+        "striker_speed_adv": 2.0
+      },
+      "sync_error": false
+    },
+    {
+      "crashed": false,
+      "ego_max_decel": 0.0,
+      "feedback_summary": "interrupted_by_user",
+      "interrupted": true,
+      "iteration": 3,
+      "llm_diagnostics": {
+        "llm_0": {
+          "active_control_mode": "simple_attack",
+          "active_owner": "llm_0",
+          "active_phase": "attack",
+          "active_plan_id": "",
+          "brake_armed": false,
+          "current_decision": {
+            "intent": "claim_side",
+            "message": "claim_side",
+            "urgency": "low"
+          },
+          "executor_state": "hold",
+          "geometry_role_hint": {
+            "llm_0": "Blocker",
+            "llm_1": "Striker"
+          },
+          "intent": "hold_side_front",
+          "lead_acquired": false,
+          "llm_trace_tail": [
+            {
+              "attempt": 1,
+              "error": "",
+              "parse_ok": true,
+              "parsed_keys": [
+                "intent",
+                "message",
+                "urgency"
+              ],
+              "protocol": "simple_attack",
+              "raw_response": "{\"intent\": \"hold_side_front\", \"urgency\": \"high\", \"message\": \"\"}",
+              "role": "Blocker",
+              "sanitized_response": "{\"intent\": \"hold_side_front\", \"urgency\": \"high\", \"message\": \"\"}",
+              "step": 4,
+              "veh_id": "llm_0"
+            },
+            {
+              "attempt": 1,
+              "error": "",
+              "parse_ok": true,
+              "parsed_keys": [
+                "intent",
+                "message",
+                "urgency"
+              ],
+              "protocol": "simple_attack",
+              "raw_response": "{\"intent\": \"claim_side\", \"urgency\": \"high\", \"message\": \"\"}",
+              "role": "Blocker",
+              "sanitized_response": "{\"intent\": \"claim_side\", \"urgency\": \"high\", \"message\": \"\"}",
+              "step": 8,
+              "veh_id": "llm_0"
+            },
+            {
+              "attempt": 1,
+              "error": "",
+              "parse_ok": true,
+              "parsed_keys": [
+                "intent",
+                "message",
+                "urgency"
+              ],
+              "protocol": "simple_attack",
+              "raw_response": "{\"intent\": \"hold_side_front\", \"urgency\": \"low\", \"message\": \"\"}",
+              "role": "Blocker",
+              "sanitized_response": "{\"intent\": \"hold_side_front\", \"urgency\": \"low\", \"message\": \"\"}",
+              "step": 12,
+              "veh_id": "llm_0"
+            },
+            {
+              "attempt": 1,
+              "error": "",
+              "parse_ok": true,
+              "parsed_keys": [
+                "intent",
+                "message",
+                "urgency"
+              ],
+              "protocol": "simple_attack",
+              "raw_response": "{\"intent\": \"claim_side\", \"urgency\": \"low\", \"message\": \"Seal ego_0's escape lane from the side.\"}",
+              "role": "Blocker",
+              "sanitized_response": "{\"intent\": \"claim_side\", \"urgency\": \"low\", \"message\": \"Seal ego_0's escape lane from the side.\"}",
+              "step": 16,
+              "veh_id": "llm_0"
+            },
+            {
+              "attempt": 1,
+              "error": "",
+              "parse_ok": true,
+              "parsed_keys": [
+                "intent",
+                "message",
+                "urgency"
+              ],
+              "protocol": "simple_attack",
+              "raw_response": "{\"intent\": \"hold_side_front\", \"urgency\": \"low\", \"message\": \"Hold side-front window, seal ego_0's escape lane\"}",
+              "role": "Blocker",
+              "sanitized_response": "{\"intent\": \"hold_side_front\", \"urgency\": \"low\", \"message\": \"Hold side-front window, seal ego_0's escape lane\"}",
+              "step": 20,
+              "veh_id": "llm_0"
+            },
+            {
+              "attempt": 1,
+              "error": "",
+              "parse_ok": true,
+              "parsed_keys": [
+                "intent",
+                "message",
+                "urgency"
+              ],
+              "protocol": "simple_attack",
+              "raw_response": "{\"intent\": \"claim_side_front\", \"urgency\": \"low\", \"message\": \"\"}",
+              "role": "Blocker",
+              "sanitized_response": "{\"intent\": \"claim_side_front\", \"urgency\": \"low\", \"message\": \"\"}",
+              "step": 24,
+              "veh_id": "llm_0"
+            }
+          ],
+          "normalization_repairs": 5,
+          "owner_plan_missing_events": 0,
+          "phase_trace": [],
+          "plan_expiry_step": -1,
+          "repair_fallback_used": 0,
+          "repaired_fields": [
+            "message",
+            "message",
+            "message",
+            "intent",
+            "message"
+          ],
+          "role": "Blocker",
+          "role_map": {
+            "llm_0": "Blocker",
+            "llm_1": "Striker"
+          },
+          "role_resolution_fallback_used": 0,
+          "role_source": "llm_confirmed_geometry",
+          "rollout_parse_fallback_used": 0,
+          "scene_gate_status": {
+            "accepted": true,
+            "background_nearby_count": 0,
+            "blocker_id": "llm_0",
+            "blocker_rel_lane": 1,
+            "blocker_rel_x": 14.0,
+            "projected_striker_rel_x": -2.0,
+            "reason": "accepted",
+            "role_map": {
+              "llm_0": "Blocker",
+              "llm_1": "Striker"
+            },
+            "sample_index": 1,
+            "sampling_strategy": "three_car_fixed_opening",
+            "scene_mode": "three_car_fixed",
+            "striker_id": "llm_1",
+            "striker_rel_lane": -1,
+            "striker_rel_x": -6.0,
+            "striker_speed_adv": 2.0
+          },
+          "striker_became_ego_leader": false,
+          "striker_completed_cut_in": false,
+          "sync_error_events": 0,
+          "target_abs_lane": 2,
+          "target_s": 1.3,
+          "target_v": 21.32420106586117,
+          "trigger_not_met_events": 0,
+          "urgency": "low",
+          "veh_id": "llm_0"
+        },
+        "llm_1": {
+          "active_control_mode": "simple_attack",
+          "active_owner": "llm_0",
+          "active_phase": "attack",
+          "active_plan_id": "",
+          "brake_armed": false,
+          "current_decision": {
+            "intent": "cut_in",
+            "message": "Force ego_0 to hard brake",
+            "urgency": "high"
+          },
+          "executor_state": "chase",
+          "geometry_role_hint": {
+            "llm_0": "Blocker",
+            "llm_1": "Striker"
+          },
+          "intent": "gain_lead",
+          "lead_acquired": false,
+          "llm_trace_tail": [
+            {
+              "attempt": 1,
+              "error": "",
+              "parse_ok": true,
+              "parsed_keys": [
+                "intent",
+                "message",
+                "urgency"
+              ],
+              "protocol": "simple_attack",
+              "raw_response": "{\"intent\": \"cut_in\", \"urgency\": \"mid\", \"message\": \"Cut in to force ego_0 into a hard brake.\"}",
+              "role": "Striker",
+              "sanitized_response": "{\"intent\": \"cut_in\", \"urgency\": \"mid\", \"message\": \"Cut in to force ego_0 into a hard brake.\"}",
+              "step": 4,
+              "veh_id": "llm_1"
+            },
+            {
+              "attempt": 1,
+              "error": "",
+              "parse_ok": true,
+              "parsed_keys": [
+                "intent",
+                "message",
+                "urgency"
+              ],
+              "protocol": "simple_attack",
+              "raw_response": "{\"intent\": \"cut_in\", \"urgency\": \"high\", \"message\": \"Cut in to force ego_0 into a hard brake.\"}",
+              "role": "Striker",
+              "sanitized_response": "{\"intent\": \"cut_in\", \"urgency\": \"high\", \"message\": \"Cut in to force ego_0 into a hard brake.\"}",
+              "step": 8,
+              "veh_id": "llm_1"
+            },
+            {
+              "attempt": 1,
+              "error": "",
+              "parse_ok": true,
+              "parsed_keys": [
+                "intent",
+                "message",
+                "urgency"
+              ],
+              "protocol": "simple_attack",
+              "raw_response": "{\"intent\": \"cut_in\", \"urgency\": \"high\", \"message\": \"Cut in to force ego_0 into a hard brake.\"}",
+              "role": "Striker",
+              "sanitized_response": "{\"intent\": \"cut_in\", \"urgency\": \"high\", \"message\": \"Cut in to force ego_0 into a hard brake.\"}",
+              "step": 12,
+              "veh_id": "llm_1"
+            },
+            {
+              "attempt": 1,
+              "error": "",
+              "parse_ok": true,
+              "parsed_keys": [
+                "intent",
+                "message",
+                "urgency"
+              ],
+              "protocol": "simple_attack",
+              "raw_response": "{\"intent\": \"cut_in\", \"urgency\": \"high\", \"message\": \"Force ego_0 to hard brake\"}",
+              "role": "Striker",
+              "sanitized_response": "{\"intent\": \"cut_in\", \"urgency\": \"high\", \"message\": \"Force ego_0 to hard brake\"}",
+              "step": 16,
+              "veh_id": "llm_1"
+            },
+            {
+              "attempt": 1,
+              "error": "",
+              "parse_ok": true,
+              "parsed_keys": [
+                "intent",
+                "message",
+                "urgency"
+              ],
+              "protocol": "simple_attack",
+              "raw_response": "{\"intent\": \"cut_in\", \"urgency\": \"high\", \"message\": \"Force ego_0 to hard brake\"}",
+              "role": "Striker",
+              "sanitized_response": "{\"intent\": \"cut_in\", \"urgency\": \"high\", \"message\": \"Force ego_0 to hard brake\"}",
+              "step": 20,
+              "veh_id": "llm_1"
+            }
+          ],
+          "normalization_repairs": 0,
+          "owner_plan_missing_events": 0,
+          "phase_trace": [],
+          "plan_expiry_step": -1,
+          "repair_fallback_used": 0,
+          "repaired_fields": [],
+          "role": "Striker",
+          "role_map": {
+            "llm_0": "Blocker",
+            "llm_1": "Striker"
+          },
+          "role_resolution_fallback_used": 0,
+          "role_source": "llm_confirmed_geometry",
+          "rollout_parse_fallback_used": 0,
+          "scene_gate_status": {
+            "accepted": true,
+            "background_nearby_count": 0,
+            "blocker_id": "llm_0",
+            "blocker_rel_lane": 1,
+            "blocker_rel_x": 14.0,
+            "projected_striker_rel_x": -2.0,
+            "reason": "accepted",
+            "role_map": {
+              "llm_0": "Blocker",
+              "llm_1": "Striker"
+            },
+            "sample_index": 1,
+            "sampling_strategy": "three_car_fixed_opening",
+            "scene_mode": "three_car_fixed",
+            "striker_id": "llm_1",
+            "striker_rel_lane": -1,
+            "striker_rel_x": -6.0,
+            "striker_speed_adv": 2.0
+          },
+          "striker_became_ego_leader": false,
+          "striker_completed_cut_in": false,
+          "sync_error_events": 0,
+          "target_abs_lane": 0,
+          "target_s": 0.8,
+          "target_v": 26.124201065861172,
+          "trigger_not_met_events": 0,
+          "urgency": "high",
+          "veh_id": "llm_1"
+        }
+      },
+      "llm_stats": {
+        "llm_0": {
+          "fallback_activations": 0,
+          "last_parse_error": "",
+          "last_phase": "attack",
+          "last_plan_id": "",
+          "last_raw_response": "{\"intent\": \"claim_side_front\", \"urgency\": \"low\", \"message\": \"\"}",
+          "model": "llama3.2:3b",
+          "normalization_repairs": 5,
+          "parse_failures": 0,
+          "repair_fallback_used": 0,
+          "role": "Blocker",
+          "role_source": "llm_confirmed_geometry",
+          "veh_id": "llm_0"
+        },
+        "llm_1": {
+          "fallback_activations": 0,
+          "last_parse_error": "",
+          "last_phase": "attack",
+          "last_plan_id": "",
+          "last_raw_response": "{\"intent\": \"cut_in\", \"urgency\": \"high\", \"message\": \"Force ego_0 to hard brake\"}",
+          "model": "llama3.2:3b",
+          "normalization_repairs": 0,
+          "parse_failures": 0,
+          "repair_fallback_used": 0,
+          "role": "Striker",
+          "role_source": "llm_confirmed_geometry",
+          "veh_id": "llm_1"
+        }
+      },
+      "min_ttc": null,
+      "normalization_repairs": 5,
+      "result": "interrupted",
+      "role_map": {
+        "llm_0": "Blocker",
+        "llm_1": "Striker"
+      },
+      "sampling_strategy": "three_car_fixed_opening",
+      "scenario_id": "20260413-072547_6503249262493916972",
+      "scene_gate_status": {
+        "accepted": true,
+        "background_nearby_count": 0,
+        "blocker_id": "llm_0",
+        "blocker_rel_lane": 1,
+        "blocker_rel_x": 14.0,
+        "projected_striker_rel_x": -2.0,
+        "reason": "accepted",
+        "role_map": {
+          "llm_0": "Blocker",
+          "llm_1": "Striker"
+        },
+        "sample_index": 1,
+        "sampling_strategy": "three_car_fixed_opening",
+        "scene_mode": "three_car_fixed",
+        "striker_id": "llm_1",
+        "striker_rel_lane": -1,
+        "striker_rel_x": -6.0,
+        "striker_speed_adv": 2.0
+      },
+      "steps_executed": 23
+    }
+  ],
+  "iterations_completed": 3,
+  "llm_max_retries": "3",
+  "llm_neighbor_k": "6",
+  "llm_timeout_s": "12",
+  "llm_trace_file": "./data/highway_20260413-072547/llm_trace.jsonl",
+  "model": "llama3.2:3b",
+  "role_map": {
+    "llm_0": "Blocker",
+    "llm_1": "Striker"
+  },
+  "role_source": "llm_confirmed_geometry",
+  "run_started_at": "20260413-072547",
+  "sampling_strategy": "three_car_fixed_opening",
+  "scenario_id": "20260413-072547_6503249262493916972",
+  "scene_gate_status": {
+    "accepted": true,
+    "background_nearby_count": 0,
+    "blocker_id": "llm_0",
+    "blocker_rel_lane": 1,
+    "blocker_rel_x": 14.0,
+    "projected_striker_rel_x": -2.0,
+    "reason": "accepted",
+    "role_map": {
+      "llm_0": "Blocker",
+      "llm_1": "Striker"
+    },
+    "sample_index": 1,
+    "sampling_strategy": "three_car_fixed_opening",
+    "scene_mode": "three_car_fixed",
+    "striker_id": "llm_1",
+    "striker_rel_lane": -1,
+    "striker_rel_x": -6.0,
+    "striker_speed_adv": 2.0
+  }
+}

@@ -25,6 +25,12 @@ class message_pool:
         self.latest_status_by_agent = {}
         self.latest_trigger_eval = {}
         self.latest_entry_by_sender = {}
+        self.negotiated_contract = {}
+        self.negotiated_history = []
+        self.negotiated_cycle_events = []
+        self.latest_negotiation_by_agent = {}
+        self.latest_requested_primitive_by_agent = {}
+        self.latest_primitive_by_agent = {}
 
     def set_scenario_context(self, context):
         self.scenario_context = deepcopy(context or {})
@@ -40,6 +46,7 @@ class message_pool:
         if step != self.control_cycle_step:
             self.control_cycle_step = step
             self.cycle_entries = []
+            self.negotiated_cycle_events = []
 
     def publish(self, entry):
         if not isinstance(entry, dict):
@@ -123,6 +130,122 @@ class message_pool:
             "cycle_entries": [self._sanitize_entry(entry) for entry in self.cycle_entries],
         }
 
+    def set_negotiated_contract(self, contract):
+        self.negotiated_contract = deepcopy(contract or {})
+
+    def publish_negotiated_negotiation(self, entry):
+        item = deepcopy(entry or {})
+        sender = str(item.get("sender", "")).strip()
+        if not sender:
+            raise ValueError("Negotiation entry requires sender.")
+        item = {
+            "namespace": "negotiated",
+            "type": "negotiation",
+            "sender": sender,
+            "proposed_role": str(item.get("proposed_role", "Undecided") or "Undecided"),
+            "pass_side": str(item.get("pass_side", "none") or "none"),
+            "message": str(item.get("message", "") or ""),
+            "step": int(item.get("step", 0) or 0),
+            "scenario_id": str(item.get("scenario_id", self.scenario_id) or self.scenario_id),
+            "rollout_id": int(item.get("rollout_id", self.rollout_id) or self.rollout_id),
+            "control_cycle_step": int(item.get("control_cycle_step", self.control_cycle_step) or self.control_cycle_step),
+        }
+        self.latest_negotiation_by_agent[sender] = item
+        self.negotiated_history.append(item)
+        if item["control_cycle_step"] == self.control_cycle_step:
+            self.negotiated_cycle_events.append(item)
+
+    def publish_negotiated_primitive(self, entry):
+        item = deepcopy(entry or {})
+        sender = str(item.get("sender", "")).strip()
+        if not sender:
+            raise ValueError("Primitive entry requires sender.")
+        eta = item.get("eta")
+        expires_at_step = item.get("expires_at_step", 0)
+        item = {
+            "namespace": "negotiated",
+            "type": "primitive",
+            "sender": sender,
+            "role": str(item.get("role", "") or ""),
+            "primitive": str(item.get("primitive", "abort") or "abort"),
+            "eta": None if eta in (None, "") else int(eta),
+            "target_v": None if item.get("target_v") in (None, "") else float(item.get("target_v")),
+            "target_s": None if item.get("target_s") in (None, "") else float(item.get("target_s")),
+            "message": str(item.get("message", "") or ""),
+            "step": int(item.get("step", 0) or 0),
+            "expires_at_step": int(expires_at_step or 0),
+            "scenario_id": str(item.get("scenario_id", self.scenario_id) or self.scenario_id),
+            "rollout_id": int(item.get("rollout_id", self.rollout_id) or self.rollout_id),
+            "control_cycle_step": int(item.get("control_cycle_step", self.control_cycle_step) or self.control_cycle_step),
+        }
+        self.latest_primitive_by_agent[sender] = item
+        self.negotiated_history.append(item)
+        if item["control_cycle_step"] == self.control_cycle_step:
+            self.negotiated_cycle_events.append(item)
+
+    def publish_negotiated_request(self, entry):
+        item = deepcopy(entry or {})
+        sender = str(item.get("sender", "")).strip()
+        if not sender:
+            raise ValueError("Request entry requires sender.")
+        eta = item.get("eta")
+        expires_at_step = item.get("expires_at_step", 0)
+        item = {
+            "namespace": "negotiated",
+            "type": "request",
+            "sender": sender,
+            "role": str(item.get("role", "") or ""),
+            "primitive": str(item.get("primitive", "abort") or "abort"),
+            "eta": None if eta in (None, "") else int(eta),
+            "target_v": None if item.get("target_v") in (None, "") else float(item.get("target_v")),
+            "target_s": None if item.get("target_s") in (None, "") else float(item.get("target_s")),
+            "message": str(item.get("message", "") or ""),
+            "step": int(item.get("step", 0) or 0),
+            "expires_at_step": int(expires_at_step or 0),
+            "scenario_id": str(item.get("scenario_id", self.scenario_id) or self.scenario_id),
+            "rollout_id": int(item.get("rollout_id", self.rollout_id) or self.rollout_id),
+            "control_cycle_step": int(item.get("control_cycle_step", self.control_cycle_step) or self.control_cycle_step),
+        }
+        self.latest_requested_primitive_by_agent[sender] = item
+        self.negotiated_history.append(item)
+        if item["control_cycle_step"] == self.control_cycle_step:
+            self.negotiated_cycle_events.append(item)
+
+    def negotiated_snapshot(self, step, viewer_id=None):
+        step = int(step or 0)
+        latest_negotiation = {}
+        for sender, entry in self.latest_negotiation_by_agent.items():
+            latest_negotiation[sender] = self._sanitize_entry(entry)
+
+        latest_requested = {}
+        for sender, entry in self.latest_requested_primitive_by_agent.items():
+            if self._is_negotiated_active(entry, step):
+                latest_requested[sender] = self._sanitize_entry(entry)
+
+        latest_primitive = {}
+        for sender, entry in self.latest_primitive_by_agent.items():
+            if self._is_negotiated_active(entry, step):
+                latest_primitive[sender] = self._sanitize_entry(entry)
+
+        recent_events = []
+        for entry in self.negotiated_history[-8:]:
+            if entry.get("type") == "negotiation" or self._is_negotiated_active(entry, step):
+                recent_events.append(self._sanitize_entry(entry))
+
+        return {
+            "scenario_id": self.scenario_id,
+            "rollout_id": self.rollout_id,
+            "viewer_id": viewer_id,
+            "control_cycle_step": int(self.control_cycle_step),
+            "scenario_context": deepcopy(self.scenario_context),
+            "negotiated_contract": deepcopy(self.negotiated_contract),
+            "latest_negotiation_by_agent": latest_negotiation,
+            "latest_requested_primitive_by_agent": latest_requested,
+            "latest_primitive_by_agent": latest_primitive,
+            "recent_negotiated_events": recent_events,
+            "negotiated_cycle_events": [self._sanitize_entry(entry) for entry in self.negotiated_cycle_events],
+        }
+
     def _is_active(self, entry, step):
         if not entry:
             return False
@@ -175,3 +298,11 @@ class message_pool:
         if not entry:
             return None
         return deepcopy(entry)
+
+    def _is_negotiated_active(self, entry, step):
+        if not entry:
+            return False
+        expires_at_step = int(entry.get("expires_at_step", 0) or 0)
+        if expires_at_step <= 0:
+            return True
+        return step <= expires_at_step
