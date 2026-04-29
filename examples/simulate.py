@@ -5,6 +5,7 @@ Usage
 """
 import argparse
 import json
+import math
 import os
 import sys
 from datetime import datetime
@@ -15,6 +16,10 @@ MAX_ITERATIONS = 10
 HARD_BRAKE_DECEL = 2.5
 SUCCESS_TTC = 3.0
 PROGRESS_EVERY_STEPS = max(0, int(os.getenv("FLOW_PROGRESS_EVERY_STEPS", "200")))
+DIRTY_SUCCESS_OBSERVATION_STEPS = max(
+    0,
+    int(os.getenv("FLOW_DIRTY_SUCCESS_OBSERVATION_STEPS", "20")),
+)
 
 
 def parse_args(args):
@@ -82,6 +87,28 @@ def collect_llm_diagnostics(env_instance, controllers=None):
         if hasattr(controller, "get_rollout_diagnostics"):
             diagnostics[veh_id] = controller.get_rollout_diagnostics()
     return diagnostics
+
+
+def any_terminal_plan_locked(controllers):
+    for controller in (controllers or {}).values():
+        if bool(getattr(controller, "_terminal_plan_locked", False)):
+            return True
+    return False
+
+
+def any_dirty_observation_active(controllers, env_instance=None):
+    for controller in (controllers or {}).values():
+        checker = getattr(controller, "_dirty_observation_active", None)
+        if callable(checker):
+            try:
+                if bool(checker(env_instance)):
+                    return True
+            except Exception:
+                if bool(getattr(controller, "_stale_merge_candidate", False)):
+                    return True
+        elif bool(getattr(controller, "_stale_merge_candidate", False)):
+            return True
+    return False
 
 
 def _scene_mode_from_context(scenario_context):
@@ -231,6 +258,77 @@ def _maybe_lock_negotiated_pass_side(proposals):
     return "none"
 
 
+def _score_geometry_role_fit(payload, role):
+    if not payload:
+        return 1e6
+    rel_x = float(payload.get("rel_x_to_ego", 0.0) or 0.0)
+    rel_lane = int(payload.get("rel_lane_to_ego", 0) or 0)
+    abs_rel_lane = abs(rel_lane)
+    lane_penalty = 8.0 * abs(abs_rel_lane - 1)
+    if role == "Blocker":
+        front_penalty = 0.0 if rel_x >= 0.0 else 12.0 + 2.0 * abs(rel_x)
+        band_penalty = abs(rel_x - 8.0) * 0.8
+        if rel_x > 18.0:
+            band_penalty += 1.2 * (rel_x - 18.0)
+        return lane_penalty + front_penalty + band_penalty
+    trail_penalty = 0.0
+    if rel_x > 2.5:
+        trail_penalty = 10.0 + 1.5 * (rel_x - 2.5)
+    elif rel_x < -10.0:
+        trail_penalty = 1.2 * (-10.0 - rel_x)
+    band_penalty = abs(rel_x + 2.0) * 0.5
+    return lane_penalty + trail_penalty + band_penalty
+
+
+def _score_negotiated_role_map(role_map, scenario_context):
+    geometry = dict(scenario_context.get("frozen_geometry", {}) or {})
+    if not geometry or not role_map:
+        return None
+    score = 0.0
+    for veh_id, role in role_map.items():
+        score += _score_geometry_role_fit(geometry.get(veh_id, {}), role)
+    return float(score)
+
+
+def _repair_negotiated_role_map(role_map, scenario_context):
+    proposed = dict(role_map or {})
+    geometry_hint = dict(scenario_context.get("geometry_role_hint", {}) or {})
+    if not proposed:
+        return {}, ""
+    if not geometry_hint or set(proposed.keys()) != set(geometry_hint.keys()):
+        return proposed, "llm_negotiated"
+
+    proposed_score = _score_negotiated_role_map(proposed, scenario_context)
+    geometry_score = _score_negotiated_role_map(geometry_hint, scenario_context)
+    if proposed_score is None or geometry_score is None:
+        return proposed, "llm_negotiated"
+    if proposed_score <= geometry_score + 4.0:
+        return proposed, "llm_negotiated"
+    return geometry_hint, "llm_negotiated_geometry_constrained"
+
+
+def _repair_negotiated_pass_side(pass_side, scenario_context, role_map):
+    locked_pass_side = _normalize_pass_side(pass_side)
+    geometry = dict(scenario_context.get("frozen_geometry", {}) or {})
+    if not geometry:
+        return locked_pass_side, False
+
+    preferred_side = _infer_geometry_pass_side(scenario_context)
+    striker_id = next((veh_id for veh_id, role in (role_map or {}).items() if role == "Striker"), "")
+    striker = geometry.get(striker_id, {}) if striker_id else {}
+    striker_rel_lane = int(striker.get("rel_lane_to_ego", 0) or 0)
+    if striker_rel_lane < 0:
+        preferred_side = "left"
+    elif striker_rel_lane > 0:
+        preferred_side = "right"
+
+    if preferred_side not in ("left", "right"):
+        return locked_pass_side, False
+    if locked_pass_side == preferred_side:
+        return locked_pass_side, False
+    return preferred_side, True
+
+
 def _maybe_lock_role_map(proposals):
     blockers = [veh_id for veh_id, payload in proposals.items() if payload.get("role") == "Blocker"]
     strikers = [veh_id for veh_id, payload in proposals.items() if payload.get("role") == "Striker"]
@@ -282,15 +380,32 @@ def resolve_roles_for_rollout(env, controllers, scenario_context, iteration):
 
             locked_role_map = _maybe_lock_negotiated_role_map(proposals)
             locked_pass_side = _maybe_lock_negotiated_pass_side(proposals)
-            if locked_role_map and locked_pass_side in ("left", "right"):
-                scenario_context["role_map"] = dict(locked_role_map)
-                scenario_context["role_source"] = "llm_negotiated"
-                scenario_context["pass_side"] = locked_pass_side
-                scenario_context["block_side"] = _opposite_side(locked_pass_side)
+            if locked_role_map:
+                repaired_role_map, role_source = _repair_negotiated_role_map(
+                    locked_role_map,
+                    scenario_context,
+                )
+                repaired_pass_side, side_repaired = _repair_negotiated_pass_side(
+                    locked_pass_side,
+                    scenario_context,
+                    repaired_role_map,
+                )
+            else:
+                repaired_role_map, role_source = {}, ""
+                repaired_pass_side, side_repaired = "none", False
+            if repaired_role_map and repaired_pass_side in ("left", "right"):
+                scenario_context["role_map"] = dict(repaired_role_map)
+                scenario_context["role_source"] = (
+                    "llm_negotiated_geometry_constrained"
+                    if side_repaired and role_source == "llm_negotiated"
+                    else role_source
+                )
+                scenario_context["pass_side"] = repaired_pass_side
+                scenario_context["block_side"] = _opposite_side(repaired_pass_side)
                 scenario_context["contract_source"] = "negotiated"
                 env.message_pool.set_scenario_context(scenario_context)
                 _refresh_assignment_context(env, controllers, scenario_context)
-                return dict(locked_role_map)
+                return dict(repaired_role_map)
 
         fallback = dict(scenario_context.get("geometry_role_hint", {}) or {})
         fallback_pass_side = _infer_geometry_pass_side(scenario_context)
@@ -446,6 +561,105 @@ def compute_min_ttc(env):
     return min_ttc
 
 
+def _float_env(name, default):
+    try:
+        return float(os.getenv(name, default))
+    except (TypeError, ValueError):
+        return float(default)
+
+
+def init_ego_motion_metrics():
+    return {
+        "prev_speed": None,
+        "prev_accel": None,
+        "accel_samples": 0,
+        "accel_abs_sum": 0.0,
+        "max_abs_accel": 0.0,
+        "max_decel": 0.0,
+        "jerk_samples": 0,
+        "jerk_abs_sum": 0.0,
+        "jerk_sq_sum": 0.0,
+        "max_abs_jerk": 0.0,
+        "comfort_samples": 0,
+        "comfort_sum": 0.0,
+    }
+
+
+def update_ego_motion_metrics(metrics, ego_speed, dt):
+    dt = max(float(dt or 0.0), 1e-3)
+    speed = float(ego_speed)
+    prev_speed = metrics.get("prev_speed")
+    metrics["prev_speed"] = speed
+    if prev_speed is None:
+        return None
+
+    accel = (speed - float(prev_speed)) / dt
+    if not math.isfinite(accel):
+        return None
+    artifact_limit = max(0.0, _float_env("FLOW_EGO_ACCEL_ARTIFACT_LIMIT", "30.0"))
+    if artifact_limit > 0.0 and abs(accel) > artifact_limit:
+        metrics["prev_accel"] = None
+        return None
+
+    abs_accel = abs(accel)
+    metrics["accel_samples"] = int(metrics.get("accel_samples", 0) or 0) + 1
+    metrics["accel_abs_sum"] = float(metrics.get("accel_abs_sum", 0.0) or 0.0) + abs_accel
+    metrics["max_abs_accel"] = max(float(metrics.get("max_abs_accel", 0.0) or 0.0), abs_accel)
+    metrics["max_decel"] = max(float(metrics.get("max_decel", 0.0) or 0.0), max(0.0, -accel))
+
+    comfort_eps = max(0.0, _float_env("FLOW_COMFORT_ACCEL_DENOISE_EPS", "1e-3"))
+    comfort_scale = max(1e-6, _float_env("FLOW_COMFORT_ACCEL_SCALE", "1.0"))
+    denoised_abs_accel = 0.0 if abs_accel <= comfort_eps else abs_accel
+    if denoised_abs_accel > 0.0:
+        comfort_value = 1.0 / ((denoised_abs_accel / comfort_scale) + 1.0)
+        metrics["comfort_sum"] = float(metrics.get("comfort_sum", 0.0) or 0.0) + comfort_value
+        metrics["comfort_samples"] = int(metrics.get("comfort_samples", 0) or 0) + 1
+
+    prev_accel = metrics.get("prev_accel")
+    metrics["prev_accel"] = accel
+    if prev_accel is None:
+        return accel
+
+    jerk = (accel - float(prev_accel)) / dt
+    if not math.isfinite(jerk):
+        return accel
+
+    abs_jerk = abs(jerk)
+    metrics["jerk_samples"] = int(metrics.get("jerk_samples", 0) or 0) + 1
+    metrics["jerk_abs_sum"] = float(metrics.get("jerk_abs_sum", 0.0) or 0.0) + abs_jerk
+    metrics["jerk_sq_sum"] = float(metrics.get("jerk_sq_sum", 0.0) or 0.0) + jerk * jerk
+    metrics["max_abs_jerk"] = max(float(metrics.get("max_abs_jerk", 0.0) or 0.0), abs_jerk)
+    return accel
+
+
+def summarize_ego_motion_metrics(metrics):
+    accel_samples = int(metrics.get("accel_samples", 0) or 0)
+    jerk_samples = int(metrics.get("jerk_samples", 0) or 0)
+    comfort_samples = int(metrics.get("comfort_samples", 0) or 0)
+    jerk_sq_sum = float(metrics.get("jerk_sq_sum", 0.0) or 0.0)
+    return {
+        "ego_max_decel": float(metrics.get("max_decel", 0.0) or 0.0),
+        "ego_max_abs_accel": float(metrics.get("max_abs_accel", 0.0) or 0.0),
+        "ego_mean_abs_accel": (
+            float(metrics.get("accel_abs_sum", 0.0) or 0.0) / accel_samples
+            if accel_samples else 0.0
+        ),
+        "ego_max_abs_jerk": float(metrics.get("max_abs_jerk", 0.0) or 0.0),
+        "ego_mean_abs_jerk": (
+            float(metrics.get("jerk_abs_sum", 0.0) or 0.0) / jerk_samples
+            if jerk_samples else 0.0
+        ),
+        "ego_rms_jerk": math.sqrt(jerk_sq_sum / jerk_samples) if jerk_samples else 0.0,
+        "ego_comfort": (
+            float(metrics.get("comfort_sum", 0.0) or 0.0) / comfort_samples
+            if comfort_samples else 1.0
+        ),
+        "ego_accel_samples": accel_samples,
+        "ego_jerk_samples": jerk_samples,
+        "ego_comfort_samples": comfort_samples,
+    }
+
+
 def choose_failure_phase(diagnostics):
     for veh_id in ("llm_0", "llm_1"):
         diag = diagnostics.get(veh_id)
@@ -467,6 +681,33 @@ def _escape_direction(initial_lane, escape_lane):
     return "same_lane"
 
 
+def classify_success_label(success, contract_source="", role_source="", striker_diag=None):
+    if not success:
+        return ""
+    if str(contract_source or "") == "fallback_geometry":
+        return "fallback_success"
+    if str(role_source or "") == "geometry_fallback":
+        return "fallback_success"
+    striker_diag = striker_diag or {}
+    dirty_markers = (
+        bool(striker_diag.get("clean_merge_failed", False)),
+        bool(striker_diag.get("stale_merge_candidate", False)),
+        bool(striker_diag.get("lane_change_stalled", False)),
+        bool(striker_diag.get("bad_merge_event", False)),
+        bool(striker_diag.get("overshoot", False)),
+        str(striker_diag.get("bad_merge_reason", "") or "") in (
+            "late_merge_ahead",
+            "stale_merge_ahead_far",
+            "rear_merge",
+            "off_window_merge",
+            "lane_change_stalled",
+        ),
+    )
+    if any(dirty_markers):
+        return "dirty_success"
+    return "clean_success"
+
+
 def build_feedback_reason(
         crashed,
         success,
@@ -474,14 +715,21 @@ def build_feedback_reason(
         diagnostics,
         failure_phase,
         contract_source="",
+        role_source="",
         striker_diag=None,
         ego_escape_lane=None,
         blocker_lane_at_escape=None,
         initial_ego_lane=None):
     if crashed:
         return "collision_on_attack"
-    if success:
-        return "success"
+    success_label = classify_success_label(
+        success,
+        contract_source=contract_source,
+        role_source=role_source,
+        striker_diag=striker_diag,
+    )
+    if success_label:
+        return success_label
 
     striker_diag = striker_diag or {}
     front_brake_triggered = bool(striker_diag.get("front_brake_triggered", False))
@@ -503,6 +751,12 @@ def build_feedback_reason(
         return "late_merge_ahead_with_brake_fallback" if front_brake_triggered else "late_merge_ahead"
     if bad_merge_reason == "stale_merge_ahead_far":
         return "stale_merge_ahead_far_with_brake_fallback" if front_brake_triggered else "stale_merge_ahead_far"
+    if bool(striker_diag.get("stale_merge_candidate", False)):
+        return "stale_merge_candidate_without_pressure"
+    if bool(striker_diag.get("clean_merge_failed", False)):
+        return "clean_merge_failed_without_pressure"
+    if bool(striker_diag.get("lane_change_stalled", False)):
+        return "lane_change_stalled"
     if bool(striker_diag.get("overshoot", False)):
         return "merge_overshoot"
     if valid_cut_in and not front_brake_triggered:
@@ -570,10 +824,13 @@ def build_run_meta(
         "run_started_at": run_started_at,
         "scenario_id": scenario_id,
         "exp_tag": flow_params["exp_tag"],
-        "model": os.getenv("FLOW_LLM_MODEL", "llama3.2:3b"),
-        "llm_timeout_s": os.getenv("FLOW_LLM_TIMEOUT_S", "8.0"),
+        "model": os.getenv("FLOW_LLM_MODEL", "deepseek-chat"),
+        "llm_timeout_s": os.getenv("FLOW_LLM_TIMEOUT_S", "45.0"),
         "llm_max_retries": "3",
         "llm_neighbor_k": os.getenv("FLOW_LLM_NEIGHBOR_K", "6"),
+        "comfort_metric": "linguasim_accel_score",
+        "comfort_accel_denoise_eps": _float_env("FLOW_COMFORT_ACCEL_DENOISE_EPS", "1e-3"),
+        "comfort_accel_scale": _float_env("FLOW_COMFORT_ACCEL_SCALE", "1.0"),
         "role_map": scenario_context.get("role_map", {}),
         "role_source": scenario_context.get("role_source", ""),
         "contract_source": scenario_context.get("contract_source", ""),
@@ -701,6 +958,7 @@ if __name__ == "__main__":
     current_step_in_iteration = 0
     current_min_ttc = float("inf")
     current_ego_max_decel = 0.0
+    current_motion_summary = summarize_ego_motion_metrics(init_ego_motion_metrics())
     current_crashed = False
     try:
         for iteration in range(MAX_ITERATIONS):
@@ -708,6 +966,7 @@ if __name__ == "__main__":
             current_step_in_iteration = 0
             crashed = False
             ego_max_decel = 0.0
+            ego_motion_metrics = init_ego_motion_metrics()
             min_ttc = float("inf")
             print(
                 "Iteration {}/{} start | horizon={}".format(
@@ -743,17 +1002,21 @@ if __name__ == "__main__":
                     flush=True,
                 )
 
-            prev_ego_speed = None
             prev_ego_lane = None
             initial_ego_lane = None
             ego_escape_lane = None
             blocker_lane_at_escape = None
             blocker_id = next((veh_id for veh_id, role in (scenario_context.get("role_map", {}) or {}).items() if role == "Blocker"), "")
             if "ego_0" in env.k.vehicle.get_ids():
-                prev_ego_speed = float(env.k.vehicle.get_speed("ego_0"))
+                update_ego_motion_metrics(
+                    ego_motion_metrics,
+                    float(env.k.vehicle.get_speed("ego_0")),
+                    max(env.sim_step, 1e-3),
+                )
                 prev_ego_lane = int(env.k.vehicle.get_lane("ego_0"))
                 initial_ego_lane = prev_ego_lane
 
+            dirty_success_observed_step = None
             for _ in range(env.env_params.horizon):
                 action = rl_actions(state)
                 state, reward, done, _ = env.step(action)
@@ -763,10 +1026,12 @@ if __name__ == "__main__":
                 if "ego_0" in env.k.vehicle.get_ids():
                     ego_speed = float(env.k.vehicle.get_speed("ego_0"))
                     ego_lane = int(env.k.vehicle.get_lane("ego_0"))
-                    if prev_ego_speed is not None:
-                        ego_decel = max(0.0, (prev_ego_speed - ego_speed) / max(env.sim_step, 1e-3))
-                        ego_max_decel = max(ego_max_decel, ego_decel)
-                    prev_ego_speed = ego_speed
+                    update_ego_motion_metrics(
+                        ego_motion_metrics,
+                        ego_speed,
+                        max(env.sim_step, 1e-3),
+                    )
+                    ego_max_decel = float(ego_motion_metrics.get("max_decel", 0.0) or 0.0)
                     if prev_ego_lane is not None and ego_lane != prev_ego_lane and ego_escape_lane is None:
                         ego_escape_lane = ego_lane
                         if blocker_id and blocker_id in env.k.vehicle.get_ids():
@@ -776,6 +1041,39 @@ if __name__ == "__main__":
                 min_ttc = min(min_ttc, compute_min_ttc(env))
                 current_min_ttc = min_ttc
                 current_ego_max_decel = ego_max_decel
+                current_motion_summary = summarize_ego_motion_metrics(ego_motion_metrics)
+                if (
+                        (not crashed)
+                        and min_ttc != float("inf")
+                        and min_ttc <= SUCCESS_TTC
+                        and ego_max_decel >= HARD_BRAKE_DECEL):
+                    if not _uses_negotiated_contract(scenario_context):
+                        break
+                    interim_diagnostics = collect_llm_diagnostics(env, controllers=controllers)
+                    interim_striker_diag = next(
+                        (diag for diag in interim_diagnostics.values() if diag.get("role") == "Striker"),
+                        {},
+                    )
+                    interim_label = classify_success_label(
+                        True,
+                        contract_source=scenario_context.get("contract_source", ""),
+                        role_source=scenario_context.get("role_source", ""),
+                        striker_diag=interim_striker_diag,
+                    )
+                    if interim_label == "clean_success":
+                        break
+                    if dirty_success_observed_step is None:
+                        dirty_success_observed_step = int(current_step_in_iteration)
+                    elif (
+                            int(current_step_in_iteration) - int(dirty_success_observed_step)
+                            >= int(DIRTY_SUCCESS_OBSERVATION_STEPS)):
+                        break
+                if (
+                        _uses_negotiated_contract(scenario_context)
+                        and any_terminal_plan_locked(controllers)
+                        and dirty_success_observed_step is None
+                        and not any_dirty_observation_active(controllers, env)):
+                    break
 
                 if PROGRESS_EVERY_STEPS > 0 and current_step_in_iteration % PROGRESS_EVERY_STEPS == 0:
                     print(
@@ -798,6 +1096,9 @@ if __name__ == "__main__":
                 if done:
                     break
 
+            motion_summary = summarize_ego_motion_metrics(ego_motion_metrics)
+            ego_max_decel = float(motion_summary["ego_max_decel"])
+            current_motion_summary = motion_summary
             hard_brake_event = ego_max_decel >= HARD_BRAKE_DECEL
             success = (
                 (not crashed)
@@ -818,6 +1119,12 @@ if __name__ == "__main__":
                 (diag for diag in diagnostics.values() if diag.get("role") == "Striker"),
                 {},
             )
+            success_label = classify_success_label(
+                success,
+                contract_source=scenario_context.get("contract_source", ""),
+                role_source=scenario_context.get("role_source", ""),
+                striker_diag=striker_diag,
+            )
             feedback_summary = determine_feedback_summary(
                 crashed,
                 success,
@@ -825,6 +1132,7 @@ if __name__ == "__main__":
                 diagnostics,
                 failure_phase,
                 contract_source=scenario_context.get("contract_source", ""),
+                role_source=scenario_context.get("role_source", ""),
                 striker_diag=striker_diag,
                 ego_escape_lane=ego_escape_lane,
                 blocker_lane_at_escape=blocker_lane_at_escape,
@@ -837,22 +1145,36 @@ if __name__ == "__main__":
                 diagnostics=diagnostics,
                 failure_phase=failure_phase,
                 contract_source=scenario_context.get("contract_source", ""),
+                role_source=scenario_context.get("role_source", ""),
                 striker_diag=striker_diag,
                 ego_escape_lane=ego_escape_lane,
                 blocker_lane_at_escape=blocker_lane_at_escape,
                 initial_ego_lane=initial_ego_lane,
             )
             escape_summary = build_escape_summary(initial_ego_lane, ego_escape_lane, blocker_lane_at_escape)
+            result_label = success_label if success_label else (
+                "collision" if crashed else "too_safe" if too_safe else "failed"
+            )
 
             feedback = {
                 "scenario_id": scenario_id,
                 "iteration": iteration + 1,
-                "result": "success" if success else ("collision" if crashed else "too_safe" if too_safe else "failed"),
+                "result": result_label,
+                "success_label": success_label,
                 "feedback_summary": feedback_summary,
                 "failure_reason": failure_reason,
                 "escape_summary": escape_summary,
                 "min_ttc": None if min_ttc == float("inf") else round(float(min_ttc), 3),
                 "ego_max_decel": round(float(ego_max_decel), 3),
+                "ego_max_abs_accel": round(float(motion_summary["ego_max_abs_accel"]), 3),
+                "ego_mean_abs_accel": round(float(motion_summary["ego_mean_abs_accel"]), 3),
+                "ego_max_abs_jerk": round(float(motion_summary["ego_max_abs_jerk"]), 3),
+                "ego_mean_abs_jerk": round(float(motion_summary["ego_mean_abs_jerk"]), 3),
+                "ego_rms_jerk": round(float(motion_summary["ego_rms_jerk"]), 3),
+                "ego_comfort": round(float(motion_summary["ego_comfort"]), 4),
+                "ego_accel_samples": int(motion_summary["ego_accel_samples"]),
+                "ego_jerk_samples": int(motion_summary["ego_jerk_samples"]),
+                "ego_comfort_samples": int(motion_summary["ego_comfort_samples"]),
                 "hard_brake_event": bool(hard_brake_event),
                 "failure_phase": failure_phase,
                 "sync_error": bool(sync_error),
@@ -870,6 +1192,11 @@ if __name__ == "__main__":
                 "merge_attempt_steps": int(striker_diag.get("merge_attempt_steps", 0) or 0),
                 "bad_merge_event": bool(striker_diag.get("bad_merge_event", False)),
                 "bad_merge_reason": str(striker_diag.get("bad_merge_reason", "") or ""),
+                "clean_merge_failed": bool(striker_diag.get("clean_merge_failed", False)),
+                "stale_merge_candidate": bool(striker_diag.get("stale_merge_candidate", False)),
+                "stale_merge_candidate_step": int(striker_diag.get("stale_merge_candidate_step", -1) or -1),
+                "lane_change_stalled": bool(striker_diag.get("lane_change_stalled", False)),
+                "merge_stall_cycles": int(striker_diag.get("merge_stall_cycles", 0) or 0),
                 "last_merge_rel_x": striker_diag.get("last_merge_rel_x"),
                 "overshoot": bool(striker_diag.get("overshoot", False)),
                 "ego_escape_lane": ego_escape_lane,
@@ -893,6 +1220,12 @@ if __name__ == "__main__":
                     "phase_trace": diag.get("phase_trace", []),
                     "min_ttc": feedback["min_ttc"],
                     "ego_max_decel": feedback["ego_max_decel"],
+                    "ego_max_abs_accel": feedback["ego_max_abs_accel"],
+                    "ego_mean_abs_accel": feedback["ego_mean_abs_accel"],
+                    "ego_max_abs_jerk": feedback["ego_max_abs_jerk"],
+                    "ego_mean_abs_jerk": feedback["ego_mean_abs_jerk"],
+                    "ego_rms_jerk": feedback["ego_rms_jerk"],
+                    "ego_comfort": feedback["ego_comfort"],
                     "hard_brake_event": feedback["hard_brake_event"],
                     "failure_phase": feedback["failure_phase"],
                     "sync_error": feedback["sync_error"],
@@ -906,11 +1239,13 @@ if __name__ == "__main__":
             rolling_feedback = feedback
 
             print(
-                "Iteration {}/{} | min_ttc={} | ego_max_decel={:.3f} | hard_brake={} | feedback={}".format(
+                "Iteration {}/{} | min_ttc={} | ego_max_decel={:.3f} | ego_mean_abs_jerk={:.3f} | ego_comfort={:.4f} | hard_brake={} | feedback={}".format(
                     iteration + 1,
                     MAX_ITERATIONS,
                     "inf" if min_ttc == float("inf") else "{:.3f}".format(min_ttc),
                     ego_max_decel,
+                    feedback["ego_mean_abs_jerk"],
+                    feedback["ego_comfort"],
                     hard_brake_event,
                     feedback_summary,
                 )
@@ -935,6 +1270,15 @@ if __name__ == "__main__":
                 "escape_summary": feedback["escape_summary"],
                 "min_ttc": feedback["min_ttc"],
                 "ego_max_decel": feedback["ego_max_decel"],
+                "ego_max_abs_accel": feedback["ego_max_abs_accel"],
+                "ego_mean_abs_accel": feedback["ego_mean_abs_accel"],
+                "ego_max_abs_jerk": feedback["ego_max_abs_jerk"],
+                "ego_mean_abs_jerk": feedback["ego_mean_abs_jerk"],
+                "ego_rms_jerk": feedback["ego_rms_jerk"],
+                "ego_comfort": feedback["ego_comfort"],
+                "ego_accel_samples": feedback["ego_accel_samples"],
+                "ego_jerk_samples": feedback["ego_jerk_samples"],
+                "ego_comfort_samples": feedback["ego_comfort_samples"],
                 "hard_brake_event": feedback["hard_brake_event"],
                 "striker_lane_change_time": feedback["striker_lane_change_time"],
                 "striker_rel_x_at_lane_change": feedback["striker_rel_x_at_lane_change"],
@@ -980,7 +1324,7 @@ if __name__ == "__main__":
                 persist_run_meta(run_output_dir, run_meta)
 
             if success:
-                print("危险场景生成成功")
+                print("危险场景生成成功 ({})".format(success_label or "success"))
                 break
     except KeyboardInterrupt:
         interrupted = True
@@ -1018,6 +1362,15 @@ if __name__ == "__main__":
                 "feedback_summary": "interrupted_by_user",
                 "min_ttc": None if current_min_ttc == float("inf") else round(float(current_min_ttc), 3),
                 "ego_max_decel": round(float(current_ego_max_decel), 3),
+                "ego_max_abs_accel": round(float(current_motion_summary["ego_max_abs_accel"]), 3),
+                "ego_mean_abs_accel": round(float(current_motion_summary["ego_mean_abs_accel"]), 3),
+                "ego_max_abs_jerk": round(float(current_motion_summary["ego_max_abs_jerk"]), 3),
+                "ego_mean_abs_jerk": round(float(current_motion_summary["ego_mean_abs_jerk"]), 3),
+                "ego_rms_jerk": round(float(current_motion_summary["ego_rms_jerk"]), 3),
+                "ego_comfort": round(float(current_motion_summary["ego_comfort"]), 4),
+                "ego_accel_samples": int(current_motion_summary["ego_accel_samples"]),
+                "ego_jerk_samples": int(current_motion_summary["ego_jerk_samples"]),
+                "ego_comfort_samples": int(current_motion_summary["ego_comfort_samples"]),
                 "llm_stats": interrupted_stats,
                 "llm_diagnostics": interrupted_diagnostics,
                 "normalization_repairs": sum(

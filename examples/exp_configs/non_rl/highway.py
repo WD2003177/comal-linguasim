@@ -28,7 +28,10 @@ vehicles.add(
     lane_change_params=SumoLaneChangeParams(
         lane_change_mode="sumo_default",
         model="SL2015",
-        lc_sublane=1.0,
+        lc_sublane=0.2,
+        lc_pushy=0.0,
+        lc_assertive=1.0,
+        lc_accel_lat=2.0,
     ),
     car_following_params=SumoCarFollowingParams(
         speed_mode="obey_safe_speed",

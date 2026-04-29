@@ -1,0 +1,2027 @@
+{
+  "block_side": "right",
+  "case_memory": [
+    {
+      "collision": false,
+      "ego_max_decel": 22.929,
+      "escape_summary": "ego_escaped_left_through_open_side",
+      "failure_phase": "disengage",
+      "failure_reason": "clean_success",
+      "feedback_summary": "clean_success",
+      "final_plan": {
+        "action_sequence_text": "Teammate disengaged; aborting attack.",
+        "control": {
+          "horizon_steps": 4,
+          "mode": "disengage"
+        },
+        "intent_plan": {
+          "goal": "Abort attack due to teammate disengage",
+          "intent": "abort",
+          "message": "Teammate aborted; aborting attack.",
+          "phase": "disengage",
+          "urgency": "high"
+        },
+        "message": {
+          "expires_at_step": 1504,
+          "intent": "abort",
+          "phase": "disengage",
+          "sender": "llm_0",
+          "step": 1500,
+          "target": "ego_0"
+        },
+        "message_text": "Teammate disengaged; aborting attack.",
+        "tactic": {
+          "gap_band": "tight",
+          "lane_policy": "hold_current",
+          "mode": "disengage",
+          "speed_band": "yield"
+        }
+      },
+      "hard_brake_event": true,
+      "iteration": 1,
+      "min_ttc": 1.211,
+      "phase_trace": [
+        {
+          "intent": "abort",
+          "mode": "disengage",
+          "phase": "disengage",
+          "step": 1376
+        },
+        {
+          "intent": "abort",
+          "mode": "disengage",
+          "phase": "disengage",
+          "step": 1380
+        },
+        {
+          "intent": "abort",
+          "mode": "disengage",
+          "phase": "disengage",
+          "step": 1384
+        },
+        {
+          "intent": "abort",
+          "mode": "disengage",
+          "phase": "disengage",
+          "step": 1388
+        },
+        {
+          "intent": "abort",
+          "mode": "disengage",
+          "phase": "disengage",
+          "step": 1392
+        },
+        {
+          "intent": "abort",
+          "mode": "hold_lane",
+          "phase": "disengage",
+          "step": 1396
+        },
+        {
+          "intent": "abort",
+          "mode": "disengage",
+          "phase": "disengage",
+          "step": 1400
+        },
+        {
+          "intent": "abort",
+          "mode": "disengage",
+          "phase": "disengage",
+          "step": 1404
+        },
+        {
+          "intent": "abort",
+          "mode": "disengage",
+          "phase": "disengage",
+          "step": 1408
+        },
+        {
+          "intent": "abort",
+          "mode": "disengage",
+          "phase": "disengage",
+          "step": 1412
+        },
+        {
+          "intent": "abort",
+          "mode": "disengage",
+          "phase": "disengage",
+          "step": 1416
+        },
+        {
+          "intent": "abort",
+          "mode": "disengage",
+          "phase": "disengage",
+          "step": 1420
+        },
+        {
+          "intent": "abort",
+          "mode": "disengage",
+          "phase": "disengage",
+          "step": 1424
+        },
+        {
+          "intent": "abort",
+          "mode": "disengage",
+          "phase": "disengage",
+          "step": 1428
+        },
+        {
+          "intent": "abort",
+          "mode": "disengage",
+          "phase": "disengage",
+          "step": 1432
+        },
+        {
+          "intent": "abort",
+          "mode": "hold_lane",
+          "phase": "disengage",
+          "step": 1436
+        },
+        {
+          "intent": "abort",
+          "mode": "hold_lane",
+          "phase": "disengage",
+          "step": 1440
+        },
+        {
+          "intent": "abort",
+          "mode": "disengage",
+          "phase": "disengage",
+          "step": 1444
+        },
+        {
+          "intent": "abort",
+          "mode": "disengage",
+          "phase": "disengage",
+          "step": 1448
+        },
+        {
+          "intent": "abort",
+          "mode": "disengage",
+          "phase": "disengage",
+          "step": 1452
+        },
+        {
+          "intent": "abort",
+          "mode": "disengage",
+          "phase": "disengage",
+          "step": 1456
+        },
+        {
+          "intent": "abort",
+          "mode": "disengage",
+          "phase": "disengage",
+          "step": 1460
+        },
+        {
+          "intent": "abort",
+          "mode": "disengage",
+          "phase": "disengage",
+          "step": 1464
+        },
+        {
+          "intent": "abort",
+          "mode": "disengage",
+          "phase": "disengage",
+          "step": 1468
+        },
+        {
+          "intent": "abort",
+          "mode": "disengage",
+          "phase": "disengage",
+          "step": 1472
+        },
+        {
+          "intent": "abort",
+          "mode": "disengage",
+          "phase": "disengage",
+          "step": 1476
+        },
+        {
+          "intent": "abort",
+          "mode": "disengage",
+          "phase": "disengage",
+          "step": 1480
+        },
+        {
+          "intent": "abort",
+          "mode": "disengage",
+          "phase": "disengage",
+          "step": 1484
+        },
+        {
+          "intent": "abort",
+          "mode": "disengage",
+          "phase": "disengage",
+          "step": 1488
+        },
+        {
+          "intent": "abort",
+          "mode": "disengage",
+          "phase": "disengage",
+          "step": 1492
+        },
+        {
+          "intent": "abort",
+          "mode": "disengage",
+          "phase": "disengage",
+          "step": 1496
+        },
+        {
+          "intent": "abort",
+          "mode": "disengage",
+          "phase": "disengage",
+          "step": 1500
+        }
+      ],
+      "result": "clean_success",
+      "role": "Blocker",
+      "scenario_id": "20260422-081604_324357291821414942",
+      "state_signature": {
+        "ego_lane": 1,
+        "phase": "compress",
+        "self_rel_lane": 1,
+        "self_rel_s": 1000.0,
+        "self_rel_x": 14.0,
+        "teammate_rel_lane": -1,
+        "teammate_rel_x": -5.0
+      },
+      "state_signature_bucketed": {
+        "ego_lane": 1,
+        "phase": "compress",
+        "self_rel_lane": 1,
+        "self_rel_s_bin": "loose",
+        "self_rel_x_bin": "front_mid",
+        "teammate_rel_lane_bin": "left",
+        "teammate_rel_x_bin": "rear_close"
+      },
+      "sync_error": false,
+      "veh_id": "llm_0"
+    },
+    {
+      "collision": false,
+      "ego_max_decel": 22.929,
+      "escape_summary": "ego_escaped_left_through_open_side",
+      "failure_phase": "disengage",
+      "failure_reason": "clean_success",
+      "feedback_summary": "clean_success",
+      "final_plan": {
+        "action_sequence_text": "Teammate aborted; aborting attack.",
+        "control": {
+          "horizon_steps": 4,
+          "mode": "disengage"
+        },
+        "intent_plan": {
+          "goal": "Disengage and stop forcing the attack.",
+          "intent": "abort",
+          "message": "Teammate aborted; aborting attack.",
+          "phase": "disengage",
+          "urgency": "high"
+        },
+        "message": {
+          "expires_at_step": 1504,
+          "intent": "abort",
+          "phase": "disengage",
+          "sender": "llm_1",
+          "step": 1500,
+          "target": "ego_0"
+        },
+        "message_text": "Teammate aborted; aborting attack.",
+        "tactic": {
+          "gap_band": "tight",
+          "lane_policy": "hold_current",
+          "mode": "disengage",
+          "speed_band": "yield"
+        }
+      },
+      "hard_brake_event": true,
+      "iteration": 1,
+      "min_ttc": 1.211,
+      "phase_trace": [
+        {
+          "intent": "abort",
+          "mode": "disengage",
+          "phase": "disengage",
+          "step": 1376
+        },
+        {
+          "intent": "abort",
+          "mode": "disengage",
+          "phase": "disengage",
+          "step": 1380
+        },
+        {
+          "intent": "abort",
+          "mode": "disengage",
+          "phase": "disengage",
+          "step": 1384
+        },
+        {
+          "intent": "abort",
+          "mode": "disengage",
+          "phase": "disengage",
+          "step": 1388
+        },
+        {
+          "intent": "abort",
+          "mode": "disengage",
+          "phase": "disengage",
+          "step": 1392
+        },
+        {
+          "intent": "abort",
+          "mode": "disengage",
+          "phase": "disengage",
+          "step": 1396
+        },
+        {
+          "intent": "abort",
+          "mode": "disengage",
+          "phase": "disengage",
+          "step": 1400
+        },
+        {
+          "intent": "abort",
+          "mode": "disengage",
+          "phase": "disengage",
+          "step": 1404
+        },
+        {
+          "intent": "abort",
+          "mode": "disengage",
+          "phase": "disengage",
+          "step": 1408
+        },
+        {
+          "intent": "abort",
+          "mode": "disengage",
+          "phase": "disengage",
+          "step": 1412
+        },
+        {
+          "intent": "abort",
+          "mode": "disengage",
+          "phase": "disengage",
+          "step": 1416
+        },
+        {
+          "intent": "abort",
+          "mode": "disengage",
+          "phase": "disengage",
+          "step": 1420
+        },
+        {
+          "intent": "abort",
+          "mode": "disengage",
+          "phase": "disengage",
+          "step": 1424
+        },
+        {
+          "intent": "abort",
+          "mode": "disengage",
+          "phase": "disengage",
+          "step": 1428
+        },
+        {
+          "intent": "abort",
+          "mode": "disengage",
+          "phase": "disengage",
+          "step": 1432
+        },
+        {
+          "intent": "abort",
+          "mode": "hold_lane",
+          "phase": "disengage",
+          "step": 1436
+        },
+        {
+          "intent": "abort",
+          "mode": "disengage",
+          "phase": "disengage",
+          "step": 1440
+        },
+        {
+          "intent": "abort",
+          "mode": "disengage",
+          "phase": "disengage",
+          "step": 1444
+        },
+        {
+          "intent": "abort",
+          "mode": "disengage",
+          "phase": "disengage",
+          "step": 1448
+        },
+        {
+          "intent": "abort",
+          "mode": "disengage",
+          "phase": "disengage",
+          "step": 1452
+        },
+        {
+          "intent": "abort",
+          "mode": "disengage",
+          "phase": "disengage",
+          "step": 1456
+        },
+        {
+          "intent": "abort",
+          "mode": "disengage",
+          "phase": "disengage",
+          "step": 1460
+        },
+        {
+          "intent": "abort",
+          "mode": "disengage",
+          "phase": "disengage",
+          "step": 1464
+        },
+        {
+          "intent": "abort",
+          "mode": "disengage",
+          "phase": "disengage",
+          "step": 1468
+        },
+        {
+          "intent": "abort",
+          "mode": "disengage",
+          "phase": "disengage",
+          "step": 1472
+        },
+        {
+          "intent": "abort",
+          "mode": "disengage",
+          "phase": "disengage",
+          "step": 1476
+        },
+        {
+          "intent": "abort",
+          "mode": "disengage",
+          "phase": "disengage",
+          "step": 1480
+        },
+        {
+          "intent": "abort",
+          "mode": "disengage",
+          "phase": "disengage",
+          "step": 1484
+        },
+        {
+          "intent": "abort",
+          "mode": "disengage",
+          "phase": "disengage",
+          "step": 1488
+        },
+        {
+          "intent": "abort",
+          "mode": "disengage",
+          "phase": "disengage",
+          "step": 1492
+        },
+        {
+          "intent": "abort",
+          "mode": "disengage",
+          "phase": "disengage",
+          "step": 1496
+        },
+        {
+          "intent": "abort",
+          "mode": "disengage",
+          "phase": "disengage",
+          "step": 1500
+        }
+      ],
+      "result": "clean_success",
+      "role": "Striker",
+      "scenario_id": "20260422-081604_324357291821414942",
+      "state_signature": {
+        "ego_lane": 1,
+        "phase": "compress",
+        "self_rel_lane": -1,
+        "self_rel_s": 1000.0,
+        "self_rel_x": -5.0,
+        "teammate_rel_lane": 1,
+        "teammate_rel_x": 14.0
+      },
+      "state_signature_bucketed": {
+        "ego_lane": 1,
+        "phase": "compress",
+        "self_rel_lane": -1,
+        "self_rel_s_bin": "loose",
+        "self_rel_x_bin": "rear_close",
+        "teammate_rel_lane_bin": "right",
+        "teammate_rel_x_bin": "front_mid"
+      },
+      "sync_error": false,
+      "veh_id": "llm_1"
+    }
+  ],
+  "contract_source": "negotiated",
+  "exp_tag": "highway",
+  "frozen_geometry": {
+    "ego_0": {
+      "edge": "highway_0",
+      "ego_edge": "highway_0",
+      "ego_lane": 1,
+      "ego_pos": 324.0,
+      "ego_speed": 20.5,
+      "lane": 1,
+      "pos": 324.0,
+      "rel_lane_to_ego": 0,
+      "rel_speed_to_ego": 0.0,
+      "rel_x_to_ego": 0.0,
+      "speed": 20.5,
+      "type_id": "ego",
+      "veh_id": "ego_0"
+    },
+    "llm_0": {
+      "edge": "highway_0",
+      "ego_edge": "highway_0",
+      "ego_lane": 1,
+      "ego_pos": 324.0,
+      "ego_speed": 20.5,
+      "lane": 2,
+      "pos": 338.0,
+      "rel_lane_to_ego": 1,
+      "rel_speed_to_ego": 0.8000000000000007,
+      "rel_x_to_ego": 14.0,
+      "speed": 21.3,
+      "type_id": "llm",
+      "veh_id": "llm_0"
+    },
+    "llm_1": {
+      "edge": "highway_0",
+      "ego_edge": "highway_0",
+      "ego_lane": 1,
+      "ego_pos": 324.0,
+      "ego_speed": 20.5,
+      "lane": 0,
+      "pos": 319.0,
+      "rel_lane_to_ego": -1,
+      "rel_speed_to_ego": 3.0,
+      "rel_x_to_ego": -5.0,
+      "speed": 23.5,
+      "type_id": "llm",
+      "veh_id": "llm_1"
+    }
+  },
+  "geometry_role_hint": {
+    "llm_0": "Blocker",
+    "llm_1": "Striker"
+  },
+  "interrupted": false,
+  "iterations": [
+    {
+      "bad_merge_event": true,
+      "bad_merge_reason": "stale_merge_ahead_far",
+      "block_side": "right",
+      "blocker_lane_at_escape": 2,
+      "contract_source": "negotiated",
+      "crashed": false,
+      "ego_escape_lane": 0,
+      "ego_max_decel": 22.929,
+      "escape_summary": "ego_escaped_left_through_open_side",
+      "failure_phase": "disengage",
+      "failure_reason": "clean_success",
+      "feedback": {
+        "bad_merge_event": true,
+        "bad_merge_reason": "stale_merge_ahead_far",
+        "blocker_lane_at_escape": 2,
+        "collision": false,
+        "contract_source": "negotiated",
+        "ego_escape_lane": 0,
+        "ego_max_decel": 22.929,
+        "escape_summary": "ego_escaped_left_through_open_side",
+        "failure_phase": "disengage",
+        "failure_reason": "clean_success",
+        "feedback_summary": "clean_success",
+        "front_brake_triggered": false,
+        "hard_brake_event": true,
+        "iteration": 1,
+        "last_lane_change_attempted": false,
+        "last_merge_rel_x": 22.531,
+        "merge_attempt_steps": 0,
+        "merged_into_ego_lane": true,
+        "min_ttc": 1.211,
+        "overshoot": true,
+        "result": "clean_success",
+        "role_source": "llm_negotiated",
+        "scenario_id": "20260422-081604_324357291821414942",
+        "scene_gate_status": {
+          "accepted": true,
+          "background_nearby_count": 0,
+          "blocker_id": "llm_0",
+          "blocker_rel_lane": 1,
+          "blocker_rel_x": 14.0,
+          "projected_striker_rel_x": 1.0,
+          "reason": "accepted",
+          "sample_index": 1,
+          "sampling_strategy": "three_car_fixed_negotiated_opening",
+          "scene_mode": "three_car_fixed_negotiated",
+          "striker_id": "llm_1",
+          "striker_rel_lane": -1,
+          "striker_rel_x": -5.0,
+          "striker_speed_adv": 3.0
+        },
+        "striker_completed_cut_in": false,
+        "striker_lane_change_time": 8.0,
+        "striker_rel_x_at_lane_change": 19.197,
+        "success_label": "clean_success",
+        "sync_error": false,
+        "valid_cut_in_merge": false
+      },
+      "feedback_summary": "clean_success",
+      "front_brake_triggered": false,
+      "hard_brake_event": true,
+      "iteration": 1,
+      "last_lane_change_attempted": false,
+      "last_merge_rel_x": 22.531,
+      "llm_diagnostics": {
+        "llm_0": {
+          "action_reuse_count": 0,
+          "active_control_mode": "disengage",
+          "active_phase": "disengage",
+          "bad_merge_event": false,
+          "bad_merge_reason": "",
+          "block_side": "right",
+          "brake_armed": false,
+          "contract_source": "negotiated",
+          "current_decision": {
+            "action_sequence_text": "Teammate disengaged; aborting attack.",
+            "control": {
+              "horizon_steps": 4,
+              "mode": "disengage"
+            },
+            "intent_plan": {
+              "goal": "Abort attack due to teammate disengage",
+              "intent": "abort",
+              "message": "Teammate aborted; aborting attack.",
+              "phase": "disengage",
+              "urgency": "high"
+            },
+            "message": {
+              "expires_at_step": 1504,
+              "intent": "abort",
+              "phase": "disengage",
+              "sender": "llm_0",
+              "step": 1500,
+              "target": "ego_0"
+            },
+            "message_text": "Teammate disengaged; aborting attack.",
+            "tactic": {
+              "gap_band": "tight",
+              "lane_policy": "hold_current",
+              "mode": "disengage",
+              "speed_band": "yield"
+            }
+          },
+          "executor_state": "disengage",
+          "front_brake_triggered": false,
+          "geometry_role_hint": {
+            "llm_0": "Blocker",
+            "llm_1": "Striker"
+          },
+          "intent": "abort",
+          "last_action_refresh_reason": "decision_expired",
+          "last_action_rel_x_bucket": "gt_10",
+          "last_action_reused": false,
+          "last_bad_merge_event_step": -1,
+          "last_history_injection_phase": "disengage",
+          "last_lane_change_attempted": false,
+          "last_local_ready": {
+            "approach_window_ready": false,
+            "blocker_side_front_ready": false,
+            "front_brake_window_ready": false,
+            "merged_into_ego_lane": false,
+            "overshoot": false,
+            "same_lane_lead_established": false,
+            "speed_adv": 0.029,
+            "teammate_block_band_ready": false,
+            "teammate_pass_window_ready": false
+          },
+          "last_merge_event_step": -1,
+          "last_merge_rel_x": null,
+          "last_published_trigger_satisfied": true,
+          "last_teammate_intent": "abort",
+          "last_teammate_phase": "disengage",
+          "last_teammate_tactic": {
+            "gap_band": "tight",
+            "intent": "abort",
+            "lane_policy": "hold_current",
+            "message": "Teammate aborted; aborting attack.",
+            "mode": "disengage",
+            "phase": "disengage",
+            "speed_band": "yield"
+          },
+          "last_valid_merge_event_step": -1,
+          "latest_action_sequence_text": "Teammate disengaged; aborting attack.",
+          "latest_intent_plan": {
+            "goal": "Abort attack due to teammate disengage",
+            "intent": "abort",
+            "message": "Teammate aborted; aborting attack.",
+            "phase": "disengage",
+            "urgency": "high"
+          },
+          "latest_tactic_profile": {
+            "gap_band": "tight",
+            "lane_policy": "hold_current",
+            "mode": "disengage",
+            "speed_band": "yield"
+          },
+          "lead_acquired": false,
+          "llm_trace_tail": [
+            {
+              "attempt": 1,
+              "error": "",
+              "parse_ok": true,
+              "parsed_keys": [
+                "goal",
+                "intent",
+                "message",
+                "phase",
+                "urgency"
+              ],
+              "protocol": "highway_intent",
+              "raw_response": "{\n  \"phase\": \"disengage\",\n  \"intent\": \"abort\",\n  \"urgency\": \"high\",\n  \"message\": \"Teammate aborted; aborting attack.\"\n}",
+              "role": "Blocker",
+              "sanitized_response": "{\n  \"phase\": \"disengage\",\n  \"intent\": \"abort\",\n  \"urgency\": \"high\",\n  \"message\": \"Teammate aborted; aborting attack.\"\n}",
+              "step": 1492,
+              "veh_id": "llm_0"
+            },
+            {
+              "attempt": 1,
+              "error": "",
+              "parse_ok": true,
+              "parsed_keys": [
+                "mode",
+                "reason"
+              ],
+              "protocol": "highway_action_gate",
+              "raw_response": "{\"mode\": \"recompute\", \"reason\": \"decision_expired\"}",
+              "role": "Blocker",
+              "sanitized_response": "{\"mode\": \"recompute\", \"reason\": \"decision_expired\"}",
+              "step": 1492,
+              "veh_id": "llm_0"
+            },
+            {
+              "attempt": 1,
+              "error": "",
+              "parse_ok": true,
+              "parsed_keys": [
+                "message",
+                "tactic"
+              ],
+              "protocol": "highway_tactic",
+              "raw_response": "{\n  \"message\": \"Disengaging and releasing blockade.\",\n  \"tactic\": {\n    \"mode\": \"disengage\",\n    \"lane_policy\": \"hold_current\",\n    \"gap_band\": \"tight\",\n    \"speed_band\": \"yield\"\n  }\n}",
+              "role": "Blocker",
+              "sanitized_response": "{\n  \"message\": \"Disengaging and releasing blockade.\",\n  \"tactic\": {\n    \"mode\": \"disengage\",\n    \"lane_policy\": \"hold_current\",\n    \"gap_band\": \"tight\",\n    \"speed_band\": \"yield\"\n  }\n}",
+              "step": 1492,
+              "veh_id": "llm_0"
+            },
+            {
+              "aggressive_cut_in_ready": false,
+              "approach_window_ready": false,
+              "attempt": 0,
+              "bad_merge_event": false,
+              "bad_merge_reason": "",
+              "contract_pass_side": "left",
+              "ego_lane": 0,
+              "error": "",
+              "executor_state": "disengage",
+              "front_brake_triggered": false,
+              "intent": "abort",
+              "lane_change_attempted": false,
+              "last_merge_rel_x": null,
+              "merge_event_this_step": false,
+              "merged_into_ego_lane": false,
+              "overshoot": false,
+              "parse_ok": true,
+              "prev_self_lane": 1,
+              "protocol": "highway_runtime",
+              "raw_response": "",
+              "rel_x": 200.0,
+              "role": "Blocker",
+              "same_lane_lead_established": false,
+              "sanitized_response": "",
+              "self_lane": 1,
+              "speed_adv": 0.029,
+              "step": 1492,
+              "target_lc": 0,
+              "teammate_intent": "abort",
+              "teammate_phase": "disengage",
+              "teammate_tactic": {
+                "gap_band": "tight",
+                "intent": "abort",
+                "lane_policy": "hold_current",
+                "message": "Teammate aborted; aborting attack.",
+                "mode": "disengage",
+                "phase": "disengage",
+                "speed_band": "yield"
+              },
+              "valid_cut_in_merge": false,
+              "veh_id": "llm_0"
+            },
+            {
+              "attempt": 1,
+              "error": "",
+              "parse_ok": true,
+              "parsed_keys": [
+                "goal",
+                "intent",
+                "message",
+                "phase",
+                "urgency"
+              ],
+              "protocol": "highway_intent",
+              "raw_response": "{\n  \"phase\": \"disengage\",\n  \"intent\": \"abort\",\n  \"urgency\": \"high\",\n  \"goal\": \"Abort attack due to teammate disengage\",\n  \"message\": \"Teammate aborted; aborting attack.\"\n}",
+              "role": "Blocker",
+              "sanitized_response": "{\n  \"phase\": \"disengage\",\n  \"intent\": \"abort\",\n  \"urgency\": \"high\",\n  \"goal\": \"Abort attack due to teammate disengage\",\n  \"message\": \"Teammate aborted; aborting attack.\"\n}",
+              "step": 1496,
+              "veh_id": "llm_0"
+            },
+            {
+              "attempt": 1,
+              "error": "",
+              "parse_ok": true,
+              "parsed_keys": [
+                "mode",
+                "reason"
+              ],
+              "protocol": "highway_action_gate",
+              "raw_response": "{\"mode\": \"recompute\", \"reason\": \"decision_expired\"}",
+              "role": "Blocker",
+              "sanitized_response": "{\"mode\": \"recompute\", \"reason\": \"decision_expired\"}",
+              "step": 1496,
+              "veh_id": "llm_0"
+            },
+            {
+              "attempt": 1,
+              "error": "",
+              "parse_ok": true,
+              "parsed_keys": [
+                "message",
+                "tactic"
+              ],
+              "protocol": "highway_tactic",
+              "raw_response": "{\n  \"message\": \"Teammate aborted; aborting attack.\",\n  \"tactic\": {\n    \"mode\": \"disengage\",\n    \"lane_policy\": \"hold_current\",\n    \"gap_band\": \"tight\",\n    \"speed_band\": \"yield\"\n  }\n}",
+              "role": "Blocker",
+              "sanitized_response": "{\n  \"message\": \"Teammate aborted; aborting attack.\",\n  \"tactic\": {\n    \"mode\": \"disengage\",\n    \"lane_policy\": \"hold_current\",\n    \"gap_band\": \"tight\",\n    \"speed_band\": \"yield\"\n  }\n}",
+              "step": 1496,
+              "veh_id": "llm_0"
+            },
+            {
+              "aggressive_cut_in_ready": false,
+              "approach_window_ready": false,
+              "attempt": 0,
+              "bad_merge_event": false,
+              "bad_merge_reason": "",
+              "contract_pass_side": "left",
+              "ego_lane": 0,
+              "error": "",
+              "executor_state": "disengage",
+              "front_brake_triggered": false,
+              "intent": "abort",
+              "lane_change_attempted": false,
+              "last_merge_rel_x": null,
+              "merge_event_this_step": false,
+              "merged_into_ego_lane": false,
+              "overshoot": false,
+              "parse_ok": true,
+              "prev_self_lane": 1,
+              "protocol": "highway_runtime",
+              "raw_response": "",
+              "rel_x": 200.0,
+              "role": "Blocker",
+              "same_lane_lead_established": false,
+              "sanitized_response": "",
+              "self_lane": 1,
+              "speed_adv": 0.029,
+              "step": 1496,
+              "target_lc": 0,
+              "teammate_intent": "abort",
+              "teammate_phase": "disengage",
+              "teammate_tactic": {
+                "gap_band": "tight",
+                "intent": "abort",
+                "lane_policy": "hold_current",
+                "message": "Aborting attack, disengaging.",
+                "mode": "disengage",
+                "phase": "disengage",
+                "speed_band": "yield"
+              },
+              "valid_cut_in_merge": false,
+              "veh_id": "llm_0"
+            },
+            {
+              "attempt": 1,
+              "error": "",
+              "parse_ok": true,
+              "parsed_keys": [
+                "goal",
+                "intent",
+                "message",
+                "phase",
+                "urgency"
+              ],
+              "protocol": "highway_intent",
+              "raw_response": "{\n  \"phase\": \"disengage\",\n  \"intent\": \"abort\",\n  \"urgency\": \"high\",\n  \"goal\": \"Abort attack due to teammate disengage\",\n  \"message\": \"Teammate aborted; aborting attack.\"\n}",
+              "role": "Blocker",
+              "sanitized_response": "{\n  \"phase\": \"disengage\",\n  \"intent\": \"abort\",\n  \"urgency\": \"high\",\n  \"goal\": \"Abort attack due to teammate disengage\",\n  \"message\": \"Teammate aborted; aborting attack.\"\n}",
+              "step": 1500,
+              "veh_id": "llm_0"
+            },
+            {
+              "attempt": 1,
+              "error": "",
+              "parse_ok": true,
+              "parsed_keys": [
+                "mode",
+                "reason"
+              ],
+              "protocol": "highway_action_gate",
+              "raw_response": "{\"mode\": \"recompute\", \"reason\": \"decision_expired\"}",
+              "role": "Blocker",
+              "sanitized_response": "{\"mode\": \"recompute\", \"reason\": \"decision_expired\"}",
+              "step": 1500,
+              "veh_id": "llm_0"
+            },
+            {
+              "attempt": 1,
+              "error": "",
+              "parse_ok": true,
+              "parsed_keys": [
+                "message",
+                "tactic"
+              ],
+              "protocol": "highway_tactic",
+              "raw_response": "{\n  \"message\": \"Teammate disengaged; aborting attack.\",\n  \"tactic\": {\n    \"mode\": \"disengage\",\n    \"lane_policy\": \"hold_current\",\n    \"gap_band\": \"tight\",\n    \"speed_band\": \"yield\"\n  }\n}",
+              "role": "Blocker",
+              "sanitized_response": "{\n  \"message\": \"Teammate disengaged; aborting attack.\",\n  \"tactic\": {\n    \"mode\": \"disengage\",\n    \"lane_policy\": \"hold_current\",\n    \"gap_band\": \"tight\",\n    \"speed_band\": \"yield\"\n  }\n}",
+              "step": 1500,
+              "veh_id": "llm_0"
+            },
+            {
+              "aggressive_cut_in_ready": false,
+              "approach_window_ready": false,
+              "attempt": 0,
+              "bad_merge_event": false,
+              "bad_merge_reason": "",
+              "contract_pass_side": "left",
+              "ego_lane": 0,
+              "error": "",
+              "executor_state": "disengage",
+              "front_brake_triggered": false,
+              "intent": "abort",
+              "lane_change_attempted": false,
+              "last_merge_rel_x": null,
+              "merge_event_this_step": false,
+              "merged_into_ego_lane": false,
+              "overshoot": false,
+              "parse_ok": true,
+              "prev_self_lane": 1,
+              "protocol": "highway_runtime",
+              "raw_response": "",
+              "rel_x": 200.0,
+              "role": "Blocker",
+              "same_lane_lead_established": false,
+              "sanitized_response": "",
+              "self_lane": 1,
+              "speed_adv": 0.029,
+              "step": 1500,
+              "target_lc": 0,
+              "teammate_intent": "abort",
+              "teammate_phase": "disengage",
+              "teammate_tactic": {
+                "gap_band": "tight",
+                "intent": "abort",
+                "lane_policy": "hold_current",
+                "message": "Teammate aborted; aborting attack.",
+                "mode": "disengage",
+                "phase": "disengage",
+                "speed_band": "yield"
+              },
+              "valid_cut_in_merge": false,
+              "veh_id": "llm_0"
+            }
+          ],
+          "merge_attempt_steps": 0,
+          "merge_commit_until_step": -1,
+          "merge_event_this_step": false,
+          "merged_into_ego_lane": false,
+          "normalization_repairs": 657,
+          "overshoot": false,
+          "pass_side": "left",
+          "phase_trace": [
+            {
+              "intent": "abort",
+              "mode": "disengage",
+              "phase": "disengage",
+              "step": 1376
+            },
+            {
+              "intent": "abort",
+              "mode": "disengage",
+              "phase": "disengage",
+              "step": 1380
+            },
+            {
+              "intent": "abort",
+              "mode": "disengage",
+              "phase": "disengage",
+              "step": 1384
+            },
+            {
+              "intent": "abort",
+              "mode": "disengage",
+              "phase": "disengage",
+              "step": 1388
+            },
+            {
+              "intent": "abort",
+              "mode": "disengage",
+              "phase": "disengage",
+              "step": 1392
+            },
+            {
+              "intent": "abort",
+              "mode": "hold_lane",
+              "phase": "disengage",
+              "step": 1396
+            },
+            {
+              "intent": "abort",
+              "mode": "disengage",
+              "phase": "disengage",
+              "step": 1400
+            },
+            {
+              "intent": "abort",
+              "mode": "disengage",
+              "phase": "disengage",
+              "step": 1404
+            },
+            {
+              "intent": "abort",
+              "mode": "disengage",
+              "phase": "disengage",
+              "step": 1408
+            },
+            {
+              "intent": "abort",
+              "mode": "disengage",
+              "phase": "disengage",
+              "step": 1412
+            },
+            {
+              "intent": "abort",
+              "mode": "disengage",
+              "phase": "disengage",
+              "step": 1416
+            },
+            {
+              "intent": "abort",
+              "mode": "disengage",
+              "phase": "disengage",
+              "step": 1420
+            },
+            {
+              "intent": "abort",
+              "mode": "disengage",
+              "phase": "disengage",
+              "step": 1424
+            },
+            {
+              "intent": "abort",
+              "mode": "disengage",
+              "phase": "disengage",
+              "step": 1428
+            },
+            {
+              "intent": "abort",
+              "mode": "disengage",
+              "phase": "disengage",
+              "step": 1432
+            },
+            {
+              "intent": "abort",
+              "mode": "hold_lane",
+              "phase": "disengage",
+              "step": 1436
+            },
+            {
+              "intent": "abort",
+              "mode": "hold_lane",
+              "phase": "disengage",
+              "step": 1440
+            },
+            {
+              "intent": "abort",
+              "mode": "disengage",
+              "phase": "disengage",
+              "step": 1444
+            },
+            {
+              "intent": "abort",
+              "mode": "disengage",
+              "phase": "disengage",
+              "step": 1448
+            },
+            {
+              "intent": "abort",
+              "mode": "disengage",
+              "phase": "disengage",
+              "step": 1452
+            },
+            {
+              "intent": "abort",
+              "mode": "disengage",
+              "phase": "disengage",
+              "step": 1456
+            },
+            {
+              "intent": "abort",
+              "mode": "disengage",
+              "phase": "disengage",
+              "step": 1460
+            },
+            {
+              "intent": "abort",
+              "mode": "disengage",
+              "phase": "disengage",
+              "step": 1464
+            },
+            {
+              "intent": "abort",
+              "mode": "disengage",
+              "phase": "disengage",
+              "step": 1468
+            },
+            {
+              "intent": "abort",
+              "mode": "disengage",
+              "phase": "disengage",
+              "step": 1472
+            },
+            {
+              "intent": "abort",
+              "mode": "disengage",
+              "phase": "disengage",
+              "step": 1476
+            },
+            {
+              "intent": "abort",
+              "mode": "disengage",
+              "phase": "disengage",
+              "step": 1480
+            },
+            {
+              "intent": "abort",
+              "mode": "disengage",
+              "phase": "disengage",
+              "step": 1484
+            },
+            {
+              "intent": "abort",
+              "mode": "disengage",
+              "phase": "disengage",
+              "step": 1488
+            },
+            {
+              "intent": "abort",
+              "mode": "disengage",
+              "phase": "disengage",
+              "step": 1492
+            },
+            {
+              "intent": "abort",
+              "mode": "disengage",
+              "phase": "disengage",
+              "step": 1496
+            },
+            {
+              "intent": "abort",
+              "mode": "disengage",
+              "phase": "disengage",
+              "step": 1500
+            }
+          ],
+          "prev_self_lane": 1,
+          "repair_fallback_used": 0,
+          "repaired_fields": [
+            "phase",
+            "intent",
+            "phase",
+            "intent",
+            "phase",
+            "intent",
+            "phase",
+            "intent",
+            "phase",
+            "intent",
+            "phase",
+            "intent",
+            "phase",
+            "intent",
+            "phase",
+            "intent",
+            "phase",
+            "intent",
+            "phase",
+            "intent",
+            "phase",
+            "intent",
+            "phase",
+            "intent",
+            "phase",
+            "intent",
+            "phase",
+            "intent",
+            "phase",
+            "intent",
+            "phase",
+            "intent"
+          ],
+          "role": "Blocker",
+          "role_map": {
+            "llm_0": "Blocker",
+            "llm_1": "Striker"
+          },
+          "role_resolution_fallback_used": 0,
+          "role_source": "llm_negotiated",
+          "rollout_parse_fallback_used": 0,
+          "scene_gate_status": {
+            "accepted": true,
+            "background_nearby_count": 0,
+            "blocker_id": "llm_0",
+            "blocker_rel_lane": 1,
+            "blocker_rel_x": 14.0,
+            "projected_striker_rel_x": 1.0,
+            "reason": "accepted",
+            "sample_index": 1,
+            "sampling_strategy": "three_car_fixed_negotiated_opening",
+            "scene_mode": "three_car_fixed_negotiated",
+            "striker_id": "llm_1",
+            "striker_rel_lane": -1,
+            "striker_rel_x": -5.0,
+            "striker_speed_adv": 3.0
+          },
+          "seal_escape_until_step": -1,
+          "striker_became_ego_leader": false,
+          "striker_completed_cut_in": false,
+          "striker_lane_change_time": null,
+          "striker_rel_x_at_lane_change": null,
+          "sync_error_events": 0,
+          "target_abs_lane": 1,
+          "target_s": 5.5,
+          "target_v": 0.1,
+          "trigger_not_met_events": 0,
+          "urgency": "high",
+          "valid_cut_in_merge": false,
+          "veh_id": "llm_0"
+        },
+        "llm_1": {
+          "action_reuse_count": 0,
+          "active_control_mode": "disengage",
+          "active_phase": "disengage",
+          "bad_merge_event": true,
+          "bad_merge_reason": "stale_merge_ahead_far",
+          "block_side": "right",
+          "brake_armed": false,
+          "contract_source": "negotiated",
+          "current_decision": {
+            "action_sequence_text": "Teammate aborted; aborting attack.",
+            "control": {
+              "horizon_steps": 4,
+              "mode": "disengage"
+            },
+            "intent_plan": {
+              "goal": "Disengage and stop forcing the attack.",
+              "intent": "abort",
+              "message": "Teammate aborted; aborting attack.",
+              "phase": "disengage",
+              "urgency": "high"
+            },
+            "message": {
+              "expires_at_step": 1504,
+              "intent": "abort",
+              "phase": "disengage",
+              "sender": "llm_1",
+              "step": 1500,
+              "target": "ego_0"
+            },
+            "message_text": "Teammate aborted; aborting attack.",
+            "tactic": {
+              "gap_band": "tight",
+              "lane_policy": "hold_current",
+              "mode": "disengage",
+              "speed_band": "yield"
+            }
+          },
+          "executor_state": "disengage",
+          "front_brake_triggered": false,
+          "geometry_role_hint": {
+            "llm_0": "Blocker",
+            "llm_1": "Striker"
+          },
+          "intent": "abort",
+          "last_action_refresh_reason": "decision_expired",
+          "last_action_rel_x_bucket": "gt_10",
+          "last_action_reused": false,
+          "last_bad_merge_event_step": 152,
+          "last_history_injection_phase": "disengage",
+          "last_lane_change_attempted": false,
+          "last_local_ready": {
+            "approach_window_ready": false,
+            "blocker_side_front_ready": false,
+            "front_brake_window_ready": false,
+            "merged_into_ego_lane": false,
+            "overshoot": true,
+            "same_lane_lead_established": false,
+            "speed_adv": 0.46,
+            "teammate_block_band_ready": false,
+            "teammate_pass_window_ready": false
+          },
+          "last_merge_event_step": 152,
+          "last_merge_rel_x": 22.531,
+          "last_published_trigger_satisfied": true,
+          "last_teammate_intent": "abort",
+          "last_teammate_phase": "disengage",
+          "last_teammate_tactic": {
+            "gap_band": "tight",
+            "intent": "abort",
+            "lane_policy": "hold_current",
+            "message": "Teammate disengaged; aborting attack.",
+            "mode": "disengage",
+            "phase": "disengage",
+            "speed_band": "yield"
+          },
+          "last_valid_merge_event_step": -1,
+          "latest_action_sequence_text": "Teammate aborted; aborting attack.",
+          "latest_intent_plan": {
+            "goal": "Disengage and stop forcing the attack.",
+            "intent": "abort",
+            "message": "Teammate aborted; aborting attack.",
+            "phase": "disengage",
+            "urgency": "high"
+          },
+          "latest_tactic_profile": {
+            "gap_band": "tight",
+            "lane_policy": "hold_current",
+            "mode": "disengage",
+            "speed_band": "yield"
+          },
+          "lead_acquired": false,
+          "llm_trace_tail": [
+            {
+              "attempt": 1,
+              "error": "",
+              "parse_ok": true,
+              "parsed_keys": [
+                "goal",
+                "intent",
+                "message",
+                "phase",
+                "urgency"
+              ],
+              "protocol": "highway_intent",
+              "raw_response": "{\"phase\": \"disengage\", \"intent\": \"abort\", \"urgency\": \"high\", \"message\": \"Teammate aborted; aborting attack.\"}",
+              "role": "Striker",
+              "sanitized_response": "{\"phase\": \"disengage\", \"intent\": \"abort\", \"urgency\": \"high\", \"message\": \"Teammate aborted; aborting attack.\"}",
+              "step": 1492,
+              "veh_id": "llm_1"
+            },
+            {
+              "attempt": 1,
+              "error": "",
+              "parse_ok": true,
+              "parsed_keys": [
+                "mode",
+                "reason"
+              ],
+              "protocol": "highway_action_gate",
+              "raw_response": "{\"mode\": \"recompute\", \"reason\": \"decision_expired\"}",
+              "role": "Striker",
+              "sanitized_response": "{\"mode\": \"recompute\", \"reason\": \"decision_expired\"}",
+              "step": 1492,
+              "veh_id": "llm_1"
+            },
+            {
+              "attempt": 1,
+              "error": "",
+              "parse_ok": true,
+              "parsed_keys": [
+                "message",
+                "tactic"
+              ],
+              "protocol": "highway_tactic",
+              "raw_response": "{\n  \"message\": \"Aborting attack, disengaging.\",\n  \"tactic\": {\n    \"mode\": \"disengage\",\n    \"lane_policy\": \"hold_current\",\n    \"gap_band\": \"tight\",\n    \"speed_band\": \"yield\"\n  }\n}",
+              "role": "Striker",
+              "sanitized_response": "{\n  \"message\": \"Aborting attack, disengaging.\",\n  \"tactic\": {\n    \"mode\": \"disengage\",\n    \"lane_policy\": \"hold_current\",\n    \"gap_band\": \"tight\",\n    \"speed_band\": \"yield\"\n  }\n}",
+              "step": 1492,
+              "veh_id": "llm_1"
+            },
+            {
+              "aggressive_cut_in_ready": false,
+              "approach_window_ready": false,
+              "attempt": 0,
+              "bad_merge_event": true,
+              "bad_merge_reason": "stale_merge_ahead_far",
+              "contract_pass_side": "left",
+              "ego_lane": 0,
+              "error": "",
+              "executor_state": "disengage",
+              "front_brake_triggered": false,
+              "intent": "abort",
+              "lane_change_attempted": false,
+              "last_merge_rel_x": 22.531,
+              "merge_event_this_step": false,
+              "merged_into_ego_lane": true,
+              "overshoot": true,
+              "parse_ok": true,
+              "prev_self_lane": 0,
+              "protocol": "highway_runtime",
+              "raw_response": "",
+              "rel_x": 200.0,
+              "role": "Striker",
+              "same_lane_lead_established": false,
+              "sanitized_response": "",
+              "self_lane": 0,
+              "speed_adv": 0.46,
+              "step": 1492,
+              "target_lc": 0,
+              "teammate_intent": "abort",
+              "teammate_phase": "disengage",
+              "teammate_tactic": {
+                "gap_band": "tight",
+                "intent": "abort",
+                "lane_policy": "hold_current",
+                "message": "Disengaging and releasing blockade.",
+                "mode": "disengage",
+                "phase": "disengage",
+                "speed_band": "yield"
+              },
+              "valid_cut_in_merge": false,
+              "veh_id": "llm_1"
+            },
+            {
+              "attempt": 1,
+              "error": "",
+              "parse_ok": true,
+              "parsed_keys": [
+                "goal",
+                "intent",
+                "message",
+                "phase",
+                "urgency"
+              ],
+              "protocol": "highway_intent",
+              "raw_response": "{\n  \"phase\": \"disengage\",\n  \"intent\": \"abort\",\n  \"urgency\": \"high\",\n  \"message\": \"Teammate aborted; aborting attack.\"\n}",
+              "role": "Striker",
+              "sanitized_response": "{\n  \"phase\": \"disengage\",\n  \"intent\": \"abort\",\n  \"urgency\": \"high\",\n  \"message\": \"Teammate aborted; aborting attack.\"\n}",
+              "step": 1496,
+              "veh_id": "llm_1"
+            },
+            {
+              "attempt": 1,
+              "error": "",
+              "parse_ok": true,
+              "parsed_keys": [
+                "mode",
+                "reason"
+              ],
+              "protocol": "highway_action_gate",
+              "raw_response": "{\"mode\": \"recompute\", \"reason\": \"decision_expired\"}",
+              "role": "Striker",
+              "sanitized_response": "{\"mode\": \"recompute\", \"reason\": \"decision_expired\"}",
+              "step": 1496,
+              "veh_id": "llm_1"
+            },
+            {
+              "attempt": 1,
+              "error": "",
+              "parse_ok": true,
+              "parsed_keys": [
+                "message",
+                "tactic"
+              ],
+              "protocol": "highway_tactic",
+              "raw_response": "{\n  \"message\": \"Teammate aborted; aborting attack.\",\n  \"tactic\": {\n    \"mode\": \"disengage\",\n    \"lane_policy\": \"hold_current\",\n    \"gap_band\": \"tight\",\n    \"speed_band\": \"yield\"\n  }\n}",
+              "role": "Striker",
+              "sanitized_response": "{\n  \"message\": \"Teammate aborted; aborting attack.\",\n  \"tactic\": {\n    \"mode\": \"disengage\",\n    \"lane_policy\": \"hold_current\",\n    \"gap_band\": \"tight\",\n    \"speed_band\": \"yield\"\n  }\n}",
+              "step": 1496,
+              "veh_id": "llm_1"
+            },
+            {
+              "aggressive_cut_in_ready": false,
+              "approach_window_ready": false,
+              "attempt": 0,
+              "bad_merge_event": true,
+              "bad_merge_reason": "stale_merge_ahead_far",
+              "contract_pass_side": "left",
+              "ego_lane": 0,
+              "error": "",
+              "executor_state": "disengage",
+              "front_brake_triggered": false,
+              "intent": "abort",
+              "lane_change_attempted": false,
+              "last_merge_rel_x": 22.531,
+              "merge_event_this_step": false,
+              "merged_into_ego_lane": true,
+              "overshoot": true,
+              "parse_ok": true,
+              "prev_self_lane": 0,
+              "protocol": "highway_runtime",
+              "raw_response": "",
+              "rel_x": 200.0,
+              "role": "Striker",
+              "same_lane_lead_established": false,
+              "sanitized_response": "",
+              "self_lane": 0,
+              "speed_adv": 0.46,
+              "step": 1496,
+              "target_lc": 0,
+              "teammate_intent": "abort",
+              "teammate_phase": "disengage",
+              "teammate_tactic": {
+                "gap_band": "tight",
+                "intent": "abort",
+                "lane_policy": "hold_current",
+                "message": "Teammate aborted; aborting attack.",
+                "mode": "disengage",
+                "phase": "disengage",
+                "speed_band": "yield"
+              },
+              "valid_cut_in_merge": false,
+              "veh_id": "llm_1"
+            },
+            {
+              "attempt": 1,
+              "error": "",
+              "parse_ok": true,
+              "parsed_keys": [
+                "goal",
+                "intent",
+                "message",
+                "phase",
+                "urgency"
+              ],
+              "protocol": "highway_intent",
+              "raw_response": "{\n  \"phase\": \"disengage\",\n  \"intent\": \"abort\",\n  \"urgency\": \"high\",\n  \"message\": \"Teammate aborted; aborting attack.\"\n}",
+              "role": "Striker",
+              "sanitized_response": "{\n  \"phase\": \"disengage\",\n  \"intent\": \"abort\",\n  \"urgency\": \"high\",\n  \"message\": \"Teammate aborted; aborting attack.\"\n}",
+              "step": 1500,
+              "veh_id": "llm_1"
+            },
+            {
+              "attempt": 1,
+              "error": "",
+              "parse_ok": true,
+              "parsed_keys": [
+                "mode",
+                "reason"
+              ],
+              "protocol": "highway_action_gate",
+              "raw_response": "{\"mode\": \"recompute\", \"reason\": \"decision_expired\"}",
+              "role": "Striker",
+              "sanitized_response": "{\"mode\": \"recompute\", \"reason\": \"decision_expired\"}",
+              "step": 1500,
+              "veh_id": "llm_1"
+            },
+            {
+              "attempt": 1,
+              "error": "",
+              "parse_ok": true,
+              "parsed_keys": [
+                "message",
+                "tactic"
+              ],
+              "protocol": "highway_tactic",
+              "raw_response": "{\n  \"message\": \"Teammate aborted; aborting attack.\",\n  \"tactic\": {\n    \"mode\": \"disengage\",\n    \"lane_policy\": \"hold_current\",\n    \"gap_band\": \"tight\",\n    \"speed_band\": \"yield\"\n  }\n}",
+              "role": "Striker",
+              "sanitized_response": "{\n  \"message\": \"Teammate aborted; aborting attack.\",\n  \"tactic\": {\n    \"mode\": \"disengage\",\n    \"lane_policy\": \"hold_current\",\n    \"gap_band\": \"tight\",\n    \"speed_band\": \"yield\"\n  }\n}",
+              "step": 1500,
+              "veh_id": "llm_1"
+            },
+            {
+              "aggressive_cut_in_ready": false,
+              "approach_window_ready": false,
+              "attempt": 0,
+              "bad_merge_event": true,
+              "bad_merge_reason": "stale_merge_ahead_far",
+              "contract_pass_side": "left",
+              "ego_lane": 0,
+              "error": "",
+              "executor_state": "disengage",
+              "front_brake_triggered": false,
+              "intent": "abort",
+              "lane_change_attempted": false,
+              "last_merge_rel_x": 22.531,
+              "merge_event_this_step": false,
+              "merged_into_ego_lane": true,
+              "overshoot": true,
+              "parse_ok": true,
+              "prev_self_lane": 0,
+              "protocol": "highway_runtime",
+              "raw_response": "",
+              "rel_x": 200.0,
+              "role": "Striker",
+              "same_lane_lead_established": false,
+              "sanitized_response": "",
+              "self_lane": 0,
+              "speed_adv": 0.46,
+              "step": 1500,
+              "target_lc": 0,
+              "teammate_intent": "abort",
+              "teammate_phase": "disengage",
+              "teammate_tactic": {
+                "gap_band": "tight",
+                "intent": "abort",
+                "lane_policy": "hold_current",
+                "message": "Teammate disengaged; aborting attack.",
+                "mode": "disengage",
+                "phase": "disengage",
+                "speed_band": "yield"
+              },
+              "valid_cut_in_merge": false,
+              "veh_id": "llm_1"
+            }
+          ],
+          "merge_attempt_steps": 0,
+          "merge_commit_until_step": -1,
+          "merge_event_this_step": false,
+          "merged_into_ego_lane": true,
+          "normalization_repairs": 432,
+          "overshoot": true,
+          "pass_side": "left",
+          "phase_trace": [
+            {
+              "intent": "abort",
+              "mode": "disengage",
+              "phase": "disengage",
+              "step": 1376
+            },
+            {
+              "intent": "abort",
+              "mode": "disengage",
+              "phase": "disengage",
+              "step": 1380
+            },
+            {
+              "intent": "abort",
+              "mode": "disengage",
+              "phase": "disengage",
+              "step": 1384
+            },
+            {
+              "intent": "abort",
+              "mode": "disengage",
+              "phase": "disengage",
+              "step": 1388
+            },
+            {
+              "intent": "abort",
+              "mode": "disengage",
+              "phase": "disengage",
+              "step": 1392
+            },
+            {
+              "intent": "abort",
+              "mode": "disengage",
+              "phase": "disengage",
+              "step": 1396
+            },
+            {
+              "intent": "abort",
+              "mode": "disengage",
+              "phase": "disengage",
+              "step": 1400
+            },
+            {
+              "intent": "abort",
+              "mode": "disengage",
+              "phase": "disengage",
+              "step": 1404
+            },
+            {
+              "intent": "abort",
+              "mode": "disengage",
+              "phase": "disengage",
+              "step": 1408
+            },
+            {
+              "intent": "abort",
+              "mode": "disengage",
+              "phase": "disengage",
+              "step": 1412
+            },
+            {
+              "intent": "abort",
+              "mode": "disengage",
+              "phase": "disengage",
+              "step": 1416
+            },
+            {
+              "intent": "abort",
+              "mode": "disengage",
+              "phase": "disengage",
+              "step": 1420
+            },
+            {
+              "intent": "abort",
+              "mode": "disengage",
+              "phase": "disengage",
+              "step": 1424
+            },
+            {
+              "intent": "abort",
+              "mode": "disengage",
+              "phase": "disengage",
+              "step": 1428
+            },
+            {
+              "intent": "abort",
+              "mode": "disengage",
+              "phase": "disengage",
+              "step": 1432
+            },
+            {
+              "intent": "abort",
+              "mode": "hold_lane",
+              "phase": "disengage",
+              "step": 1436
+            },
+            {
+              "intent": "abort",
+              "mode": "disengage",
+              "phase": "disengage",
+              "step": 1440
+            },
+            {
+              "intent": "abort",
+              "mode": "disengage",
+              "phase": "disengage",
+              "step": 1444
+            },
+            {
+              "intent": "abort",
+              "mode": "disengage",
+              "phase": "disengage",
+              "step": 1448
+            },
+            {
+              "intent": "abort",
+              "mode": "disengage",
+              "phase": "disengage",
+              "step": 1452
+            },
+            {
+              "intent": "abort",
+              "mode": "disengage",
+              "phase": "disengage",
+              "step": 1456
+            },
+            {
+              "intent": "abort",
+              "mode": "disengage",
+              "phase": "disengage",
+              "step": 1460
+            },
+            {
+              "intent": "abort",
+              "mode": "disengage",
+              "phase": "disengage",
+              "step": 1464
+            },
+            {
+              "intent": "abort",
+              "mode": "disengage",
+              "phase": "disengage",
+              "step": 1468
+            },
+            {
+              "intent": "abort",
+              "mode": "disengage",
+              "phase": "disengage",
+              "step": 1472
+            },
+            {
+              "intent": "abort",
+              "mode": "disengage",
+              "phase": "disengage",
+              "step": 1476
+            },
+            {
+              "intent": "abort",
+              "mode": "disengage",
+              "phase": "disengage",
+              "step": 1480
+            },
+            {
+              "intent": "abort",
+              "mode": "disengage",
+              "phase": "disengage",
+              "step": 1484
+            },
+            {
+              "intent": "abort",
+              "mode": "disengage",
+              "phase": "disengage",
+              "step": 1488
+            },
+            {
+              "intent": "abort",
+              "mode": "disengage",
+              "phase": "disengage",
+              "step": 1492
+            },
+            {
+              "intent": "abort",
+              "mode": "disengage",
+              "phase": "disengage",
+              "step": 1496
+            },
+            {
+              "intent": "abort",
+              "mode": "disengage",
+              "phase": "disengage",
+              "step": 1500
+            }
+          ],
+          "prev_self_lane": 0,
+          "repair_fallback_used": 0,
+          "repaired_fields": [
+            "phase",
+            "intent",
+            "phase",
+            "intent",
+            "phase",
+            "intent",
+            "phase",
+            "intent",
+            "phase",
+            "intent",
+            "phase",
+            "intent",
+            "phase",
+            "intent",
+            "phase",
+            "intent",
+            "phase",
+            "intent",
+            "phase",
+            "intent",
+            "phase",
+            "intent",
+            "phase",
+            "intent",
+            "phase",
+            "intent",
+            "phase",
+            "intent",
+            "phase",
+            "intent",
+            "phase",
+            "intent"
+          ],
+          "role": "Striker",
+          "role_map": {
+            "llm_0": "Blocker",
+            "llm_1": "Striker"
+          },
+          "role_resolution_fallback_used": 0,
+          "role_source": "llm_negotiated",
+          "rollout_parse_fallback_used": 0,
+          "scene_gate_status": {
+            "accepted": true,
+            "background_nearby_count": 0,
+            "blocker_id": "llm_0",
+            "blocker_rel_lane": 1,
+            "blocker_rel_x": 14.0,
+            "projected_striker_rel_x": 1.0,
+            "reason": "accepted",
+            "sample_index": 1,
+            "sampling_strategy": "three_car_fixed_negotiated_opening",
+            "scene_mode": "three_car_fixed_negotiated",
+            "striker_id": "llm_1",
+            "striker_rel_lane": -1,
+            "striker_rel_x": -5.0,
+            "striker_speed_adv": 3.0
+          },
+          "seal_escape_until_step": -1,
+          "striker_became_ego_leader": false,
+          "striker_completed_cut_in": false,
+          "striker_lane_change_time": 8.0,
+          "striker_rel_x_at_lane_change": 19.197,
+          "sync_error_events": 0,
+          "target_abs_lane": 0,
+          "target_s": 5.5,
+          "target_v": 0.1,
+          "trigger_not_met_events": 0,
+          "urgency": "high",
+          "valid_cut_in_merge": false,
+          "veh_id": "llm_1"
+        }
+      },
+      "llm_stats": {
+        "llm_0": {
+          "block_side": "right",
+          "contract_source": "negotiated",
+          "fallback_activations": 0,
+          "last_parse_error": "",
+          "last_phase": "disengage",
+          "last_raw_response": "{\n  \"message\": \"Teammate disengaged; aborting attack.\",\n  \"tactic\": {\n    \"mode\": \"disengage\",\n    \"lane_policy\": \"hold_current\",\n    \"gap_band\": \"tight\",\n    \"speed_band\": \"yield\"\n  }\n}",
+          "model": "deepseek-chat",
+          "normalization_repairs": 657,
+          "parse_failures": 0,
+          "pass_side": "left",
+          "repair_fallback_used": 0,
+          "role": "Blocker",
+          "role_source": "llm_negotiated",
+          "veh_id": "llm_0"
+        },
+        "llm_1": {
+          "block_side": "right",
+          "contract_source": "negotiated",
+          "fallback_activations": 0,
+          "last_parse_error": "",
+          "last_phase": "disengage",
+          "last_raw_response": "{\n  \"message\": \"Teammate aborted; aborting attack.\",\n  \"tactic\": {\n    \"mode\": \"disengage\",\n    \"lane_policy\": \"hold_current\",\n    \"gap_band\": \"tight\",\n    \"speed_band\": \"yield\"\n  }\n}",
+          "model": "deepseek-chat",
+          "normalization_repairs": 432,
+          "parse_failures": 1,
+          "pass_side": "left",
+          "repair_fallback_used": 0,
+          "role": "Striker",
+          "role_source": "llm_negotiated",
+          "veh_id": "llm_1"
+        }
+      },
+      "merge_attempt_steps": 0,
+      "merged_into_ego_lane": true,
+      "min_ttc": 1.211,
+      "normalization_repairs": 1089,
+      "overshoot": true,
+      "pass_side": "left",
+      "result": "clean_success",
+      "role_map": {
+        "llm_0": "Blocker",
+        "llm_1": "Striker"
+      },
+      "role_source": "llm_negotiated",
+      "sampling_strategy": "three_car_fixed_negotiated_opening",
+      "scenario_id": "20260422-081604_324357291821414942",
+      "scene_gate_status": {
+        "accepted": true,
+        "background_nearby_count": 0,
+        "blocker_id": "llm_0",
+        "blocker_rel_lane": 1,
+        "blocker_rel_x": 14.0,
+        "projected_striker_rel_x": 1.0,
+        "reason": "accepted",
+        "sample_index": 1,
+        "sampling_strategy": "three_car_fixed_negotiated_opening",
+        "scene_mode": "three_car_fixed_negotiated",
+        "striker_id": "llm_1",
+        "striker_rel_lane": -1,
+        "striker_rel_x": -5.0,
+        "striker_speed_adv": 3.0
+      },
+      "striker_completed_cut_in": false,
+      "striker_lane_change_time": 8.0,
+      "striker_rel_x_at_lane_change": 19.197,
+      "sync_error": false,
+      "valid_cut_in_merge": false
+    }
+  ],
+  "iterations_completed": 1,
+  "llm_max_retries": "3",
+  "llm_neighbor_k": "6",
+  "llm_timeout_s": "45",
+  "llm_trace_file": "./data/highway_20260422-081604/llm_trace.jsonl",
+  "model": "deepseek-chat",
+  "pass_side": "left",
+  "role_map": {
+    "llm_0": "Blocker",
+    "llm_1": "Striker"
+  },
+  "role_source": "llm_negotiated",
+  "run_started_at": "20260422-081604",
+  "sampling_strategy": "three_car_fixed_negotiated_opening",
+  "scenario_id": "20260422-081604_324357291821414942",
+  "scene_gate_status": {
+    "accepted": true,
+    "background_nearby_count": 0,
+    "blocker_id": "llm_0",
+    "blocker_rel_lane": 1,
+    "blocker_rel_x": 14.0,
+    "projected_striker_rel_x": 1.0,
+    "reason": "accepted",
+    "sample_index": 1,
+    "sampling_strategy": "three_car_fixed_negotiated_opening",
+    "scene_mode": "three_car_fixed_negotiated",
+    "striker_id": "llm_1",
+    "striker_rel_lane": -1,
+    "striker_rel_x": -5.0,
+    "striker_speed_adv": 3.0
+  }
+}

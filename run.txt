@@ -8,12 +8,19 @@ docker run -it --platform linux/amd64 \
 
 export SUMO_HOME="/root/sumo" && export PATH="$HOME/sumo/bin:$PATH" && export PYTHONPATH="$HOME/sumo/tools:$PYTHONPATH"
 
+DeepSeek API 推荐环境变量
+export DEEPSEEK_API_KEY="sk-b8da07d06a224a8f9ff1e72dff94fb06"
+export FLOW_LLM_MODEL="deepseek-chat"
+export FLOW_LLM_BASE_URL="https://api.deepseek.com"
+export FLOW_LLM_TIMEOUT_S="45"
+export FLOW_LLM_MAX_TOKENS="768"
+
 python examples/simulate.py highway --no_render --gen_emission
 
 可视化
 python scripts/render_video.py \
-  data/highway_20260408-072844/highway_iter00_emission.csv \
-  --output data/highway_20260408-072844/simulation_replay_clear.mp4 \
+  data/highway_20260415-030734/highway_iter00_emission.csv \
+  --output data/highway_20260415-030734/simulation_replay_clear.mp4 \
   --figsize 12 6 \
   --dpi 140 \
   --marker-size 42 \

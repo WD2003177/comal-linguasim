@@ -1,0 +1,2751 @@
+{
+  "block_side": "right",
+  "case_memory": [
+    {
+      "collision": true,
+      "ego_comfort": 0.8414,
+      "ego_max_abs_accel": 0.774,
+      "ego_max_abs_jerk": 0.04,
+      "ego_max_decel": 0.0,
+      "ego_mean_abs_accel": 0.226,
+      "ego_mean_abs_jerk": 0.018,
+      "ego_rms_jerk": 0.023,
+      "escape_summary": "",
+      "failure_phase": "strike",
+      "failure_reason": "collision_on_attack",
+      "feedback_summary": "collision_on_attack",
+      "final_plan": {
+        "action_sequence_text": "Blocking right side to seal escape.",
+        "control": {
+          "horizon_steps": 8,
+          "mode": "track_pose"
+        },
+        "intent_plan": {
+          "goal": "Seal ego_0's escape lane while supporting the striker.",
+          "intent": "seal_escape",
+          "message": "Blocking right, forcing ego left.",
+          "phase": "strike",
+          "urgency": "high"
+        },
+        "message": {
+          "expires_at_step": 424,
+          "intent": "seal_escape",
+          "phase": "strike",
+          "sender": "llm_0",
+          "step": 416,
+          "target": "ego_0"
+        },
+        "message_text": "Blocking right side to seal escape.",
+        "tactic": {
+          "gap_band": "tight",
+          "hold_cycles": 3,
+          "lane_policy": "block_side",
+          "lead_gap_hint_m": 0.8,
+          "mode": "track_pose",
+          "sequence": [
+            "seal_escape"
+          ],
+          "speed_band": "press",
+          "speed_delta_hint_mps": 2.5,
+          "style": "aggressive",
+          "tactic_hints": {
+            "hold_cycles": 3,
+            "lead_gap_hint_m": 0.8,
+            "sequence": [
+              "seal_escape"
+            ],
+            "speed_delta_hint_mps": 2.5
+          }
+        }
+      },
+      "hard_brake_event": false,
+      "iteration": 1,
+      "min_ttc": null,
+      "phase_trace": [
+        {
+          "intent": "seal_escape",
+          "mode": "track_pose",
+          "phase": "strike",
+          "step": 292
+        },
+        {
+          "intent": "seal_escape",
+          "mode": "track_pose",
+          "phase": "strike",
+          "step": 296
+        },
+        {
+          "intent": "seal_escape",
+          "mode": "track_pose",
+          "phase": "strike",
+          "step": 300
+        },
+        {
+          "intent": "seal_escape",
+          "mode": "track_pose",
+          "phase": "strike",
+          "step": 304
+        },
+        {
+          "intent": "seal_escape",
+          "mode": "track_pose",
+          "phase": "strike",
+          "step": 308
+        },
+        {
+          "intent": "seal_escape",
+          "mode": "track_pose",
+          "phase": "strike",
+          "step": 312
+        },
+        {
+          "intent": "seal_escape",
+          "mode": "track_pose",
+          "phase": "strike",
+          "step": 316
+        },
+        {
+          "intent": "seal_escape",
+          "mode": "track_pose",
+          "phase": "strike",
+          "step": 320
+        },
+        {
+          "intent": "seal_escape",
+          "mode": "track_pose",
+          "phase": "strike",
+          "step": 324
+        },
+        {
+          "intent": "seal_escape",
+          "mode": "track_pose",
+          "phase": "strike",
+          "step": 328
+        },
+        {
+          "intent": "seal_escape",
+          "mode": "track_pose",
+          "phase": "strike",
+          "step": 332
+        },
+        {
+          "intent": "seal_escape",
+          "mode": "track_pose",
+          "phase": "strike",
+          "step": 336
+        },
+        {
+          "intent": "seal_escape",
+          "mode": "track_pose",
+          "phase": "strike",
+          "step": 340
+        },
+        {
+          "intent": "seal_escape",
+          "mode": "track_pose",
+          "phase": "strike",
+          "step": 344
+        },
+        {
+          "intent": "seal_escape",
+          "mode": "track_pose",
+          "phase": "strike",
+          "step": 348
+        },
+        {
+          "intent": "seal_escape",
+          "mode": "track_pose",
+          "phase": "strike",
+          "step": 352
+        },
+        {
+          "intent": "seal_escape",
+          "mode": "track_pose",
+          "phase": "strike",
+          "step": 356
+        },
+        {
+          "intent": "seal_escape",
+          "mode": "track_pose",
+          "phase": "strike",
+          "step": 360
+        },
+        {
+          "intent": "seal_escape",
+          "mode": "track_pose",
+          "phase": "strike",
+          "step": 364
+        },
+        {
+          "intent": "seal_escape",
+          "mode": "track_pose",
+          "phase": "strike",
+          "step": 368
+        },
+        {
+          "intent": "seal_escape",
+          "mode": "track_pose",
+          "phase": "strike",
+          "step": 372
+        },
+        {
+          "intent": "seal_escape",
+          "mode": "track_pose",
+          "phase": "strike",
+          "step": 376
+        },
+        {
+          "intent": "seal_escape",
+          "mode": "track_pose",
+          "phase": "strike",
+          "step": 380
+        },
+        {
+          "intent": "seal_escape",
+          "mode": "track_pose",
+          "phase": "strike",
+          "step": 384
+        },
+        {
+          "intent": "seal_escape",
+          "mode": "track_pose",
+          "phase": "strike",
+          "step": 388
+        },
+        {
+          "intent": "seal_escape",
+          "mode": "track_pose",
+          "phase": "strike",
+          "step": 392
+        },
+        {
+          "intent": "seal_escape",
+          "mode": "track_pose",
+          "phase": "strike",
+          "step": 396
+        },
+        {
+          "intent": "seal_escape",
+          "mode": "track_pose",
+          "phase": "strike",
+          "step": 400
+        },
+        {
+          "intent": "seal_escape",
+          "mode": "track_pose",
+          "phase": "strike",
+          "step": 404
+        },
+        {
+          "intent": "seal_escape",
+          "mode": "track_pose",
+          "phase": "strike",
+          "step": 408
+        },
+        {
+          "intent": "seal_escape",
+          "mode": "track_pose",
+          "phase": "strike",
+          "step": 412
+        },
+        {
+          "intent": "seal_escape",
+          "mode": "track_pose",
+          "phase": "strike",
+          "step": 416
+        }
+      ],
+      "result": "collision",
+      "role": "Blocker",
+      "scenario_id": "20260428-112230_5865466388425964754",
+      "state_signature": {
+        "ego_lane": 1,
+        "phase": "compress",
+        "self_rel_lane": 1,
+        "self_rel_s": 1000.0,
+        "self_rel_x": 14.0,
+        "teammate_rel_lane": -1,
+        "teammate_rel_x": -5.0
+      },
+      "state_signature_bucketed": {
+        "ego_lane": 1,
+        "phase": "compress",
+        "self_rel_lane": 1,
+        "self_rel_s_bin": "loose",
+        "self_rel_x_bin": "front_mid",
+        "teammate_rel_lane_bin": "left",
+        "teammate_rel_x_bin": "rear_close"
+      },
+      "sync_error": false,
+      "veh_id": "llm_0"
+    },
+    {
+      "collision": true,
+      "ego_comfort": 0.8414,
+      "ego_max_abs_accel": 0.774,
+      "ego_max_abs_jerk": 0.04,
+      "ego_max_decel": 0.0,
+      "ego_mean_abs_accel": 0.226,
+      "ego_mean_abs_jerk": 0.018,
+      "ego_rms_jerk": 0.023,
+      "escape_summary": "",
+      "failure_phase": "strike",
+      "failure_reason": "collision_on_attack",
+      "feedback_summary": "collision_on_attack",
+      "final_plan": {
+        "action_sequence_text": "Merging left to pass with aggressive lane change.",
+        "control": {
+          "horizon_steps": 8,
+          "mode": "track_pose"
+        },
+        "intent_plan": {
+          "goal": "Cut into ego_0's lane from the negotiated pass side.",
+          "intent": "merge_commit",
+          "message": "Merging left to pass.",
+          "phase": "strike",
+          "urgency": "high"
+        },
+        "message": {
+          "expires_at_step": 424,
+          "intent": "merge_commit",
+          "phase": "strike",
+          "sender": "llm_1",
+          "step": 416,
+          "target": "ego_0"
+        },
+        "message_text": "Merging left to pass with aggressive lane change.",
+        "tactic": {
+          "gap_band": "tight",
+          "hold_cycles": 2,
+          "lane_policy": "ego_lane",
+          "lead_gap_hint_m": 2.5,
+          "mode": "track_pose",
+          "sequence": [
+            "gain_lead",
+            "commit_lane_change",
+            "front_brake"
+          ],
+          "speed_band": "surge",
+          "speed_delta_hint_mps": 1.5,
+          "style": "aggressive",
+          "tactic_hints": {
+            "hold_cycles": 2,
+            "lead_gap_hint_m": 2.5,
+            "sequence": [
+              "gain_lead",
+              "commit_lane_change",
+              "front_brake"
+            ],
+            "speed_delta_hint_mps": 1.5
+          }
+        }
+      },
+      "hard_brake_event": false,
+      "iteration": 1,
+      "min_ttc": null,
+      "phase_trace": [
+        {
+          "intent": "merge_commit",
+          "mode": "track_pose",
+          "phase": "strike",
+          "step": 292
+        },
+        {
+          "intent": "merge_commit",
+          "mode": "track_pose",
+          "phase": "strike",
+          "step": 296
+        },
+        {
+          "intent": "merge_commit",
+          "mode": "track_pose",
+          "phase": "strike",
+          "step": 300
+        },
+        {
+          "intent": "merge_commit",
+          "mode": "track_pose",
+          "phase": "strike",
+          "step": 304
+        },
+        {
+          "intent": "merge_commit",
+          "mode": "track_pose",
+          "phase": "strike",
+          "step": 308
+        },
+        {
+          "intent": "merge_commit",
+          "mode": "track_pose",
+          "phase": "strike",
+          "step": 312
+        },
+        {
+          "intent": "merge_commit",
+          "mode": "track_pose",
+          "phase": "strike",
+          "step": 316
+        },
+        {
+          "intent": "merge_commit",
+          "mode": "track_pose",
+          "phase": "strike",
+          "step": 320
+        },
+        {
+          "intent": "merge_commit",
+          "mode": "track_pose",
+          "phase": "strike",
+          "step": 324
+        },
+        {
+          "intent": "merge_commit",
+          "mode": "track_pose",
+          "phase": "strike",
+          "step": 328
+        },
+        {
+          "intent": "merge_commit",
+          "mode": "track_pose",
+          "phase": "strike",
+          "step": 332
+        },
+        {
+          "intent": "merge_commit",
+          "mode": "track_pose",
+          "phase": "strike",
+          "step": 336
+        },
+        {
+          "intent": "merge_commit",
+          "mode": "track_pose",
+          "phase": "strike",
+          "step": 340
+        },
+        {
+          "intent": "merge_commit",
+          "mode": "track_pose",
+          "phase": "strike",
+          "step": 344
+        },
+        {
+          "intent": "merge_commit",
+          "mode": "track_pose",
+          "phase": "strike",
+          "step": 348
+        },
+        {
+          "intent": "merge_commit",
+          "mode": "track_pose",
+          "phase": "strike",
+          "step": 352
+        },
+        {
+          "intent": "merge_commit",
+          "mode": "track_pose",
+          "phase": "strike",
+          "step": 356
+        },
+        {
+          "intent": "merge_commit",
+          "mode": "track_pose",
+          "phase": "strike",
+          "step": 360
+        },
+        {
+          "intent": "merge_commit",
+          "mode": "track_pose",
+          "phase": "strike",
+          "step": 364
+        },
+        {
+          "intent": "merge_commit",
+          "mode": "track_pose",
+          "phase": "strike",
+          "step": 368
+        },
+        {
+          "intent": "merge_commit",
+          "mode": "track_pose",
+          "phase": "strike",
+          "step": 372
+        },
+        {
+          "intent": "merge_commit",
+          "mode": "track_pose",
+          "phase": "strike",
+          "step": 376
+        },
+        {
+          "intent": "merge_commit",
+          "mode": "track_pose",
+          "phase": "strike",
+          "step": 380
+        },
+        {
+          "intent": "merge_commit",
+          "mode": "track_pose",
+          "phase": "strike",
+          "step": 384
+        },
+        {
+          "intent": "merge_commit",
+          "mode": "track_pose",
+          "phase": "strike",
+          "step": 388
+        },
+        {
+          "intent": "merge_commit",
+          "mode": "track_pose",
+          "phase": "strike",
+          "step": 392
+        },
+        {
+          "intent": "merge_commit",
+          "mode": "track_pose",
+          "phase": "strike",
+          "step": 396
+        },
+        {
+          "intent": "merge_commit",
+          "mode": "track_pose",
+          "phase": "strike",
+          "step": 400
+        },
+        {
+          "intent": "merge_commit",
+          "mode": "track_pose",
+          "phase": "strike",
+          "step": 404
+        },
+        {
+          "intent": "merge_commit",
+          "mode": "track_pose",
+          "phase": "strike",
+          "step": 408
+        },
+        {
+          "intent": "merge_commit",
+          "mode": "track_pose",
+          "phase": "strike",
+          "step": 412
+        },
+        {
+          "intent": "merge_commit",
+          "mode": "track_pose",
+          "phase": "strike",
+          "step": 416
+        }
+      ],
+      "result": "collision",
+      "role": "Striker",
+      "scenario_id": "20260428-112230_5865466388425964754",
+      "state_signature": {
+        "ego_lane": 1,
+        "phase": "compress",
+        "self_rel_lane": -1,
+        "self_rel_s": 1000.0,
+        "self_rel_x": -5.0,
+        "teammate_rel_lane": 1,
+        "teammate_rel_x": 14.0
+      },
+      "state_signature_bucketed": {
+        "ego_lane": 1,
+        "phase": "compress",
+        "self_rel_lane": -1,
+        "self_rel_s_bin": "loose",
+        "self_rel_x_bin": "rear_close",
+        "teammate_rel_lane_bin": "right",
+        "teammate_rel_x_bin": "front_mid"
+      },
+      "sync_error": false,
+      "veh_id": "llm_1"
+    }
+  ],
+  "comfort_accel_denoise_eps": 0.001,
+  "comfort_accel_scale": 1.0,
+  "comfort_metric": "linguasim_accel_score",
+  "contract_source": "negotiated",
+  "exp_tag": "highway",
+  "frozen_geometry": {
+    "ego_0": {
+      "edge": "highway_0",
+      "ego_edge": "highway_0",
+      "ego_lane": 1,
+      "ego_pos": 324.0,
+      "ego_speed": 20.5,
+      "lane": 1,
+      "pos": 324.0,
+      "rel_lane_to_ego": 0,
+      "rel_speed_to_ego": 0.0,
+      "rel_x_to_ego": 0.0,
+      "speed": 20.5,
+      "type_id": "ego",
+      "veh_id": "ego_0"
+    },
+    "llm_0": {
+      "edge": "highway_0",
+      "ego_edge": "highway_0",
+      "ego_lane": 1,
+      "ego_pos": 324.0,
+      "ego_speed": 20.5,
+      "lane": 2,
+      "pos": 338.0,
+      "rel_lane_to_ego": 1,
+      "rel_speed_to_ego": 0.8000000000000007,
+      "rel_x_to_ego": 14.0,
+      "speed": 21.3,
+      "type_id": "llm",
+      "veh_id": "llm_0"
+    },
+    "llm_1": {
+      "edge": "highway_0",
+      "ego_edge": "highway_0",
+      "ego_lane": 1,
+      "ego_pos": 324.0,
+      "ego_speed": 20.5,
+      "lane": 0,
+      "pos": 319.0,
+      "rel_lane_to_ego": -1,
+      "rel_speed_to_ego": 3.0,
+      "rel_x_to_ego": -5.0,
+      "speed": 23.5,
+      "type_id": "llm",
+      "veh_id": "llm_1"
+    }
+  },
+  "geometry_role_hint": {
+    "llm_0": "Blocker",
+    "llm_1": "Striker"
+  },
+  "interrupted": true,
+  "iterations": [
+    {
+      "bad_merge_event": false,
+      "bad_merge_reason": "",
+      "block_side": "right",
+      "blocker_lane_at_escape": null,
+      "contract_source": "negotiated",
+      "crashed": true,
+      "ego_accel_samples": 417,
+      "ego_comfort": 0.8414,
+      "ego_comfort_samples": 417,
+      "ego_escape_lane": null,
+      "ego_jerk_samples": 416,
+      "ego_max_abs_accel": 0.774,
+      "ego_max_abs_jerk": 0.04,
+      "ego_max_decel": 0.0,
+      "ego_mean_abs_accel": 0.226,
+      "ego_mean_abs_jerk": 0.018,
+      "ego_rms_jerk": 0.023,
+      "escape_summary": "",
+      "failure_phase": "strike",
+      "failure_reason": "collision_on_attack",
+      "feedback": {
+        "bad_merge_event": false,
+        "bad_merge_reason": "",
+        "blocker_lane_at_escape": null,
+        "clean_merge_failed": false,
+        "collision": true,
+        "contract_source": "negotiated",
+        "ego_accel_samples": 417,
+        "ego_comfort": 0.8414,
+        "ego_comfort_samples": 417,
+        "ego_escape_lane": null,
+        "ego_jerk_samples": 416,
+        "ego_max_abs_accel": 0.774,
+        "ego_max_abs_jerk": 0.04,
+        "ego_max_decel": 0.0,
+        "ego_mean_abs_accel": 0.226,
+        "ego_mean_abs_jerk": 0.018,
+        "ego_rms_jerk": 0.023,
+        "escape_summary": "",
+        "failure_phase": "strike",
+        "failure_reason": "collision_on_attack",
+        "feedback_summary": "collision_on_attack",
+        "front_brake_triggered": false,
+        "hard_brake_event": false,
+        "iteration": 1,
+        "lane_change_stalled": false,
+        "last_lane_change_attempted": true,
+        "last_merge_rel_x": null,
+        "merge_attempt_steps": 2,
+        "merge_stall_cycles": 0,
+        "merged_into_ego_lane": false,
+        "min_ttc": null,
+        "overshoot": false,
+        "result": "collision",
+        "role_source": "llm_negotiated",
+        "scenario_id": "20260428-112230_5865466388425964754",
+        "scene_gate_status": {
+          "accepted": true,
+          "background_nearby_count": 0,
+          "blocker_id": "llm_0",
+          "blocker_rel_lane": 1,
+          "blocker_rel_x": 14.0,
+          "projected_striker_rel_x": 1.0,
+          "reason": "accepted",
+          "sample_index": 1,
+          "sampling_strategy": "three_car_fixed_negotiated_opening",
+          "scene_mode": "three_car_fixed_negotiated",
+          "striker_id": "llm_1",
+          "striker_rel_lane": -1,
+          "striker_rel_x": -5.0,
+          "striker_speed_adv": 3.0
+        },
+        "stale_merge_candidate": false,
+        "stale_merge_candidate_step": -1,
+        "striker_completed_cut_in": false,
+        "striker_lane_change_time": null,
+        "striker_rel_x_at_lane_change": null,
+        "success_label": "",
+        "sync_error": false,
+        "valid_cut_in_merge": false
+      },
+      "feedback_summary": "collision_on_attack",
+      "front_brake_triggered": false,
+      "hard_brake_event": false,
+      "iteration": 1,
+      "last_lane_change_attempted": true,
+      "last_merge_rel_x": null,
+      "llm_diagnostics": {
+        "llm_0": {
+          "action_reuse_count": 2,
+          "active_control_mode": "track_pose",
+          "active_phase": "strike",
+          "bad_merge_event": false,
+          "bad_merge_reason": "",
+          "block_side": "right",
+          "brake_armed": false,
+          "clean_merge_failed": false,
+          "contract_source": "negotiated",
+          "current_decision": {
+            "action_sequence_text": "Blocking right side to seal escape.",
+            "control": {
+              "horizon_steps": 8,
+              "mode": "track_pose"
+            },
+            "intent_plan": {
+              "goal": "Seal ego_0's escape lane while supporting the striker.",
+              "intent": "seal_escape",
+              "message": "Blocking right, forcing ego left.",
+              "phase": "strike",
+              "urgency": "high"
+            },
+            "message": {
+              "expires_at_step": 424,
+              "intent": "seal_escape",
+              "phase": "strike",
+              "sender": "llm_0",
+              "step": 416,
+              "target": "ego_0"
+            },
+            "message_text": "Blocking right side to seal escape.",
+            "tactic": {
+              "gap_band": "tight",
+              "hold_cycles": 3,
+              "lane_policy": "block_side",
+              "lead_gap_hint_m": 0.8,
+              "mode": "track_pose",
+              "sequence": [
+                "seal_escape"
+              ],
+              "speed_band": "press",
+              "speed_delta_hint_mps": 2.5,
+              "style": "aggressive",
+              "tactic_hints": {
+                "hold_cycles": 3,
+                "lead_gap_hint_m": 0.8,
+                "sequence": [
+                  "seal_escape"
+                ],
+                "speed_delta_hint_mps": 2.5
+              }
+            }
+          },
+          "executor_state": "seal",
+          "force_cut_in_blocked_reason": "",
+          "front_brake_triggered": false,
+          "geometry_role_hint": {
+            "llm_0": "Blocker",
+            "llm_1": "Striker"
+          },
+          "intent": "seal_escape",
+          "lane_change_stalled": false,
+          "last_action_refresh_reason": "signature_unchanged",
+          "last_action_rel_x_bucket": "6_to_10",
+          "last_action_reused": true,
+          "last_bad_merge_event_step": -1,
+          "last_history_injection_phase": "strike",
+          "last_lane_change_attempted": false,
+          "last_local_ready": {
+            "approach_window_ready": false,
+            "blocker_side_front_ready": false,
+            "front_brake_window_ready": false,
+            "merged_into_ego_lane": false,
+            "overshoot": false,
+            "same_lane_lead_established": false,
+            "speed_adv": 0.487,
+            "teammate_block_band_ready": false,
+            "teammate_pass_window_ready": false
+          },
+          "last_merge_event_step": -1,
+          "last_merge_rel_x": null,
+          "last_published_trigger_satisfied": true,
+          "last_teammate_intent": "merge_commit",
+          "last_teammate_phase": "strike",
+          "last_teammate_tactic": {
+            "gap_band": "tight",
+            "intent": "merge_commit",
+            "lane_policy": "ego_lane",
+            "message": "Committing merge into ego lane with left pass.",
+            "mode": "track_pose",
+            "phase": "strike",
+            "sequence": [],
+            "speed_band": "surge"
+          },
+          "last_valid_merge_event_step": -1,
+          "latest_action_sequence_text": "Blocking right side to seal escape.",
+          "latest_intent_plan": {
+            "goal": "Seal ego_0's escape lane while supporting the striker.",
+            "intent": "seal_escape",
+            "message": "Blocking right, forcing ego left.",
+            "phase": "strike",
+            "urgency": "high"
+          },
+          "latest_tactic_profile": {
+            "gap_band": "tight",
+            "hold_cycles": 3,
+            "lane_policy": "block_side",
+            "lead_gap_hint_m": 0.8,
+            "mode": "track_pose",
+            "sequence": [
+              "seal_escape"
+            ],
+            "speed_band": "press",
+            "speed_delta_hint_mps": 2.5,
+            "style": "aggressive",
+            "tactic_hints": {
+              "hold_cycles": 3,
+              "lead_gap_hint_m": 0.8,
+              "sequence": [
+                "seal_escape"
+              ],
+              "speed_delta_hint_mps": 2.5
+            }
+          },
+          "lead_acquired": false,
+          "llm_trace_tail": [
+            {
+              "attempt": 1,
+              "error": "",
+              "parse_ok": true,
+              "parsed_keys": [
+                "mode",
+                "reason"
+              ],
+              "protocol": "highway_action_gate",
+              "raw_response": "{\"mode\": \"reuse\", \"reason\": \"signature_unchanged\"}",
+              "role": "Blocker",
+              "sanitized_response": "{\"mode\": \"reuse\", \"reason\": \"signature_unchanged\"}",
+              "step": 404,
+              "veh_id": "llm_0"
+            },
+            {
+              "aggressive_cut_in_ready": false,
+              "approach_window_ready": false,
+              "attempt": 0,
+              "bad_merge_event": false,
+              "bad_merge_reason": "",
+              "clean_merge_failed": false,
+              "contract_pass_side": "left",
+              "ego_lane": 1,
+              "error": "",
+              "executor_state": "seal",
+              "force_cut_in_blocked_reason": "",
+              "front_brake_triggered": false,
+              "intent": "seal_escape",
+              "lane_change_attempted": false,
+              "lane_change_stalled": false,
+              "last_merge_rel_x": null,
+              "merge_event_this_step": false,
+              "merge_stall_cycles": 0,
+              "merged_into_ego_lane": false,
+              "overshoot": false,
+              "parse_ok": true,
+              "prev_self_lane": 2,
+              "protocol": "highway_runtime",
+              "raw_response": "",
+              "rel_x": 8.102,
+              "role": "Blocker",
+              "same_lane_lead_established": false,
+              "sanitized_response": "",
+              "self_lane": 2,
+              "speed_adv": 1.055,
+              "stale_merge_candidate": false,
+              "stale_merge_candidate_step": -1,
+              "step": 404,
+              "target_lc": 0,
+              "teammate_intent": "merge_commit",
+              "teammate_phase": "strike",
+              "teammate_tactic": {
+                "gap_band": "tight",
+                "intent": "merge_commit",
+                "lane_policy": "ego_lane",
+                "message": "Merging left into ego lane.",
+                "mode": "track_pose",
+                "phase": "strike",
+                "sequence": [],
+                "speed_band": "surge"
+              },
+              "valid_cut_in_merge": false,
+              "veh_id": "llm_0"
+            },
+            {
+              "attempt": 1,
+              "error": "",
+              "parse_ok": true,
+              "parsed_keys": [
+                "goal",
+                "intent",
+                "message",
+                "phase",
+                "urgency"
+              ],
+              "protocol": "highway_intent",
+              "raw_response": "{\n  \"intent\": \"seal_escape\",\n  \"message\": \"Blocking right side to seal escape.\"\n}",
+              "role": "Blocker",
+              "sanitized_response": "{\n  \"intent\": \"seal_escape\",\n  \"message\": \"Blocking right side to seal escape.\"\n}",
+              "step": 408,
+              "veh_id": "llm_0"
+            },
+            {
+              "attempt": 1,
+              "error": "",
+              "parse_ok": true,
+              "parsed_keys": [
+                "mode",
+                "reason"
+              ],
+              "protocol": "highway_action_gate",
+              "raw_response": "{\"mode\": \"recompute\", \"reason\": \"hard_refresh\"}",
+              "role": "Blocker",
+              "sanitized_response": "{\"mode\": \"recompute\", \"reason\": \"hard_refresh\"}",
+              "step": 408,
+              "veh_id": "llm_0"
+            },
+            {
+              "attempt": 1,
+              "error": "",
+              "parse_ok": true,
+              "parsed_keys": [
+                "message",
+                "tactic"
+              ],
+              "protocol": "highway_tactic",
+              "raw_response": "{\n  \"message\": \"Blocking right side to seal escape.\",\n  \"tactic\": {\n    \"style\": \"aggressive\",\n    \"sequence\": [\"seal_escape\"],\n    \"speed_delta_hint_mps\": 2.5,\n    \"lead_gap_hint_m\": 0.8,\n    \"hold_cycles\": 3\n  }\n}",
+              "role": "Blocker",
+              "sanitized_response": "{\n  \"message\": \"Blocking right side to seal escape.\",\n  \"tactic\": {\n    \"style\": \"aggressive\",\n    \"sequence\": [\"seal_escape\"],\n    \"speed_delta_hint_mps\": 2.5,\n    \"lead_gap_hint_m\": 0.8,\n    \"hold_cycles\": 3\n  }\n}",
+              "step": 408,
+              "veh_id": "llm_0"
+            },
+            {
+              "aggressive_cut_in_ready": false,
+              "approach_window_ready": false,
+              "attempt": 0,
+              "bad_merge_event": false,
+              "bad_merge_reason": "",
+              "clean_merge_failed": false,
+              "contract_pass_side": "left",
+              "ego_lane": 1,
+              "error": "",
+              "executor_state": "seal",
+              "force_cut_in_blocked_reason": "",
+              "front_brake_triggered": false,
+              "intent": "seal_escape",
+              "lane_change_attempted": false,
+              "lane_change_stalled": false,
+              "last_merge_rel_x": null,
+              "merge_event_this_step": false,
+              "merge_stall_cycles": 0,
+              "merged_into_ego_lane": false,
+              "overshoot": false,
+              "parse_ok": true,
+              "prev_self_lane": 2,
+              "protocol": "highway_runtime",
+              "raw_response": "",
+              "rel_x": 8.483,
+              "role": "Blocker",
+              "same_lane_lead_established": false,
+              "sanitized_response": "",
+              "self_lane": 2,
+              "speed_adv": 0.892,
+              "stale_merge_candidate": false,
+              "stale_merge_candidate_step": -1,
+              "step": 408,
+              "target_lc": 0,
+              "teammate_intent": "merge_commit",
+              "teammate_phase": "strike",
+              "teammate_tactic": {
+                "gap_band": "tight",
+                "intent": "merge_commit",
+                "lane_policy": "ego_lane",
+                "message": "Committing merge into ego lane with left pass.",
+                "mode": "track_pose",
+                "phase": "strike",
+                "sequence": [],
+                "speed_band": "surge"
+              },
+              "valid_cut_in_merge": false,
+              "veh_id": "llm_0"
+            },
+            {
+              "attempt": 1,
+              "error": "",
+              "parse_ok": true,
+              "parsed_keys": [
+                "goal",
+                "intent",
+                "message",
+                "phase",
+                "urgency"
+              ],
+              "protocol": "highway_intent",
+              "raw_response": "{\n  \"intent\": \"seal_escape\",\n  \"message\": \"Blocking right side to seal escape.\"\n}",
+              "role": "Blocker",
+              "sanitized_response": "{\n  \"intent\": \"seal_escape\",\n  \"message\": \"Blocking right side to seal escape.\"\n}",
+              "step": 412,
+              "veh_id": "llm_0"
+            },
+            {
+              "attempt": 1,
+              "error": "",
+              "parse_ok": true,
+              "parsed_keys": [
+                "mode",
+                "reason"
+              ],
+              "protocol": "highway_action_gate",
+              "raw_response": "{\"mode\": \"reuse\", \"reason\": \"signature_unchanged\"}",
+              "role": "Blocker",
+              "sanitized_response": "{\"mode\": \"reuse\", \"reason\": \"signature_unchanged\"}",
+              "step": 412,
+              "veh_id": "llm_0"
+            },
+            {
+              "aggressive_cut_in_ready": false,
+              "approach_window_ready": false,
+              "attempt": 0,
+              "bad_merge_event": false,
+              "bad_merge_reason": "",
+              "clean_merge_failed": false,
+              "contract_pass_side": "left",
+              "ego_lane": 1,
+              "error": "",
+              "executor_state": "seal",
+              "force_cut_in_blocked_reason": "",
+              "front_brake_triggered": false,
+              "intent": "seal_escape",
+              "lane_change_attempted": false,
+              "lane_change_stalled": false,
+              "last_merge_rel_x": null,
+              "merge_event_this_step": false,
+              "merge_stall_cycles": 0,
+              "merged_into_ego_lane": false,
+              "overshoot": false,
+              "parse_ok": true,
+              "prev_self_lane": 2,
+              "protocol": "highway_runtime",
+              "raw_response": "",
+              "rel_x": 8.799,
+              "role": "Blocker",
+              "same_lane_lead_established": false,
+              "sanitized_response": "",
+              "self_lane": 2,
+              "speed_adv": 0.73,
+              "stale_merge_candidate": false,
+              "stale_merge_candidate_step": -1,
+              "step": 412,
+              "target_lc": 0,
+              "teammate_intent": "merge_commit",
+              "teammate_phase": "strike",
+              "teammate_tactic": {
+                "gap_band": "tight",
+                "intent": "merge_commit",
+                "lane_policy": "ego_lane",
+                "message": "Committing merge into ego lane with left pass.",
+                "mode": "track_pose",
+                "phase": "strike",
+                "sequence": [],
+                "speed_band": "surge"
+              },
+              "valid_cut_in_merge": false,
+              "veh_id": "llm_0"
+            },
+            {
+              "attempt": 1,
+              "error": "",
+              "parse_ok": true,
+              "parsed_keys": [
+                "goal",
+                "intent",
+                "message",
+                "phase",
+                "urgency"
+              ],
+              "protocol": "highway_intent",
+              "raw_response": "{\n  \"intent\": \"seal_escape\",\n  \"message\": \"Blocking right, forcing ego left.\"\n}",
+              "role": "Blocker",
+              "sanitized_response": "{\n  \"intent\": \"seal_escape\",\n  \"message\": \"Blocking right, forcing ego left.\"\n}",
+              "step": 416,
+              "veh_id": "llm_0"
+            },
+            {
+              "attempt": 1,
+              "error": "",
+              "parse_ok": true,
+              "parsed_keys": [
+                "mode",
+                "reason"
+              ],
+              "protocol": "highway_action_gate",
+              "raw_response": "{\"mode\": \"reuse\", \"reason\": \"signature_unchanged\"}",
+              "role": "Blocker",
+              "sanitized_response": "{\"mode\": \"reuse\", \"reason\": \"signature_unchanged\"}",
+              "step": 416,
+              "veh_id": "llm_0"
+            },
+            {
+              "aggressive_cut_in_ready": false,
+              "approach_window_ready": false,
+              "attempt": 0,
+              "bad_merge_event": false,
+              "bad_merge_reason": "",
+              "clean_merge_failed": false,
+              "contract_pass_side": "left",
+              "ego_lane": 1,
+              "error": "",
+              "executor_state": "seal",
+              "force_cut_in_blocked_reason": "",
+              "front_brake_triggered": false,
+              "intent": "seal_escape",
+              "lane_change_attempted": false,
+              "lane_change_stalled": false,
+              "last_merge_rel_x": null,
+              "merge_event_this_step": false,
+              "merge_stall_cycles": 0,
+              "merged_into_ego_lane": false,
+              "overshoot": false,
+              "parse_ok": true,
+              "prev_self_lane": 2,
+              "protocol": "highway_runtime",
+              "raw_response": "",
+              "rel_x": 9.051,
+              "role": "Blocker",
+              "same_lane_lead_established": false,
+              "sanitized_response": "",
+              "self_lane": 2,
+              "speed_adv": 0.568,
+              "stale_merge_candidate": false,
+              "stale_merge_candidate_step": -1,
+              "step": 416,
+              "target_lc": 0,
+              "teammate_intent": "merge_commit",
+              "teammate_phase": "strike",
+              "teammate_tactic": {
+                "gap_band": "tight",
+                "intent": "merge_commit",
+                "lane_policy": "ego_lane",
+                "message": "Committing merge into ego lane with left pass.",
+                "mode": "track_pose",
+                "phase": "strike",
+                "sequence": [],
+                "speed_band": "surge"
+              },
+              "valid_cut_in_merge": false,
+              "veh_id": "llm_0"
+            }
+          ],
+          "merge_attempt_steps": 0,
+          "merge_commit_until_step": -1,
+          "merge_event_this_step": false,
+          "merge_stall_cycles": 0,
+          "merged_into_ego_lane": false,
+          "normalization_repairs": 14,
+          "overshoot": false,
+          "pass_side": "left",
+          "phase_trace": [
+            {
+              "intent": "seal_escape",
+              "mode": "track_pose",
+              "phase": "strike",
+              "step": 292
+            },
+            {
+              "intent": "seal_escape",
+              "mode": "track_pose",
+              "phase": "strike",
+              "step": 296
+            },
+            {
+              "intent": "seal_escape",
+              "mode": "track_pose",
+              "phase": "strike",
+              "step": 300
+            },
+            {
+              "intent": "seal_escape",
+              "mode": "track_pose",
+              "phase": "strike",
+              "step": 304
+            },
+            {
+              "intent": "seal_escape",
+              "mode": "track_pose",
+              "phase": "strike",
+              "step": 308
+            },
+            {
+              "intent": "seal_escape",
+              "mode": "track_pose",
+              "phase": "strike",
+              "step": 312
+            },
+            {
+              "intent": "seal_escape",
+              "mode": "track_pose",
+              "phase": "strike",
+              "step": 316
+            },
+            {
+              "intent": "seal_escape",
+              "mode": "track_pose",
+              "phase": "strike",
+              "step": 320
+            },
+            {
+              "intent": "seal_escape",
+              "mode": "track_pose",
+              "phase": "strike",
+              "step": 324
+            },
+            {
+              "intent": "seal_escape",
+              "mode": "track_pose",
+              "phase": "strike",
+              "step": 328
+            },
+            {
+              "intent": "seal_escape",
+              "mode": "track_pose",
+              "phase": "strike",
+              "step": 332
+            },
+            {
+              "intent": "seal_escape",
+              "mode": "track_pose",
+              "phase": "strike",
+              "step": 336
+            },
+            {
+              "intent": "seal_escape",
+              "mode": "track_pose",
+              "phase": "strike",
+              "step": 340
+            },
+            {
+              "intent": "seal_escape",
+              "mode": "track_pose",
+              "phase": "strike",
+              "step": 344
+            },
+            {
+              "intent": "seal_escape",
+              "mode": "track_pose",
+              "phase": "strike",
+              "step": 348
+            },
+            {
+              "intent": "seal_escape",
+              "mode": "track_pose",
+              "phase": "strike",
+              "step": 352
+            },
+            {
+              "intent": "seal_escape",
+              "mode": "track_pose",
+              "phase": "strike",
+              "step": 356
+            },
+            {
+              "intent": "seal_escape",
+              "mode": "track_pose",
+              "phase": "strike",
+              "step": 360
+            },
+            {
+              "intent": "seal_escape",
+              "mode": "track_pose",
+              "phase": "strike",
+              "step": 364
+            },
+            {
+              "intent": "seal_escape",
+              "mode": "track_pose",
+              "phase": "strike",
+              "step": 368
+            },
+            {
+              "intent": "seal_escape",
+              "mode": "track_pose",
+              "phase": "strike",
+              "step": 372
+            },
+            {
+              "intent": "seal_escape",
+              "mode": "track_pose",
+              "phase": "strike",
+              "step": 376
+            },
+            {
+              "intent": "seal_escape",
+              "mode": "track_pose",
+              "phase": "strike",
+              "step": 380
+            },
+            {
+              "intent": "seal_escape",
+              "mode": "track_pose",
+              "phase": "strike",
+              "step": 384
+            },
+            {
+              "intent": "seal_escape",
+              "mode": "track_pose",
+              "phase": "strike",
+              "step": 388
+            },
+            {
+              "intent": "seal_escape",
+              "mode": "track_pose",
+              "phase": "strike",
+              "step": 392
+            },
+            {
+              "intent": "seal_escape",
+              "mode": "track_pose",
+              "phase": "strike",
+              "step": 396
+            },
+            {
+              "intent": "seal_escape",
+              "mode": "track_pose",
+              "phase": "strike",
+              "step": 400
+            },
+            {
+              "intent": "seal_escape",
+              "mode": "track_pose",
+              "phase": "strike",
+              "step": 404
+            },
+            {
+              "intent": "seal_escape",
+              "mode": "track_pose",
+              "phase": "strike",
+              "step": 408
+            },
+            {
+              "intent": "seal_escape",
+              "mode": "track_pose",
+              "phase": "strike",
+              "step": 412
+            },
+            {
+              "intent": "seal_escape",
+              "mode": "track_pose",
+              "phase": "strike",
+              "step": 416
+            }
+          ],
+          "prev_self_lane": 2,
+          "repair_fallback_used": 0,
+          "repaired_fields": [
+            "phase",
+            "intent",
+            "phase",
+            "intent",
+            "phase",
+            "intent",
+            "phase",
+            "intent",
+            "phase",
+            "intent",
+            "phase",
+            "intent",
+            "phase",
+            "intent"
+          ],
+          "role": "Blocker",
+          "role_map": {
+            "llm_0": "Blocker",
+            "llm_1": "Striker"
+          },
+          "role_resolution_fallback_used": 0,
+          "role_source": "llm_negotiated",
+          "rollout_parse_fallback_used": 0,
+          "scene_gate_status": {
+            "accepted": true,
+            "background_nearby_count": 0,
+            "blocker_id": "llm_0",
+            "blocker_rel_lane": 1,
+            "blocker_rel_x": 14.0,
+            "projected_striker_rel_x": 1.0,
+            "reason": "accepted",
+            "sample_index": 1,
+            "sampling_strategy": "three_car_fixed_negotiated_opening",
+            "scene_mode": "three_car_fixed_negotiated",
+            "striker_id": "llm_1",
+            "striker_rel_lane": -1,
+            "striker_rel_x": -5.0,
+            "striker_speed_adv": 3.0
+          },
+          "seal_escape_until_step": -1,
+          "stale_merge_candidate": false,
+          "stale_merge_candidate_step": -1,
+          "striker_became_ego_leader": false,
+          "striker_completed_cut_in": false,
+          "striker_lane_change_time": null,
+          "striker_rel_x_at_lane_change": null,
+          "sync_error_events": 0,
+          "target_abs_lane": 2,
+          "target_s": 0.5,
+          "target_v": 26.41398302621058,
+          "terminal_lock_reason": "",
+          "terminal_lock_step": -1,
+          "terminal_plan_locked": false,
+          "trigger_not_met_events": 0,
+          "urgency": "high",
+          "valid_cut_in_merge": false,
+          "veh_id": "llm_0"
+        },
+        "llm_1": {
+          "action_reuse_count": 0,
+          "active_control_mode": "track_pose",
+          "active_phase": "strike",
+          "bad_merge_event": false,
+          "bad_merge_reason": "",
+          "block_side": "right",
+          "brake_armed": false,
+          "clean_merge_failed": false,
+          "contract_source": "negotiated",
+          "current_decision": {
+            "action_sequence_text": "Merging left to pass with aggressive lane change.",
+            "control": {
+              "horizon_steps": 8,
+              "mode": "track_pose"
+            },
+            "intent_plan": {
+              "goal": "Cut into ego_0's lane from the negotiated pass side.",
+              "intent": "merge_commit",
+              "message": "Merging left to pass.",
+              "phase": "strike",
+              "urgency": "high"
+            },
+            "message": {
+              "expires_at_step": 424,
+              "intent": "merge_commit",
+              "phase": "strike",
+              "sender": "llm_1",
+              "step": 416,
+              "target": "ego_0"
+            },
+            "message_text": "Merging left to pass with aggressive lane change.",
+            "tactic": {
+              "gap_band": "tight",
+              "hold_cycles": 2,
+              "lane_policy": "ego_lane",
+              "lead_gap_hint_m": 2.5,
+              "mode": "track_pose",
+              "sequence": [
+                "gain_lead",
+                "commit_lane_change",
+                "front_brake"
+              ],
+              "speed_band": "surge",
+              "speed_delta_hint_mps": 1.5,
+              "style": "aggressive",
+              "tactic_hints": {
+                "hold_cycles": 2,
+                "lead_gap_hint_m": 2.5,
+                "sequence": [
+                  "gain_lead",
+                  "commit_lane_change",
+                  "front_brake"
+                ],
+                "speed_delta_hint_mps": 1.5
+              }
+            }
+          },
+          "executor_state": "cut_in_commit",
+          "force_cut_in_blocked_reason": "",
+          "front_brake_triggered": false,
+          "geometry_role_hint": {
+            "llm_0": "Blocker",
+            "llm_1": "Striker"
+          },
+          "intent": "merge_commit",
+          "lane_change_stalled": false,
+          "last_action_refresh_reason": "hard_refresh",
+          "last_action_rel_x_bucket": "2_to_6",
+          "last_action_reused": false,
+          "last_bad_merge_event_step": -1,
+          "last_history_injection_phase": "strike",
+          "last_lane_change_attempted": true,
+          "last_local_ready": {
+            "approach_window_ready": true,
+            "blocker_side_front_ready": false,
+            "front_brake_window_ready": false,
+            "merged_into_ego_lane": false,
+            "overshoot": false,
+            "same_lane_lead_established": false,
+            "speed_adv": 0.594,
+            "teammate_block_band_ready": true,
+            "teammate_pass_window_ready": false
+          },
+          "last_merge_event_step": -1,
+          "last_merge_rel_x": null,
+          "last_published_trigger_satisfied": true,
+          "last_teammate_intent": "seal_escape",
+          "last_teammate_phase": "strike",
+          "last_teammate_tactic": {
+            "gap_band": "tight",
+            "intent": "seal_escape",
+            "lane_policy": "block_side",
+            "message": "Blocking right side to seal escape.",
+            "mode": "track_pose",
+            "phase": "strike",
+            "sequence": [],
+            "speed_band": "press"
+          },
+          "last_valid_merge_event_step": -1,
+          "latest_action_sequence_text": "Merging left to pass with aggressive lane change.",
+          "latest_intent_plan": {
+            "goal": "Cut into ego_0's lane from the negotiated pass side.",
+            "intent": "merge_commit",
+            "message": "Merging left to pass.",
+            "phase": "strike",
+            "urgency": "high"
+          },
+          "latest_tactic_profile": {
+            "gap_band": "tight",
+            "hold_cycles": 2,
+            "lane_policy": "ego_lane",
+            "lead_gap_hint_m": 2.5,
+            "mode": "track_pose",
+            "sequence": [
+              "gain_lead",
+              "commit_lane_change",
+              "front_brake"
+            ],
+            "speed_band": "surge",
+            "speed_delta_hint_mps": 1.5,
+            "style": "aggressive",
+            "tactic_hints": {
+              "hold_cycles": 2,
+              "lead_gap_hint_m": 2.5,
+              "sequence": [
+                "gain_lead",
+                "commit_lane_change",
+                "front_brake"
+              ],
+              "speed_delta_hint_mps": 1.5
+            }
+          },
+          "lead_acquired": false,
+          "llm_trace_tail": [
+            {
+              "attempt": 1,
+              "error": "",
+              "parse_ok": true,
+              "parsed_keys": [
+                "message",
+                "tactic"
+              ],
+              "protocol": "highway_tactic",
+              "raw_response": "{\n  \"message\": \"Committing merge into ego lane with left pass.\",\n  \"tactic\": {\n    \"style\": \"aggressive\",\n    \"sequence\": [\"gain_lead\", \"commit_lane_change\", \"front_brake\"],\n    \"speed_delta_hint_mps\": 1.2,\n    \"lead_gap_hint_m\": 2.5,\n    \"hold_cycles\": 2\n  }\n}",
+              "role": "Striker",
+              "sanitized_response": "{\n  \"message\": \"Committing merge into ego lane with left pass.\",\n  \"tactic\": {\n    \"style\": \"aggressive\",\n    \"sequence\": [\"gain_lead\", \"commit_lane_change\", \"front_brake\"],\n    \"speed_delta_hint_mps\": 1.2,\n    \"lead_gap_hint_m\": 2.5,\n    \"hold_cycles\": 2\n  }\n}",
+              "step": 404,
+              "veh_id": "llm_1"
+            },
+            {
+              "aggressive_cut_in_ready": false,
+              "approach_window_ready": true,
+              "attempt": 0,
+              "bad_merge_event": false,
+              "bad_merge_reason": "",
+              "clean_merge_failed": false,
+              "contract_pass_side": "left",
+              "ego_lane": 1,
+              "error": "",
+              "executor_state": "merge_wait_gap",
+              "force_cut_in_blocked_reason": "too_close",
+              "front_brake_triggered": false,
+              "intent": "merge_commit",
+              "lane_change_attempted": false,
+              "lane_change_stalled": false,
+              "last_merge_rel_x": null,
+              "merge_event_this_step": false,
+              "merge_stall_cycles": 0,
+              "merged_into_ego_lane": false,
+              "overshoot": false,
+              "parse_ok": true,
+              "prev_self_lane": 0,
+              "protocol": "highway_runtime",
+              "raw_response": "",
+              "rel_x": 5.094,
+              "role": "Striker",
+              "same_lane_lead_established": false,
+              "sanitized_response": "",
+              "self_lane": 0,
+              "speed_adv": 0.542,
+              "stale_merge_candidate": false,
+              "stale_merge_candidate_step": -1,
+              "step": 404,
+              "target_lc": 0,
+              "teammate_intent": "seal_escape",
+              "teammate_phase": "strike",
+              "teammate_tactic": {
+                "gap_band": "tight",
+                "intent": "seal_escape",
+                "lane_policy": "block_side",
+                "message": "Blocking right to seal escape.",
+                "mode": "track_pose",
+                "phase": "strike",
+                "sequence": [],
+                "speed_band": "press"
+              },
+              "valid_cut_in_merge": false,
+              "veh_id": "llm_1"
+            },
+            {
+              "attempt": 1,
+              "error": "",
+              "parse_ok": true,
+              "parsed_keys": [
+                "goal",
+                "intent",
+                "message",
+                "phase",
+                "urgency"
+              ],
+              "protocol": "highway_intent",
+              "raw_response": "{\n  \"intent\": \"merge_commit\",\n  \"message\": \"Merging into ego lane left side.\"\n}",
+              "role": "Striker",
+              "sanitized_response": "{\n  \"intent\": \"merge_commit\",\n  \"message\": \"Merging into ego lane left side.\"\n}",
+              "step": 408,
+              "veh_id": "llm_1"
+            },
+            {
+              "attempt": 1,
+              "error": "",
+              "parse_ok": true,
+              "parsed_keys": [
+                "mode",
+                "reason"
+              ],
+              "protocol": "highway_action_gate",
+              "raw_response": "{\"mode\": \"reuse\", \"reason\": \"signature_unchanged\"}",
+              "role": "Striker",
+              "sanitized_response": "{\"mode\": \"reuse\", \"reason\": \"signature_unchanged\"}",
+              "step": 408,
+              "veh_id": "llm_1"
+            },
+            {
+              "aggressive_cut_in_ready": false,
+              "approach_window_ready": true,
+              "attempt": 0,
+              "bad_merge_event": false,
+              "bad_merge_reason": "",
+              "clean_merge_failed": false,
+              "contract_pass_side": "left",
+              "ego_lane": 1,
+              "error": "",
+              "executor_state": "merge_wait_gap",
+              "force_cut_in_blocked_reason": "too_close",
+              "front_brake_triggered": false,
+              "intent": "merge_commit",
+              "lane_change_attempted": false,
+              "lane_change_stalled": false,
+              "last_merge_rel_x": null,
+              "merge_event_this_step": false,
+              "merge_stall_cycles": 0,
+              "merged_into_ego_lane": false,
+              "overshoot": false,
+              "parse_ok": true,
+              "prev_self_lane": 0,
+              "protocol": "highway_runtime",
+              "raw_response": "",
+              "rel_x": 5.313,
+              "role": "Striker",
+              "same_lane_lead_established": false,
+              "sanitized_response": "",
+              "self_lane": 0,
+              "speed_adv": 0.551,
+              "stale_merge_candidate": false,
+              "stale_merge_candidate_step": -1,
+              "step": 408,
+              "target_lc": 0,
+              "teammate_intent": "seal_escape",
+              "teammate_phase": "strike",
+              "teammate_tactic": {
+                "gap_band": "tight",
+                "intent": "seal_escape",
+                "lane_policy": "block_side",
+                "message": "Blocking right to seal escape.",
+                "mode": "track_pose",
+                "phase": "strike",
+                "sequence": [],
+                "speed_band": "press"
+              },
+              "valid_cut_in_merge": false,
+              "veh_id": "llm_1"
+            },
+            {
+              "attempt": 1,
+              "error": "",
+              "parse_ok": true,
+              "parsed_keys": [
+                "goal",
+                "intent",
+                "message",
+                "phase",
+                "urgency"
+              ],
+              "protocol": "highway_intent",
+              "raw_response": "{\n  \"intent\": \"merge_commit\",\n  \"message\": \"Merging left to pass.\"\n}",
+              "role": "Striker",
+              "sanitized_response": "{\n  \"intent\": \"merge_commit\",\n  \"message\": \"Merging left to pass.\"\n}",
+              "step": 412,
+              "veh_id": "llm_1"
+            },
+            {
+              "attempt": 1,
+              "error": "",
+              "parse_ok": true,
+              "parsed_keys": [
+                "mode",
+                "reason"
+              ],
+              "protocol": "highway_action_gate",
+              "raw_response": "{\"mode\": \"reuse\", \"reason\": \"signature_unchanged\"}",
+              "role": "Striker",
+              "sanitized_response": "{\"mode\": \"reuse\", \"reason\": \"signature_unchanged\"}",
+              "step": 412,
+              "veh_id": "llm_1"
+            },
+            {
+              "aggressive_cut_in_ready": false,
+              "approach_window_ready": true,
+              "attempt": 0,
+              "bad_merge_event": false,
+              "bad_merge_reason": "",
+              "clean_merge_failed": false,
+              "contract_pass_side": "left",
+              "ego_lane": 1,
+              "error": "",
+              "executor_state": "merge_wait_gap",
+              "force_cut_in_blocked_reason": "too_close",
+              "front_brake_triggered": false,
+              "intent": "merge_commit",
+              "lane_change_attempted": false,
+              "lane_change_stalled": false,
+              "last_merge_rel_x": null,
+              "merge_event_this_step": false,
+              "merge_stall_cycles": 0,
+              "merged_into_ego_lane": false,
+              "overshoot": false,
+              "parse_ok": true,
+              "prev_self_lane": 0,
+              "protocol": "highway_runtime",
+              "raw_response": "",
+              "rel_x": 5.535,
+              "role": "Striker",
+              "same_lane_lead_established": false,
+              "sanitized_response": "",
+              "self_lane": 0,
+              "speed_adv": 0.56,
+              "stale_merge_candidate": false,
+              "stale_merge_candidate_step": -1,
+              "step": 412,
+              "target_lc": 0,
+              "teammate_intent": "seal_escape",
+              "teammate_phase": "strike",
+              "teammate_tactic": {
+                "gap_band": "tight",
+                "intent": "seal_escape",
+                "lane_policy": "block_side",
+                "message": "Blocking right side to seal escape.",
+                "mode": "track_pose",
+                "phase": "strike",
+                "sequence": [],
+                "speed_band": "press"
+              },
+              "valid_cut_in_merge": false,
+              "veh_id": "llm_1"
+            },
+            {
+              "attempt": 1,
+              "error": "",
+              "parse_ok": true,
+              "parsed_keys": [
+                "goal",
+                "intent",
+                "message",
+                "phase",
+                "urgency"
+              ],
+              "protocol": "highway_intent",
+              "raw_response": "{\n  \"intent\": \"merge_commit\",\n  \"message\": \"Merging left to pass.\"\n}",
+              "role": "Striker",
+              "sanitized_response": "{\n  \"intent\": \"merge_commit\",\n  \"message\": \"Merging left to pass.\"\n}",
+              "step": 416,
+              "veh_id": "llm_1"
+            },
+            {
+              "attempt": 1,
+              "error": "",
+              "parse_ok": true,
+              "parsed_keys": [
+                "mode",
+                "reason"
+              ],
+              "protocol": "highway_action_gate",
+              "raw_response": "{\"mode\": \"recompute\", \"reason\": \"hard_refresh\"}",
+              "role": "Striker",
+              "sanitized_response": "{\"mode\": \"recompute\", \"reason\": \"hard_refresh\"}",
+              "step": 416,
+              "veh_id": "llm_1"
+            },
+            {
+              "attempt": 1,
+              "error": "",
+              "parse_ok": true,
+              "parsed_keys": [
+                "message",
+                "tactic"
+              ],
+              "protocol": "highway_tactic",
+              "raw_response": "{\n  \"message\": \"Merging left to pass with aggressive lane change.\",\n  \"tactic\": {\n    \"style\": \"aggressive\",\n    \"sequence\": [\"gain_lead\", \"commit_lane_change\", \"front_brake\"],\n    \"speed_delta_hint_mps\": 1.5,\n    \"lead_gap_hint_m\": 2.5,\n    \"hold_cycles\": 2\n  }\n}",
+              "role": "Striker",
+              "sanitized_response": "{\n  \"message\": \"Merging left to pass with aggressive lane change.\",\n  \"tactic\": {\n    \"style\": \"aggressive\",\n    \"sequence\": [\"gain_lead\", \"commit_lane_change\", \"front_brake\"],\n    \"speed_delta_hint_mps\": 1.5,\n    \"lead_gap_hint_m\": 2.5,\n    \"hold_cycles\": 2\n  }\n}",
+              "step": 416,
+              "veh_id": "llm_1"
+            },
+            {
+              "aggressive_cut_in_ready": false,
+              "approach_window_ready": true,
+              "attempt": 0,
+              "bad_merge_event": false,
+              "bad_merge_reason": "",
+              "clean_merge_failed": false,
+              "contract_pass_side": "left",
+              "ego_lane": 1,
+              "error": "",
+              "executor_state": "merge_wait_gap",
+              "force_cut_in_blocked_reason": "too_close",
+              "front_brake_triggered": false,
+              "intent": "merge_commit",
+              "lane_change_attempted": false,
+              "lane_change_stalled": false,
+              "last_merge_rel_x": null,
+              "merge_event_this_step": false,
+              "merge_stall_cycles": 0,
+              "merged_into_ego_lane": false,
+              "overshoot": false,
+              "parse_ok": true,
+              "prev_self_lane": 0,
+              "protocol": "highway_runtime",
+              "raw_response": "",
+              "rel_x": 5.762,
+              "role": "Striker",
+              "same_lane_lead_established": false,
+              "sanitized_response": "",
+              "self_lane": 0,
+              "speed_adv": 0.569,
+              "stale_merge_candidate": false,
+              "stale_merge_candidate_step": -1,
+              "step": 416,
+              "target_lc": 0,
+              "teammate_intent": "seal_escape",
+              "teammate_phase": "strike",
+              "teammate_tactic": {
+                "gap_band": "tight",
+                "intent": "seal_escape",
+                "lane_policy": "block_side",
+                "message": "Blocking right side to seal escape.",
+                "mode": "track_pose",
+                "phase": "strike",
+                "sequence": [],
+                "speed_band": "press"
+              },
+              "valid_cut_in_merge": false,
+              "veh_id": "llm_1"
+            }
+          ],
+          "merge_attempt_steps": 2,
+          "merge_commit_until_step": 442,
+          "merge_event_this_step": false,
+          "merge_stall_cycles": 0,
+          "merged_into_ego_lane": false,
+          "normalization_repairs": 2,
+          "overshoot": false,
+          "pass_side": "left",
+          "phase_trace": [
+            {
+              "intent": "merge_commit",
+              "mode": "track_pose",
+              "phase": "strike",
+              "step": 292
+            },
+            {
+              "intent": "merge_commit",
+              "mode": "track_pose",
+              "phase": "strike",
+              "step": 296
+            },
+            {
+              "intent": "merge_commit",
+              "mode": "track_pose",
+              "phase": "strike",
+              "step": 300
+            },
+            {
+              "intent": "merge_commit",
+              "mode": "track_pose",
+              "phase": "strike",
+              "step": 304
+            },
+            {
+              "intent": "merge_commit",
+              "mode": "track_pose",
+              "phase": "strike",
+              "step": 308
+            },
+            {
+              "intent": "merge_commit",
+              "mode": "track_pose",
+              "phase": "strike",
+              "step": 312
+            },
+            {
+              "intent": "merge_commit",
+              "mode": "track_pose",
+              "phase": "strike",
+              "step": 316
+            },
+            {
+              "intent": "merge_commit",
+              "mode": "track_pose",
+              "phase": "strike",
+              "step": 320
+            },
+            {
+              "intent": "merge_commit",
+              "mode": "track_pose",
+              "phase": "strike",
+              "step": 324
+            },
+            {
+              "intent": "merge_commit",
+              "mode": "track_pose",
+              "phase": "strike",
+              "step": 328
+            },
+            {
+              "intent": "merge_commit",
+              "mode": "track_pose",
+              "phase": "strike",
+              "step": 332
+            },
+            {
+              "intent": "merge_commit",
+              "mode": "track_pose",
+              "phase": "strike",
+              "step": 336
+            },
+            {
+              "intent": "merge_commit",
+              "mode": "track_pose",
+              "phase": "strike",
+              "step": 340
+            },
+            {
+              "intent": "merge_commit",
+              "mode": "track_pose",
+              "phase": "strike",
+              "step": 344
+            },
+            {
+              "intent": "merge_commit",
+              "mode": "track_pose",
+              "phase": "strike",
+              "step": 348
+            },
+            {
+              "intent": "merge_commit",
+              "mode": "track_pose",
+              "phase": "strike",
+              "step": 352
+            },
+            {
+              "intent": "merge_commit",
+              "mode": "track_pose",
+              "phase": "strike",
+              "step": 356
+            },
+            {
+              "intent": "merge_commit",
+              "mode": "track_pose",
+              "phase": "strike",
+              "step": 360
+            },
+            {
+              "intent": "merge_commit",
+              "mode": "track_pose",
+              "phase": "strike",
+              "step": 364
+            },
+            {
+              "intent": "merge_commit",
+              "mode": "track_pose",
+              "phase": "strike",
+              "step": 368
+            },
+            {
+              "intent": "merge_commit",
+              "mode": "track_pose",
+              "phase": "strike",
+              "step": 372
+            },
+            {
+              "intent": "merge_commit",
+              "mode": "track_pose",
+              "phase": "strike",
+              "step": 376
+            },
+            {
+              "intent": "merge_commit",
+              "mode": "track_pose",
+              "phase": "strike",
+              "step": 380
+            },
+            {
+              "intent": "merge_commit",
+              "mode": "track_pose",
+              "phase": "strike",
+              "step": 384
+            },
+            {
+              "intent": "merge_commit",
+              "mode": "track_pose",
+              "phase": "strike",
+              "step": 388
+            },
+            {
+              "intent": "merge_commit",
+              "mode": "track_pose",
+              "phase": "strike",
+              "step": 392
+            },
+            {
+              "intent": "merge_commit",
+              "mode": "track_pose",
+              "phase": "strike",
+              "step": 396
+            },
+            {
+              "intent": "merge_commit",
+              "mode": "track_pose",
+              "phase": "strike",
+              "step": 400
+            },
+            {
+              "intent": "merge_commit",
+              "mode": "track_pose",
+              "phase": "strike",
+              "step": 404
+            },
+            {
+              "intent": "merge_commit",
+              "mode": "track_pose",
+              "phase": "strike",
+              "step": 408
+            },
+            {
+              "intent": "merge_commit",
+              "mode": "track_pose",
+              "phase": "strike",
+              "step": 412
+            },
+            {
+              "intent": "merge_commit",
+              "mode": "track_pose",
+              "phase": "strike",
+              "step": 416
+            }
+          ],
+          "prev_self_lane": 0,
+          "repair_fallback_used": 0,
+          "repaired_fields": [
+            "speed_delta_hint_mps",
+            "sequence"
+          ],
+          "role": "Striker",
+          "role_map": {
+            "llm_0": "Blocker",
+            "llm_1": "Striker"
+          },
+          "role_resolution_fallback_used": 0,
+          "role_source": "llm_negotiated",
+          "rollout_parse_fallback_used": 0,
+          "scene_gate_status": {
+            "accepted": true,
+            "background_nearby_count": 0,
+            "blocker_id": "llm_0",
+            "blocker_rel_lane": 1,
+            "blocker_rel_x": 14.0,
+            "projected_striker_rel_x": 1.0,
+            "reason": "accepted",
+            "sample_index": 1,
+            "sampling_strategy": "three_car_fixed_negotiated_opening",
+            "scene_mode": "three_car_fixed_negotiated",
+            "striker_id": "llm_1",
+            "striker_rel_lane": -1,
+            "striker_rel_x": -5.0,
+            "striker_speed_adv": 3.0
+          },
+          "seal_escape_until_step": -1,
+          "stale_merge_candidate": false,
+          "stale_merge_candidate_step": -1,
+          "striker_became_ego_leader": false,
+          "striker_completed_cut_in": false,
+          "striker_lane_change_time": null,
+          "striker_rel_x_at_lane_change": null,
+          "sync_error_events": 0,
+          "target_abs_lane": 1,
+          "target_s": 0.5,
+          "target_v": 31.4355887014119,
+          "terminal_lock_reason": "",
+          "terminal_lock_step": -1,
+          "terminal_plan_locked": false,
+          "trigger_not_met_events": 0,
+          "urgency": "high",
+          "valid_cut_in_merge": false,
+          "veh_id": "llm_1"
+        }
+      },
+      "llm_stats": {
+        "llm_0": {
+          "block_side": "right",
+          "contract_source": "negotiated",
+          "fallback_activations": 0,
+          "last_parse_error": "",
+          "last_phase": "strike",
+          "last_raw_response": "{\n  \"intent\": \"seal_escape\",\n  \"message\": \"Blocking right, forcing ego left.\"\n}",
+          "model": "deepseek-chat",
+          "normalization_repairs": 14,
+          "parse_failures": 0,
+          "pass_side": "left",
+          "repair_fallback_used": 0,
+          "role": "Blocker",
+          "role_source": "llm_negotiated",
+          "terminal_lock_reason": "",
+          "terminal_plan_locked": false,
+          "veh_id": "llm_0"
+        },
+        "llm_1": {
+          "block_side": "right",
+          "contract_source": "negotiated",
+          "fallback_activations": 0,
+          "last_parse_error": "",
+          "last_phase": "strike",
+          "last_raw_response": "{\n  \"message\": \"Merging left to pass with aggressive lane change.\",\n  \"tactic\": {\n    \"style\": \"aggressive\",\n    \"sequence\": [\"gain_lead\", \"commit_lane_change\", \"front_brake\"],\n    \"speed_delta_hint_mps\": 1.5,\n    \"lead_gap_hint_m\": 2.5,\n    \"hold_cycles\": 2\n  }\n}",
+          "model": "deepseek-chat",
+          "normalization_repairs": 2,
+          "parse_failures": 0,
+          "pass_side": "left",
+          "repair_fallback_used": 0,
+          "role": "Striker",
+          "role_source": "llm_negotiated",
+          "terminal_lock_reason": "",
+          "terminal_plan_locked": false,
+          "veh_id": "llm_1"
+        }
+      },
+      "merge_attempt_steps": 2,
+      "merged_into_ego_lane": false,
+      "min_ttc": null,
+      "normalization_repairs": 16,
+      "overshoot": false,
+      "pass_side": "left",
+      "result": "collision",
+      "role_map": {
+        "llm_0": "Blocker",
+        "llm_1": "Striker"
+      },
+      "role_source": "llm_negotiated",
+      "sampling_strategy": "three_car_fixed_negotiated_opening",
+      "scenario_id": "20260428-112230_5865466388425964754",
+      "scene_gate_status": {
+        "accepted": true,
+        "background_nearby_count": 0,
+        "blocker_id": "llm_0",
+        "blocker_rel_lane": 1,
+        "blocker_rel_x": 14.0,
+        "projected_striker_rel_x": 1.0,
+        "reason": "accepted",
+        "sample_index": 1,
+        "sampling_strategy": "three_car_fixed_negotiated_opening",
+        "scene_mode": "three_car_fixed_negotiated",
+        "striker_id": "llm_1",
+        "striker_rel_lane": -1,
+        "striker_rel_x": -5.0,
+        "striker_speed_adv": 3.0
+      },
+      "striker_completed_cut_in": false,
+      "striker_lane_change_time": null,
+      "striker_rel_x_at_lane_change": null,
+      "sync_error": false,
+      "valid_cut_in_merge": false
+    },
+    {
+      "crashed": false,
+      "ego_accel_samples": 3,
+      "ego_comfort": 0.5647,
+      "ego_comfort_samples": 3,
+      "ego_jerk_samples": 2,
+      "ego_max_abs_accel": 0.774,
+      "ego_max_abs_jerk": 0.033,
+      "ego_max_decel": 0.0,
+      "ego_mean_abs_accel": 0.771,
+      "ego_mean_abs_jerk": 0.033,
+      "ego_rms_jerk": 0.033,
+      "feedback_summary": "interrupted_by_user",
+      "interrupted": true,
+      "iteration": 2,
+      "llm_diagnostics": {
+        "llm_0": {
+          "action_reuse_count": 0,
+          "active_control_mode": "track_pose",
+          "active_phase": "compress",
+          "bad_merge_event": false,
+          "bad_merge_reason": "",
+          "block_side": "right",
+          "brake_armed": false,
+          "clean_merge_failed": false,
+          "contract_source": "negotiated",
+          "current_decision": {
+            "action_sequence_text": "Hold right side slot, deny escape.",
+            "control": {
+              "horizon_steps": 8,
+              "mode": "track_pose"
+            },
+            "intent_plan": {
+              "goal": "Hold the block-side side-front slot and deny escape space.",
+              "intent": "hold_side_front",
+              "message": "Maintain position alongside ego to block right side.",
+              "phase": "compress",
+              "urgency": "mid"
+            },
+            "message": {
+              "expires_at_step": 12,
+              "intent": "hold_side_front",
+              "phase": "compress",
+              "sender": "llm_0",
+              "step": 4,
+              "target": "ego_0"
+            },
+            "message_text": "Hold right side slot, deny escape.",
+            "tactic": {
+              "gap_band": "medium",
+              "hold_cycles": 2,
+              "lane_policy": "block_side",
+              "lead_gap_hint_m": 2.5,
+              "mode": "track_pose",
+              "sequence": [
+                "hold_side_front",
+                "seal_escape"
+              ],
+              "speed_band": "press",
+              "speed_delta_hint_mps": 2.0,
+              "style": "aggressive",
+              "tactic_hints": {
+                "hold_cycles": 2,
+                "lead_gap_hint_m": 2.5,
+                "sequence": [
+                  "hold_side_front",
+                  "seal_escape"
+                ],
+                "speed_delta_hint_mps": 2.0
+              }
+            }
+          },
+          "executor_state": "hold",
+          "force_cut_in_blocked_reason": "",
+          "front_brake_triggered": false,
+          "geometry_role_hint": {
+            "llm_0": "Blocker",
+            "llm_1": "Striker"
+          },
+          "intent": "hold_side_front",
+          "lane_change_stalled": false,
+          "last_action_refresh_reason": "missing_signature",
+          "last_action_rel_x_bucket": "gt_10",
+          "last_action_reused": false,
+          "last_bad_merge_event_step": -1,
+          "last_history_injection_phase": "compress",
+          "last_lane_change_attempted": false,
+          "last_local_ready": {
+            "approach_window_ready": false,
+            "blocker_side_front_ready": false,
+            "front_brake_window_ready": false,
+            "merged_into_ego_lane": false,
+            "overshoot": false,
+            "same_lane_lead_established": false,
+            "speed_adv": 0.542,
+            "teammate_block_band_ready": false,
+            "teammate_pass_window_ready": false
+          },
+          "last_merge_event_step": -1,
+          "last_merge_rel_x": null,
+          "last_published_trigger_satisfied": true,
+          "last_teammate_intent": "gain_lead",
+          "last_teammate_phase": "compress",
+          "last_teammate_tactic": {},
+          "last_valid_merge_event_step": -1,
+          "latest_action_sequence_text": "Hold right side slot, deny escape.",
+          "latest_intent_plan": {
+            "goal": "Hold the block-side side-front slot and deny escape space.",
+            "intent": "hold_side_front",
+            "message": "Maintain position alongside ego to block right side.",
+            "phase": "compress",
+            "urgency": "mid"
+          },
+          "latest_tactic_profile": {
+            "gap_band": "medium",
+            "hold_cycles": 2,
+            "lane_policy": "block_side",
+            "lead_gap_hint_m": 2.5,
+            "mode": "track_pose",
+            "sequence": [
+              "hold_side_front",
+              "seal_escape"
+            ],
+            "speed_band": "press",
+            "speed_delta_hint_mps": 2.0,
+            "style": "aggressive",
+            "tactic_hints": {
+              "hold_cycles": 2,
+              "lead_gap_hint_m": 2.5,
+              "sequence": [
+                "hold_side_front",
+                "seal_escape"
+              ],
+              "speed_delta_hint_mps": 2.0
+            }
+          },
+          "lead_acquired": false,
+          "llm_trace_tail": [
+            {
+              "attempt": 1,
+              "error": "",
+              "parse_ok": true,
+              "parsed_keys": [
+                "goal",
+                "intent",
+                "message",
+                "phase",
+                "urgency"
+              ],
+              "protocol": "highway_intent",
+              "raw_response": "{\n  \"intent\": \"hold_side_front\",\n  \"message\": \"Maintain position alongside ego to block right side.\"\n}",
+              "role": "Blocker",
+              "sanitized_response": "{\n  \"intent\": \"hold_side_front\",\n  \"message\": \"Maintain position alongside ego to block right side.\"\n}",
+              "step": 4,
+              "veh_id": "llm_0"
+            },
+            {
+              "attempt": 1,
+              "error": "",
+              "parse_ok": true,
+              "parsed_keys": [
+                "mode",
+                "reason"
+              ],
+              "protocol": "highway_action_gate",
+              "raw_response": "{\"mode\": \"recompute\", \"reason\": \"missing_signature\"}",
+              "role": "Blocker",
+              "sanitized_response": "{\"mode\": \"recompute\", \"reason\": \"missing_signature\"}",
+              "step": 4,
+              "veh_id": "llm_0"
+            },
+            {
+              "attempt": 1,
+              "error": "",
+              "parse_ok": true,
+              "parsed_keys": [
+                "message",
+                "tactic"
+              ],
+              "protocol": "highway_tactic",
+              "raw_response": "{\n  \"message\": \"Hold right side slot, deny escape.\",\n  \"tactic\": {\n    \"style\": \"aggressive\",\n    \"sequence\": [\"hold_side_front\", \"seal_escape\"],\n    \"speed_delta_hint_mps\": 2.0,\n    \"lead_gap_hint_m\": 2.5,\n    \"hold_cycles\": 2\n  }\n}",
+              "role": "Blocker",
+              "sanitized_response": "{\n  \"message\": \"Hold right side slot, deny escape.\",\n  \"tactic\": {\n    \"style\": \"aggressive\",\n    \"sequence\": [\"hold_side_front\", \"seal_escape\"],\n    \"speed_delta_hint_mps\": 2.0,\n    \"lead_gap_hint_m\": 2.5,\n    \"hold_cycles\": 2\n  }\n}",
+              "step": 4,
+              "veh_id": "llm_0"
+            }
+          ],
+          "merge_attempt_steps": 0,
+          "merge_commit_until_step": -1,
+          "merge_event_this_step": false,
+          "merge_stall_cycles": 0,
+          "merged_into_ego_lane": false,
+          "normalization_repairs": 0,
+          "overshoot": false,
+          "pass_side": "left",
+          "phase_trace": [
+            {
+              "intent": "hold_side_front",
+              "mode": "track_pose",
+              "phase": "compress",
+              "step": 4
+            }
+          ],
+          "prev_self_lane": 2,
+          "repair_fallback_used": 0,
+          "repaired_fields": [],
+          "role": "Blocker",
+          "role_map": {
+            "llm_0": "Blocker",
+            "llm_1": "Striker"
+          },
+          "role_resolution_fallback_used": 0,
+          "role_source": "llm_negotiated",
+          "rollout_parse_fallback_used": 0,
+          "scene_gate_status": {
+            "accepted": true,
+            "background_nearby_count": 0,
+            "blocker_id": "llm_0",
+            "blocker_rel_lane": 1,
+            "blocker_rel_x": 14.0,
+            "projected_striker_rel_x": 1.0,
+            "reason": "accepted",
+            "sample_index": 1,
+            "sampling_strategy": "three_car_fixed_negotiated_opening",
+            "scene_mode": "three_car_fixed_negotiated",
+            "striker_id": "llm_1",
+            "striker_rel_lane": -1,
+            "striker_rel_x": -5.0,
+            "striker_speed_adv": 3.0
+          },
+          "seal_escape_until_step": -1,
+          "stale_merge_candidate": false,
+          "stale_merge_candidate_step": -1,
+          "striker_became_ego_leader": false,
+          "striker_completed_cut_in": false,
+          "striker_lane_change_time": null,
+          "striker_rel_x_at_lane_change": null,
+          "sync_error_events": 0,
+          "target_abs_lane": 2,
+          "target_s": 0.5,
+          "target_v": 21.531279971668994,
+          "terminal_lock_reason": "",
+          "terminal_lock_step": -1,
+          "terminal_plan_locked": false,
+          "trigger_not_met_events": 0,
+          "urgency": "mid",
+          "valid_cut_in_merge": false,
+          "veh_id": "llm_0"
+        },
+        "llm_1": {
+          "action_reuse_count": 0,
+          "active_control_mode": "disengage",
+          "active_phase": "attack",
+          "bad_merge_event": false,
+          "bad_merge_reason": "",
+          "block_side": "right",
+          "brake_armed": false,
+          "clean_merge_failed": false,
+          "contract_source": "negotiated",
+          "current_decision": {
+            "action_sequence_text": "gain lead via pass side with medium gap and press speed.",
+            "control": {
+              "horizon_steps": 8,
+              "mode": "track_pose"
+            },
+            "intent_plan": {
+              "goal": "Gain a front or side-front position from the pass side.",
+              "intent": "gain_lead",
+              "message": "Gain a front or side-front position from the pass side.",
+              "phase": "compress",
+              "urgency": "mid"
+            },
+            "message": {
+              "expires_at_step": 9,
+              "intent": "gain_lead",
+              "phase": "compress",
+              "sender": "llm_1",
+              "step": 1,
+              "target": "ego_0"
+            },
+            "message_text": "gain lead via pass side with medium gap and press speed.",
+            "tactic": {
+              "gap_band": "medium",
+              "lane_policy": "pass_side",
+              "mode": "track_pose",
+              "speed_band": "press"
+            }
+          },
+          "executor_state": "track_pose",
+          "force_cut_in_blocked_reason": "",
+          "front_brake_triggered": false,
+          "geometry_role_hint": {
+            "llm_0": "Blocker",
+            "llm_1": "Striker"
+          },
+          "intent": "gain_lead",
+          "lane_change_stalled": false,
+          "last_action_refresh_reason": "missing_signature",
+          "last_action_rel_x_bucket": "",
+          "last_action_reused": false,
+          "last_bad_merge_event_step": -1,
+          "last_history_injection_phase": "compress",
+          "last_lane_change_attempted": false,
+          "last_local_ready": {
+            "approach_window_ready": false,
+            "blocker_side_front_ready": false,
+            "front_brake_window_ready": false,
+            "merged_into_ego_lane": false,
+            "overshoot": false,
+            "same_lane_lead_established": false,
+            "speed_adv": 2.917,
+            "teammate_block_band_ready": false,
+            "teammate_pass_window_ready": false
+          },
+          "last_merge_event_step": -1,
+          "last_merge_rel_x": null,
+          "last_published_trigger_satisfied": null,
+          "last_teammate_intent": "hold_side_front",
+          "last_teammate_phase": "compress",
+          "last_teammate_tactic": {
+            "gap_band": "medium",
+            "intent": "hold_side_front",
+            "lane_policy": "block_side",
+            "message": "Hold right side slot, deny escape.",
+            "mode": "track_pose",
+            "phase": "compress",
+            "sequence": [],
+            "speed_band": "press"
+          },
+          "last_valid_merge_event_step": -1,
+          "latest_action_sequence_text": "",
+          "latest_intent_plan": {
+            "goal": "Gain a front or side-front position from the pass side.",
+            "intent": "gain_lead",
+            "message": "Accelerate to overtake ego on left side.",
+            "phase": "compress",
+            "urgency": "mid"
+          },
+          "latest_tactic_profile": {},
+          "lead_acquired": false,
+          "llm_trace_tail": [
+            {
+              "attempt": 1,
+              "error": "",
+              "parse_ok": true,
+              "parsed_keys": [
+                "goal",
+                "intent",
+                "message",
+                "phase",
+                "urgency"
+              ],
+              "protocol": "highway_intent",
+              "raw_response": "{\n  \"intent\": \"gain_lead\",\n  \"message\": \"Accelerate to overtake ego on left side.\"\n}",
+              "role": "Striker",
+              "sanitized_response": "{\n  \"intent\": \"gain_lead\",\n  \"message\": \"Accelerate to overtake ego on left side.\"\n}",
+              "step": 4,
+              "veh_id": "llm_1"
+            },
+            {
+              "attempt": 1,
+              "error": "",
+              "parse_ok": true,
+              "parsed_keys": [
+                "mode",
+                "reason"
+              ],
+              "protocol": "highway_action_gate",
+              "raw_response": "{\"mode\": \"recompute\", \"reason\": \"missing_signature\"}",
+              "role": "Striker",
+              "sanitized_response": "{\"mode\": \"recompute\", \"reason\": \"missing_signature\"}",
+              "step": 4,
+              "veh_id": "llm_1"
+            }
+          ],
+          "merge_attempt_steps": 0,
+          "merge_commit_until_step": -1,
+          "merge_event_this_step": false,
+          "merge_stall_cycles": 0,
+          "merged_into_ego_lane": false,
+          "normalization_repairs": 0,
+          "overshoot": false,
+          "pass_side": "left",
+          "phase_trace": [],
+          "prev_self_lane": 0,
+          "repair_fallback_used": 0,
+          "repaired_fields": [],
+          "role": "Striker",
+          "role_map": {
+            "llm_0": "Blocker",
+            "llm_1": "Striker"
+          },
+          "role_resolution_fallback_used": 0,
+          "role_source": "llm_negotiated",
+          "rollout_parse_fallback_used": 0,
+          "scene_gate_status": {
+            "accepted": true,
+            "background_nearby_count": 0,
+            "blocker_id": "llm_0",
+            "blocker_rel_lane": 1,
+            "blocker_rel_x": 14.0,
+            "projected_striker_rel_x": 1.0,
+            "reason": "accepted",
+            "sample_index": 1,
+            "sampling_strategy": "three_car_fixed_negotiated_opening",
+            "scene_mode": "three_car_fixed_negotiated",
+            "striker_id": "llm_1",
+            "striker_rel_lane": -1,
+            "striker_rel_x": -5.0,
+            "striker_speed_adv": 3.0
+          },
+          "seal_escape_until_step": -1,
+          "stale_merge_candidate": false,
+          "stale_merge_candidate_step": -1,
+          "striker_became_ego_leader": false,
+          "striker_completed_cut_in": false,
+          "striker_lane_change_time": null,
+          "striker_rel_x_at_lane_change": null,
+          "sync_error_events": 0,
+          "target_abs_lane": 0,
+          "target_s": 0.5,
+          "target_v": 28.729104447567927,
+          "terminal_lock_reason": "",
+          "terminal_lock_step": -1,
+          "terminal_plan_locked": false,
+          "trigger_not_met_events": 0,
+          "urgency": "mid",
+          "valid_cut_in_merge": false,
+          "veh_id": "llm_1"
+        }
+      },
+      "llm_stats": {
+        "llm_0": {
+          "block_side": "right",
+          "contract_source": "negotiated",
+          "fallback_activations": 0,
+          "last_parse_error": "",
+          "last_phase": "compress",
+          "last_raw_response": "{\n  \"message\": \"Hold right side slot, deny escape.\",\n  \"tactic\": {\n    \"style\": \"aggressive\",\n    \"sequence\": [\"hold_side_front\", \"seal_escape\"],\n    \"speed_delta_hint_mps\": 2.0,\n    \"lead_gap_hint_m\": 2.5,\n    \"hold_cycles\": 2\n  }\n}",
+          "model": "deepseek-chat",
+          "normalization_repairs": 0,
+          "parse_failures": 0,
+          "pass_side": "left",
+          "repair_fallback_used": 0,
+          "role": "Blocker",
+          "role_source": "llm_negotiated",
+          "terminal_lock_reason": "",
+          "terminal_plan_locked": false,
+          "veh_id": "llm_0"
+        },
+        "llm_1": {
+          "block_side": "right",
+          "contract_source": "negotiated",
+          "fallback_activations": 0,
+          "last_parse_error": "",
+          "last_phase": "attack",
+          "last_raw_response": "{\n  \"intent\": \"gain_lead\",\n  \"message\": \"Accelerate to overtake ego on left side.\"\n}",
+          "model": "deepseek-chat",
+          "normalization_repairs": 0,
+          "parse_failures": 0,
+          "pass_side": "left",
+          "repair_fallback_used": 0,
+          "role": "Striker",
+          "role_source": "llm_negotiated",
+          "terminal_lock_reason": "",
+          "terminal_plan_locked": false,
+          "veh_id": "llm_1"
+        }
+      },
+      "min_ttc": null,
+      "normalization_repairs": 0,
+      "result": "interrupted",
+      "role_map": {
+        "llm_0": "Blocker",
+        "llm_1": "Striker"
+      },
+      "sampling_strategy": "three_car_fixed_negotiated_opening",
+      "scenario_id": "20260428-112230_5865466388425964754",
+      "scene_gate_status": {
+        "accepted": true,
+        "background_nearby_count": 0,
+        "blocker_id": "llm_0",
+        "blocker_rel_lane": 1,
+        "blocker_rel_x": 14.0,
+        "projected_striker_rel_x": 1.0,
+        "reason": "accepted",
+        "sample_index": 1,
+        "sampling_strategy": "three_car_fixed_negotiated_opening",
+        "scene_mode": "three_car_fixed_negotiated",
+        "striker_id": "llm_1",
+        "striker_rel_lane": -1,
+        "striker_rel_x": -5.0,
+        "striker_speed_adv": 3.0
+      },
+      "steps_executed": 3
+    }
+  ],
+  "iterations_completed": 2,
+  "llm_max_retries": "3",
+  "llm_neighbor_k": "6",
+  "llm_timeout_s": "45",
+  "llm_trace_file": "./data/highway_20260428-112230/llm_trace.jsonl",
+  "model": "deepseek-chat",
+  "pass_side": "left",
+  "role_map": {
+    "llm_0": "Blocker",
+    "llm_1": "Striker"
+  },
+  "role_source": "llm_negotiated",
+  "run_started_at": "20260428-112230",
+  "sampling_strategy": "three_car_fixed_negotiated_opening",
+  "scenario_id": "20260428-112230_5865466388425964754",
+  "scene_gate_status": {
+    "accepted": true,
+    "background_nearby_count": 0,
+    "blocker_id": "llm_0",
+    "blocker_rel_lane": 1,
+    "blocker_rel_x": 14.0,
+    "projected_striker_rel_x": 1.0,
+    "reason": "accepted",
+    "sample_index": 1,
+    "sampling_strategy": "three_car_fixed_negotiated_opening",
+    "scene_mode": "three_car_fixed_negotiated",
+    "striker_id": "llm_1",
+    "striker_rel_lane": -1,
+    "striker_rel_x": -5.0,
+    "striker_speed_adv": 3.0
+  }
+}

@@ -329,7 +329,13 @@ class Env(gym.Env, metaclass=ABCMeta):
             if not controller.uses_coordinated_planning():
                 continue
             controllers.append(controller)
-        controllers.sort(key=lambda controller: getattr(controller, "veh_id", ""))
+        controllers.sort(
+            key=lambda controller: (
+                controller.get_coordinated_planning_order_key()
+                if hasattr(controller, "get_coordinated_planning_order_key")
+                else (1, getattr(controller, "veh_id", ""))
+            )
+        )
         return controllers
 
     def _run_controlled_planning(self):
@@ -339,10 +345,40 @@ class Env(gym.Env, metaclass=ABCMeta):
 
         step = int(self.time_counter)
         self.message_pool.begin_control_cycle(step)
-        snapshot = self.message_pool.snapshot(step, viewer_id="coordinator")
+        if self.message_pool.is_control_cycle_planned(step):
+            return
+        structured_controllers = []
+        generic_controllers = []
         for controller in controllers:
-            controller.run_coordinated_step(self, snapshot=snapshot)
-            snapshot = self.message_pool.snapshot(step, viewer_id=controller.veh_id)
+            if (
+                    hasattr(controller, "uses_coordinated_structured_protocol")
+                    and controller.uses_coordinated_structured_protocol()):
+                structured_controllers.append(controller)
+            else:
+                generic_controllers.append(controller)
+
+        negotiated_snapshot = {}
+        if structured_controllers and hasattr(self.message_pool, "negotiated_snapshot"):
+            negotiated_snapshot = self.message_pool.negotiated_snapshot(step, viewer_id="coordinator")
+
+        for controller in structured_controllers:
+            if hasattr(controller, "prepare_intent_for_coordinated_step"):
+                controller.prepare_intent_for_coordinated_step(self, snapshot=negotiated_snapshot)
+            else:
+                controller.run_coordinated_step(self, snapshot=negotiated_snapshot)
+            negotiated_snapshot = self.message_pool.negotiated_snapshot(step, viewer_id=controller.veh_id)
+
+        if structured_controllers:
+            negotiated_snapshot = self.message_pool.negotiated_snapshot(step, viewer_id="coordinator")
+
+        for controller in structured_controllers:
+            controller.prepare_for_coordinated_step(self, snapshot=negotiated_snapshot)
+            negotiated_snapshot = self.message_pool.negotiated_snapshot(step, viewer_id=controller.veh_id)
+
+        for controller in generic_controllers:
+            controller.run_coordinated_step(self)
+
+        self.message_pool.mark_control_cycle_planned(step)
 
     def step(self, rl_actions):
         """Advance the environment by one step.
